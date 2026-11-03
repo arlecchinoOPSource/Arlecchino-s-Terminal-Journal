@@ -18,12 +18,17 @@ On this Mac, the workspace terminal supplies `DEVELOPER_DIR=/Applications/Xcode.
 ## Checks and builds
 
 ```sh
+npm run check        # everything below except the release build
 npm run lint
 npm run typecheck
-npm test
+npm test             # domain unit tests
+npm run test:ui      # Playwright UI tests (first run: npx playwright install chromium)
+npm run test:native  # cargo fmt/clippy/test and the SQLite schema check
 npm run build:web
 npm run build
 ```
+
+What each suite covers, and what it cannot prove, is described in [TESTING.md](TESTING.md). CI runs the same suite on every pull request.
 
 `build` creates a native release executable without distributing an installer. Signing, notarization, Windows installation, and release automation remain T-19. `npm run tauri -- build --bundles app` creates a local macOS app bundle for testing only.
 
