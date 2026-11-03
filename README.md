@@ -4,7 +4,7 @@ A private, lightweight writing environment that makes journaling effortless.
 
 ![Terminal identity](docs/reference/arlecchino-brand-mockup.png)
 
-**Status: project preparation. No application implementation or installable release yet.**
+**Status: early desktop development preview. No stable release yet.**
 
 Terminal is planned as an offline-first desktop journal for macOS and Windows. Open it, write with a compact rich-text toolbar, and find previous entries through title search and a chronological archive. Writing stays in a local SQLite database. No accounts, cloud dependency, analytics, advertising, or AI processing of journal content.
 
@@ -35,7 +35,7 @@ The accepted design includes autosave, full versioned JSON backup/restore, and r
 
 ## Development
 
-Work through T-01–T-20 in the documented order. T-03 will initialize the application; no `npm run dev`, app build, or feature tests exist at this preparation stage. See the development guide for verified tools and planned dependency setup.
+Open this folder in VS Code and run `npm run dev` in its terminal. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
 
 ## License
 

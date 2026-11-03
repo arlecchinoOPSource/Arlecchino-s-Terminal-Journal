@@ -1,6 +1,6 @@
 # Contributing to Terminal
 
-Read the PRD, UI design system, architecture, and AGENTS.md before changing behavior. The current stage is preparation only. Application implementation begins with an explicitly authorized backlog issue.
+Read the PRD, UI design system, architecture, and AGENTS.md before changing behavior. Application implementation is underway for explicitly authorized backlog issues.
 
 1. Select one issue and check its dependencies and acceptance criteria.
 2. Branch from current `main`: `feature/T-12-title-search`, `fix/T-08-save-error`, or `docs/T-01-specification`.
