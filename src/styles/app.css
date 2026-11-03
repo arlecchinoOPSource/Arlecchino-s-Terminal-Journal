@@ -164,3 +164,10 @@ select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .settings-about { margin: 16px 0 0; padding: 0 16px 16px; border-top: 1px solid var(--muted); }
 .settings-about p:last-child { margin: 0; font: .8125rem/1.6 var(--font-writing); }
 @media (max-width: 520px) { .settings-popover { left: 76px; width: calc(100% - 92px); } .settings-row select { width: auto; min-width: 0; flex: 1; } }
+.settings-keys dl { margin: 0; font-size: .75rem; }
+.settings-keys dl > div { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; border-top: 1px solid #84ac9a33; }
+.settings-keys dt { color: var(--mint); }
+.settings-keys dd { margin: 0; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+/* Focus rings on mint-filled surfaces need the dark colour to stay visible. */
+.popover header .icon-button:focus-visible, .archive-row[aria-current='true']:focus-visible, .settings-segmented label.selected input:focus-visible + span { outline-color: var(--near-black); }
+.popover header .icon-button:focus-visible { outline-offset: -4px; }
