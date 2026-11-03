@@ -1,4 +1,5 @@
 mod journal;
+mod preferences;
 mod storage;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -44,6 +45,22 @@ async fn journal_delete(
 }
 
 #[tauri::command]
+async fn preferences_get(
+    db: tauri::State<'_, Database>,
+) -> Result<preferences::Preferences, String> {
+    let mut guard = db.0.lock().map_err(|_| "Storage is unavailable")?;
+    preferences::get(guard.as_mut().map_err(|e| e.clone())?)
+}
+#[tauri::command]
+async fn preferences_set(
+    db: tauri::State<'_, Database>,
+    preferences: preferences::Preferences,
+) -> Result<(), String> {
+    let mut guard = db.0.lock().map_err(|_| "Storage is unavailable")?;
+    preferences::set(guard.as_mut().map_err(|e| e.clone())?, &preferences)
+}
+
+#[tauri::command]
 fn journal_finish_exit(app: tauri::AppHandle) {
     app.state::<ExitAllowed>().0.store(true, Ordering::SeqCst);
     app.exit(0);
@@ -63,7 +80,9 @@ pub fn run() {
             journal_select,
             journal_save,
             journal_delete,
-            journal_finish_exit
+            journal_finish_exit,
+            preferences_get,
+            preferences_set
         ])
         .setup(|app| {
             let database = (|| {

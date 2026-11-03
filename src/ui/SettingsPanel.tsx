@@ -1,0 +1,42 @@
+import { useId, type ReactNode } from 'react';
+import { DEFAULT_PREFERENCES, FONT_SIZE_RANGE, LINE_SPACINGS, WRITING_FONTS, WRITING_WIDTHS, type Preferences, type WritingFont } from '../domain/preferences';
+
+type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; children?: ReactNode };
+const sizes = Array.from({ length: FONT_SIZE_RANGE.max - FONT_SIZE_RANGE.min + 1 }, (_, i) => FONT_SIZE_RANGE.min + i);
+
+/** Editor preferences. Every change applies at once and is saved on this device. */
+export function SettingsPanel({ preferences, error, onChange, children }: Props) {
+  const id = useId();
+  const isDefault = (Object.keys(DEFAULT_PREFERENCES) as (keyof Preferences)[]).every(k => preferences[k] === DEFAULT_PREFERENCES[k]);
+  return <div className="settings">
+    <p className="settings-section">WRITING</p>
+    <label className="settings-row" htmlFor={`${id}-font`}><span>Font</span>
+      <select id={`${id}-font`} value={preferences.font} onChange={e => onChange({ font: e.target.value as WritingFont })}>
+        {WRITING_FONTS.map(f => <option key={f.id} value={f.id}>{f.label}{f.id === DEFAULT_PREFERENCES.font ? ' (default)' : ''}</option>)}
+      </select>
+    </label>
+    <label className="settings-row" htmlFor={`${id}-size`}><span>Text size</span>
+      <select id={`${id}-size`} value={preferences.font_size} onChange={e => onChange({ font_size: Number(e.target.value) })}>
+        {sizes.map(s => <option key={s} value={s}>{s} px{s === DEFAULT_PREFERENCES.font_size ? ' (default)' : ''}</option>)}
+      </select>
+    </label>
+    <Segmented legend="Writing width" name={`${id}-width`} options={WRITING_WIDTHS} value={preferences.writing_width} defaultValue={DEFAULT_PREFERENCES.writing_width} onChange={writing_width => onChange({ writing_width })} />
+    <Segmented legend="Line spacing" name={`${id}-spacing`} options={LINE_SPACINGS} value={preferences.line_spacing} defaultValue={DEFAULT_PREFERENCES.line_spacing} onChange={line_spacing => onChange({ line_spacing })} />
+    <div className="settings-actions">
+      <button type="button" className="settings-reset" disabled={isDefault} onClick={() => onChange({ ...DEFAULT_PREFERENCES })}>Reset to defaults</button>
+    </div>
+    <p className={error ? 'settings-status settings-error' : 'settings-status'} role={error ? 'alert' : 'status'}>{error ?? 'Changes apply immediately and are saved on this device.'}</p>
+    {children}
+  </div>;
+}
+
+type Option = { readonly value: number; readonly label: string };
+function Segmented({ legend, name, options, value, defaultValue, onChange }: { legend: string; name: string; options: readonly Option[]; value: number; defaultValue: number; onChange: (value: number) => void }) {
+  return <fieldset className="settings-segmented">
+    <legend>{legend} <span>default: {options.find(o => o.value === defaultValue)?.label}</span></legend>
+    <div>{options.map(o => <label key={o.value} className={o.value === value ? 'selected' : ''}>
+      <input type="radio" name={name} value={o.value} checked={o.value === value} onChange={() => onChange(o.value)} />
+      <span>{o.label}</span>
+    </label>)}</div>
+  </fieldset>;
+}
