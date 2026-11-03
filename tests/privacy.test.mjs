@@ -28,7 +28,8 @@ test('shipped code never writes logs, so journal content cannot reach them', () 
 test('the frontend makes no network requests and loads nothing remote', () => {
   const offenders = [];
   for (const f of files('src', ['.ts', '.tsx', '.css'])) {
-    const s = readFileSync(join(root, f), 'utf8');
+    // The SVG namespace inside inline data: images is an identifier, not a request.
+    const s = readFileSync(join(root, f), 'utf8').replaceAll('http://www.w3.org/2000/svg', '');
     if (/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|https?:\/\/(?!localhost)/.test(s)) offenders.push(f);
   }
   assert.deepEqual(offenders, []);
@@ -39,7 +40,7 @@ test('the frontend makes no network requests and loads nothing remote', () => {
 test('runtime dependencies are exactly the reviewed set', () => {
   const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
   assert.deepEqual(Object.keys(pkg.dependencies).sort(), [
-    '@fontsource/ibm-plex-mono', '@fontsource/ibm-plex-sans', '@fontsource/ibm-plex-sans-condensed', '@fontsource/ibm-plex-serif', '@fontsource/literata',
+    '@fontsource/ibm-plex-mono', '@fontsource/ibm-plex-sans', '@fontsource/ibm-plex-sans-condensed', '@fontsource/ibm-plex-serif', '@fontsource/literata', '@fontsource/orbitron',
     '@tauri-apps/api', '@tiptap/extension-table', '@tiptap/extension-text-align', '@tiptap/extension-text-style', '@tiptap/pm', '@tiptap/react', '@tiptap/starter-kit', 'react', 'react-dom',
   ]);
   const cargo = readFileSync(join(root, 'src-tauri/Cargo.toml'), 'utf8');

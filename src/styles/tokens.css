@@ -7,26 +7,43 @@
 @import '@fontsource/ibm-plex-serif/latin-400-italic.css';
 @import '@fontsource/literata/latin-400.css';
 @import '@fontsource/literata/latin-400-italic.css';
+@import '@fontsource/orbitron/latin-700.css';
+@import '@fontsource/orbitron/latin-900.css';
 
+/* Design system v0.3 — "Terminal 84" (docs/UI-DESIGN-SYSTEM-v0.3.md).
+   Text colours meet WCAG AA on every surface; control borders meet 3:1. */
 :root {
   color-scheme: dark;
-  --forest: #16231D;
-  --near-black: #090B0C;
-  --mint: #B0E2CC;
-  --muted: #84AC9A;
-  --raised: #20332A;
-  --focus: #D0F8E7;
-  --error: #F0A6A6;
-  --outline: 1px solid var(--mint);
-  --font-ui: 'IBM Plex Mono', monospace;
+  /* Surfaces, darkest to lightest */
+  --void: #04070A;      /* window canvas */
+  --gutter: #060B0E;    /* space beside the writing page */
+  --panel: #0A1116;     /* rail, toolbar, status bar, panels */
+  --page: #0C151A;      /* writing page */
+  --panel-2: #0F1A20;   /* inputs, hover, raised */
+  --tint: #11292A;      /* accent-tinted selection background */
+  /* Lines */
+  --line: #18292F;      /* quiet rules */
+  --line-2: #24464C;    /* frames */
+  --line-3: #3F7A7E;    /* control borders (3:1) */
+  /* Ink */
+  --text: #DDEFEA;
+  --text-2: #9FBDB6;
+  --muted: #7A9B95;
+  /* Signals */
+  --phosphor: #4FF0D0;     /* primary accent */
+  --phosphor-hi: #A6FFEE;  /* highlight, gradient top */
+  --phosphor-lo: #148E80;  /* gradient foot, dim accent */
+  --glow: rgba(79, 240, 208, .32);
+  --amber: #FFB648;        /* attention: unsaved, saving */
+  --danger: #FF6B78;       /* failures and destructive actions */
+  --focus: #B9FFF1;
+
+  --font-ui: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-display: 'Orbitron', 'IBM Plex Sans Condensed', sans-serif;
   --font-writing: 'IBM Plex Sans', sans-serif;
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --rail-width: 76px;
+  --radius: 3px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --rail-width: 72px;
   --writing-width: 720px;
   /* Writing preferences (T-13); overridden at runtime from saved settings. */
   --entry-font: 'IBM Plex Sans', sans-serif;

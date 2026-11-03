@@ -6,6 +6,7 @@ import { JournalController } from '../domain/journal-controller';
 import { repository } from '../persistence/repository';
 import { Shell } from '../ui/Shell';
 import { IconButton } from '../ui/IconButton';
+import { Icon } from '../ui/Icon';
 import { ArchivePanel } from '../ui/ArchivePanel';
 import { SearchPanel } from '../ui/SearchPanel';
 import { SettingsPanel } from '../ui/SettingsPanel';
@@ -20,6 +21,9 @@ import { FormattingToolbar } from './FormattingToolbar';
 import { ariaShortcut, isMacPlatform, shortcutLabel } from '../domain/shortcuts';
 
 const mac=isMacPlatform();
+const entryDate=(ms:number)=>new Date(ms).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}).toUpperCase();
+/** Visual tone of the save indicator; the status text itself is the accessible signal. */
+const statusTone=(status:string)=>status==='Saved'?'ok':status==='Empty draft'?'idle':status==='Saving…'||status==='Loading…'?'busy':status==='Unsaved changes'?'pending':'error';
 const errorText=(e:unknown)=>e instanceof Error?e.message:typeof e==='string'?e:'Something went wrong. Your journal has not been changed.';
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 
@@ -86,7 +90,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const dialog=useRef<HTMLDialogElement>(null);
   const editor=useEditor({
-    extensions:basicExtensions(),content:state.draft.content,autofocus:'start',
+    extensions:basicExtensions(),content:state.draft.content,autofocus:false,
     editable:state.ready&&!state.busy,
     editorProps:{attributes:{class:'journal-body',role:'textbox','aria-label':'Journal body','aria-multiline':'true','aria-describedby':'storage-status',spellcheck:'false',autocorrect:'off',autocapitalize:'off'}},
     onUpdate:({editor:current})=>controller.edit({content:current.getJSON()}),
@@ -94,6 +98,16 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   // Toggling editability must not emit an update; otherwise opening or switching
   // an entry would autosave unchanged content and reorder the archive.
   useEffect(()=>{editor?.setEditable(state.ready&&!state.busy,false);},[editor,state.ready,state.busy]);
+  // Put the caret in the body once the entry is editable, but only if nothing else has
+  // focus: never steal it from a panel opened by shortcut or from someone already typing.
+  const focusedOnce=useRef(false);
+  useEffect(()=>{
+    if(!editor||focusedOnce.current||!state.ready||state.busy)return;
+    focusedOnce.current=true;
+    // Focus synchronously after the check: Tiptap's focus command defers by another frame,
+    // which could steal focus from a panel opened in between.
+    requestAnimationFrame(()=>{const active=document.activeElement;if(editor.isDestroyed||(active&&active!==document.body))return;editor.commands.setTextSelection(1);editor.view.focus();});
+  },[editor,state.ready,state.busy]);
   const history=useEditorState({editor,selector:({editor:current})=>({canUndo:current?.can().undo()??false,canRedo:current?.can().redo()??false,isEmpty:current?.isEmpty??true})});
   const error=state.error??lifecycleError;
   const [exporting,setExporting]=useState(false);
@@ -113,18 +127,22 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy} settings={settings}
     search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
-    status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}
+    status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>} statusTone={statusTone(state.status)}
     formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
     historyControls={<><IconButton icon="undo" label="Undo" title={`Undo (${shortcutLabel('Mod+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Z',mac)} disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" title={`Redo (${shortcutLabel('Mod+Shift+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Shift+Z',mac)} disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
     <div className="writing-column">
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
       {notice&&<div className="journal-notice" role="status"><p>{notice}</p><button type="button" onClick={dismissNotice}>Dismiss</button></div>}
-      <div className="entry-navigation">
-        {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
-        <button type="button" disabled={!state.entry||state.busy||exporting} onClick={()=>void exportEntry()}>Export entry…</button>
-        <button type="button" disabled={!state.entry||state.busy} onClick={()=>dialog.current?.showModal()}>Delete entry</button>
+      <div className="entry-meta">
+        <span className="entry-label">ENTRY</span><span className="draft-label">{state.entry?`#${state.entry.entry_number}`:'DRAFT'}</span>
+        {state.entry&&<span className="entry-date">{entryDate(state.entry.created_at)}</span>}
+        <span className="entry-rule" aria-hidden="true" />
+        <div className="entry-actions">
+          <button type="button" className="ghost-button" title="Export this entry as a web page or plain text" disabled={!state.entry||state.busy||exporting} onClick={()=>void exportEntry()}><Icon name="export" /><span className="ghost-label">Export entry…</span></button>
+          <button type="button" className="ghost-button danger-hover" title="Delete this entry" disabled={!state.entry||state.busy} onClick={()=>dialog.current?.showModal()}><Icon name="trash" /><span className="ghost-label">Delete entry</span></button>
+        </div>
       </div>
-      <p className="entry-meta"><span className="entry-label">ENTRY</span><span className="draft-label">{state.entry?`#${state.entry.entry_number}`:'DRAFT'}</span></p>
+      {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
       <input className="entry-title" aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>controller.edit({title:e.target.value})} />
       <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<EditorContent editor={editor}/></div>
     </div>
