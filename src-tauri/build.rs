@@ -13,6 +13,7 @@ fn main() {
             "backup_choose",
             "backup_restore",
             "backup_cancel",
+            "entry_export",
         ]),
     ))
     .expect("could not build application permissions");

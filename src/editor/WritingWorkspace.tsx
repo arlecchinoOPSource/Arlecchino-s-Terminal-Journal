@@ -13,6 +13,8 @@ import { usePreferences } from '../ui/usePreferences';
 import { preferencesRepository } from '../persistence/preferences';
 import { backupRepository, type RestorePreview } from '../persistence/backup';
 import { BackupSection, RestoreDialog, type BackupStatus } from '../ui/BackupSection';
+import { entryToHtml, entryToText, exportFileStem } from '../domain/export';
+import { exportEntryFile } from '../persistence/entryExport';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
 import { ariaShortcut, isMacPlatform, shortcutLabel } from '../domain/shortcuts';
@@ -94,6 +96,19 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   useEffect(()=>{editor?.setEditable(state.ready&&!state.busy,false);},[editor,state.ready,state.busy]);
   const history=useEditorState({editor,selector:({editor:current})=>({canUndo:current?.can().undo()??false,canRedo:current?.can().redo()??false,isEmpty:current?.isEmpty??true})});
   const error=state.error??lifecycleError;
+  const [exporting,setExporting]=useState(false);
+  const [exportStatus,setExportStatus]=useState<{text:string;error?:boolean}|null>(null);
+  async function exportEntry(){
+    setExporting(true);setExportStatus(null);
+    try {
+      await controller.flush();
+      const {draft,entry}=controller.snapshot();if(!entry)return;
+      const exportable={title:draft.title,content:draft.content,created_at:entry.created_at,updated_at:entry.updated_at};
+      const saved=await exportEntryFile(exportFileStem(draft.title),entryToHtml(exportable),entryToText(exportable));
+      if(saved)setExportStatus({text:`Exported as “${saved}”.`});
+    } catch(e){setExportStatus({text:e instanceof Error?e.message:typeof e==='string'?e:'The entry could not be exported.',error:true});}
+    finally {setExporting(false);}
+  }
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy} settings={settings}
     search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
@@ -105,6 +120,8 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
       {notice&&<div className="journal-notice" role="status"><p>{notice}</p><button type="button" onClick={dismissNotice}>Dismiss</button></div>}
       <div className="entry-navigation">
+        {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
+        <button type="button" disabled={!state.entry||state.busy||exporting} onClick={()=>void exportEntry()}>Export entry…</button>
         <button type="button" disabled={!state.entry||state.busy} onClick={()=>dialog.current?.showModal()}>Delete entry</button>
       </div>
       <p className="entry-meta"><span className="entry-label">ENTRY</span><span className="draft-label">{state.entry?`#${state.entry.entry_number}`:'DRAFT'}</span></p>
@@ -112,6 +129,6 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
       <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<EditorContent editor={editor}/></div>
     </div>
     {restoreDialog}
-    <dialog ref={dialog} aria-labelledby="delete-title"><h2 id="delete-title">Delete this entry?</h2><p>This removes the entry from this device. This cannot be undone.</p><form method="dialog"><button autoFocus>Cancel</button><button className="destructive" onClick={()=>void controller.remove()}>Delete entry</button></form></dialog>
+    <dialog ref={dialog} aria-labelledby="delete-title"><h2 id="delete-title">Delete “{state.draft.title.trim()||'Untitled'}”?</h2><p>This removes the entry from this device and from Archives and Search. It cannot be undone. To keep a copy, cancel and use Export entry first.</p><form method="dialog"><button autoFocus>Cancel</button><button className="destructive" onClick={()=>void controller.remove()}>Delete entry</button></form></dialog>
   </Shell>;
 }

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { JournalController } from '../src/domain/journal-controller.ts';
+import { searchTitles } from '../src/domain/search.ts';
 function fixture() {
   const rows=new Map();let number=0;const writes=[];
   const repo={last:async()=>null,list:async()=>[...rows.values()],select:async id=>rows.get(id)??null,delete:async id=>{rows.delete(id);},save:async d=>{writes.push({...d});const old=rows.get(d.id);const e={...d,revision:(old?.revision??0)+1,entry_number:old?.entry_number??++number,created_at:1,updated_at:1};rows.set(d.id,e);return e;}};
@@ -80,4 +81,15 @@ test('restore is not attempted when pending edits cannot be saved',async()=>{
   let called=false;
   await assert.rejects(c.replaceJournal(async()=>{called=true;}));
   assert.equal(called,false);assert.equal(c.snapshot().draft.title,'Unsaved');assert.equal(c.snapshot().busy,false);
+});
+test('deleting an entry removes it from the archive list and search results',async()=>{
+  const {repo,rows}=fixture();const c=new JournalController(repo,60000);await c.initialize();
+  c.edit({title:'Lisbon keep'});await c.switchTo(null);c.edit({title:'Lisbon remove'});await c.flush();
+  const removed=c.snapshot().entry.id;
+  assert.deepEqual(searchTitles(c.snapshot().entries,'lisbon').map(e=>e.title).sort(),['Lisbon keep','Lisbon remove']);
+  await c.remove();
+  assert.equal(rows.has(removed),false);
+  assert.deepEqual(c.snapshot().entries.map(e=>e.title),['Lisbon keep']);
+  assert.deepEqual(searchTitles(c.snapshot().entries,'lisbon').map(e=>e.title),['Lisbon keep']);
+  assert.equal(c.snapshot().entry,null);
 });
