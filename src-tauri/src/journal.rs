@@ -20,7 +20,7 @@ pub struct Summary {
     pub title: String,
     pub updated_at: i64,
 }
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct Save {
     pub id: String,
     pub title: String,
@@ -96,6 +96,53 @@ pub fn select(db: &mut Connection, id: Option<&str>) -> Result<Option<Entry>, St
     tx.commit().map_err(safe)?;
     Ok(entry)
 }
+// Font values must match FONT_FAMILIES / FONT_SIZES in src/editor/extensions.ts.
+const FONT_FAMILIES: [&str; 2] = [
+    "'IBM Plex Mono', monospace",
+    "'IBM Plex Sans Condensed', sans-serif",
+];
+const FONT_SIZES: [&str; 4] = ["14px", "17px", "20px", "24px"];
+
+fn small_int(v: &Value, min: i64, max: i64) -> bool {
+    v.as_i64().is_some_and(|n| (min..=max).contains(&n))
+}
+/// Each supported node or mark accepts only its own known attributes. `null`
+/// always means "default". Anything else is refused so imported or pasted
+/// content cannot smuggle styles, URLs or markup into stored entries.
+fn valid_attr(kind: &str, key: &str, v: &Value) -> bool {
+    if v.is_null() {
+        return matches!(
+            (kind, key),
+            ("paragraph" | "heading", "textAlign")
+                | ("orderedList", "start" | "type")
+                | ("textStyle", "fontFamily" | "fontSize")
+        );
+    }
+    match (kind, key) {
+        ("paragraph" | "heading", "textAlign") => {
+            matches!(v.as_str(), Some("left" | "center" | "right"))
+        }
+        ("heading", "level") => small_int(v, 1, 3),
+        ("orderedList", "start") => small_int(v, -1_000_000, 1_000_000),
+        // Pasted lists keep their HTML/CSS list type (e.g. "a", "disc"); it is only
+        // ever rendered as a list attribute, so a short plain word is accepted.
+        ("orderedList", "type") => v.as_str().is_some_and(|t| {
+            !t.is_empty()
+                && t.len() <= 24
+                && t.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+        }),
+        ("textStyle", "fontFamily") => v.as_str().is_some_and(|f| FONT_FAMILIES.contains(&f)),
+        ("textStyle", "fontSize") => v.as_str().is_some_and(|f| FONT_SIZES.contains(&f)),
+        _ => false,
+    }
+}
+fn valid_attrs(kind: &str, v: &Value) -> bool {
+    match v.get("attrs") {
+        None => true,
+        Some(Value::Object(attrs)) => attrs.iter().all(|(k, a)| valid_attr(kind, k, a)),
+        _ => false,
+    }
+}
 fn valid_node(v: &Value, depth: usize) -> bool {
     if depth > 64 {
         return false;
@@ -103,7 +150,19 @@ fn valid_node(v: &Value, depth: usize) -> bool {
     let Some(kind) = v.get("type").and_then(Value::as_str) else {
         return false;
     };
-    if !matches!(kind, "doc" | "paragraph" | "text" | "hardBreak") {
+    if !matches!(
+        kind,
+        "doc"
+            | "paragraph"
+            | "text"
+            | "hardBreak"
+            | "heading"
+            | "bulletList"
+            | "orderedList"
+            | "listItem"
+            | "blockquote"
+    ) || !valid_attrs(kind, v)
+    {
         return false;
     }
     if kind == "text" && v.get("text").and_then(Value::as_str).is_none() {
@@ -113,12 +172,15 @@ fn valid_node(v: &Value, depth: usize) -> bool {
         let Some(marks) = marks.as_array() else {
             return false;
         };
-        if marks.iter().any(|m| {
-            !matches!(
-                m.get("type").and_then(Value::as_str),
-                Some("bold" | "italic" | "underline" | "strike")
-            )
-        }) {
+        if marks
+            .iter()
+            .any(|m| match m.get("type").and_then(Value::as_str) {
+                Some(mark @ ("bold" | "italic" | "underline" | "strike" | "textStyle")) => {
+                    !valid_attrs(mark, m)
+                }
+                _ => true,
+            })
+        {
             return false;
         }
     }
@@ -300,6 +362,43 @@ mod tests {
         let mut bad = draft(1);
         bad.content = serde_json::json!({"type":"doc","content":[{"type":"image","attrs":{"src":"https://example.invalid"}}]});
         assert!(save(&mut db, bad).is_err());
+        assert!(list(&db).unwrap().is_empty());
+    }
+    #[test]
+    fn formatted_document_round_trips() {
+        let mut db = db();
+        let mut formatted = draft(1);
+        formatted.content =
+            serde_json::from_str(include_str!("../../tests/fixtures/formatted-entry.json"))
+                .unwrap();
+        let saved = save(&mut db, formatted.clone()).unwrap().unwrap();
+        assert_eq!(
+            get(&db, &saved.id).unwrap().unwrap().content,
+            formatted.content
+        );
+    }
+    #[test]
+    fn pasted_list_types_are_accepted() {
+        let mut db = db();
+        let mut pasted = draft(1);
+        pasted.content = serde_json::json!({"type":"doc","content":[{"type":"orderedList","attrs":{"start":null,"type":"disc"},"content":[{"type":"listItem","content":[{"type":"paragraph","attrs":{"textAlign":null},"content":[{"type":"text","text":"x","marks":[{"type":"textStyle","attrs":{"fontFamily":null,"fontSize":null}}]}]}]}]}]});
+        assert!(save(&mut db, pasted).is_ok());
+    }
+    #[test]
+    fn unknown_styles_and_attributes_are_rejected() {
+        let mut db = db();
+        for content in [
+            serde_json::json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"x","marks":[{"type":"textStyle","attrs":{"fontFamily":"url(https://example.invalid)","fontSize":null}}]}]}]}),
+            serde_json::json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"x","marks":[{"type":"textStyle","attrs":{"color":"red"}}]}]}]}),
+            serde_json::json!({"type":"doc","content":[{"type":"heading","attrs":{"level":6,"textAlign":null},"content":[{"type":"text","text":"x"}]}]}),
+            serde_json::json!({"type":"doc","content":[{"type":"paragraph","attrs":{"textAlign":"justify","style":"x"},"content":[{"type":"text","text":"x"}]}]}),
+            serde_json::json!({"type":"doc","content":[{"type":"orderedList","attrs":{"type":"x\" onload=\"y"},"content":[]}]}),
+            serde_json::json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"x","marks":[{"type":"link","attrs":{"href":"https://example.invalid"}}]}]}]}),
+        ] {
+            let mut bad = draft(1);
+            bad.content = content;
+            assert!(save(&mut db, bad).is_err());
+        }
         assert!(list(&db).unwrap().is_empty());
     }
     #[test]

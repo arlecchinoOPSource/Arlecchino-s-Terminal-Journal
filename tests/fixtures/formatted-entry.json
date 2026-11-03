@@ -1,0 +1,203 @@
+{
+ "type": "doc",
+ "content": [
+  {
+   "type": "heading",
+   "attrs": {
+    "textAlign": null,
+    "level": 1
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Synthetic heading"
+    }
+   ]
+  },
+  {
+   "type": "heading",
+   "attrs": {
+    "textAlign": "center",
+    "level": 3
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "Centered subheading"
+    }
+   ]
+  },
+  {
+   "type": "paragraph",
+   "attrs": {
+    "textAlign": "right"
+   },
+   "content": [
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "bold"
+      }
+     ],
+     "text": "Bold"
+    },
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "italic"
+      }
+     ],
+     "text": " italic"
+    },
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "underline"
+      }
+     ],
+     "text": " underline"
+    },
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "strike"
+      }
+     ],
+     "text": " strike"
+    }
+   ]
+  },
+  {
+   "type": "paragraph",
+   "attrs": {
+    "textAlign": null
+   },
+   "content": [
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "textStyle",
+       "attrs": {
+        "fontFamily": "'IBM Plex Mono', monospace",
+        "fontSize": "20px"
+       }
+      }
+     ],
+     "text": "Mono 20"
+    },
+    {
+     "type": "text",
+     "marks": [
+      {
+       "type": "textStyle",
+       "attrs": {
+        "fontFamily": "'IBM Plex Sans Condensed', sans-serif",
+        "fontSize": null
+       }
+      }
+     ],
+     "text": " condensed"
+    }
+   ]
+  },
+  {
+   "type": "bulletList",
+   "content": [
+    {
+     "type": "listItem",
+     "content": [
+      {
+       "type": "paragraph",
+       "attrs": {
+        "textAlign": null
+       },
+       "content": [
+        {
+         "type": "text",
+         "text": "Bullet one"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "listItem",
+     "content": [
+      {
+       "type": "paragraph",
+       "attrs": {
+        "textAlign": null
+       },
+       "content": [
+        {
+         "type": "text",
+         "text": "Bullet two"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "orderedList",
+   "attrs": {
+    "start": 3,
+    "type": null
+   },
+   "content": [
+    {
+     "type": "listItem",
+     "content": [
+      {
+       "type": "paragraph",
+       "attrs": {
+        "textAlign": null
+       },
+       "content": [
+        {
+         "type": "text",
+         "text": "Third"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "blockquote",
+   "content": [
+    {
+     "type": "paragraph",
+     "attrs": {
+      "textAlign": null
+     },
+     "content": [
+      {
+       "type": "text",
+       "text": "Quoted synthetic line"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "paragraph",
+   "attrs": {
+    "textAlign": null
+   },
+   "content": [
+    {
+     "type": "text",
+     "text": "After the table"
+    }
+   ]
+  }
+ ]
+}

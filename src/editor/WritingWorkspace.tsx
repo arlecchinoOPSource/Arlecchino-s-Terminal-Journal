@@ -7,6 +7,7 @@ import { repository } from '../persistence/repository';
 import { Shell } from '../ui/Shell';
 import { IconButton } from '../ui/IconButton';
 import { basicExtensions } from './extensions';
+import { FormattingToolbar } from './FormattingToolbar';
 
 export function WritingWorkspace() {
   const [controller] = useState(()=>new JournalController(repository));
@@ -52,6 +53,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}
+    formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
     historyControls={<><IconButton icon="undo" label="Undo" disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
     <div className="writing-column">
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
