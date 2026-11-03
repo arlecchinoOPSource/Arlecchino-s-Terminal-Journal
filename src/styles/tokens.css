@@ -1,4 +1,6 @@
 @import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-sans-condensed/latin-600.css';
 @import '@fontsource/ibm-plex-sans-condensed/latin-400.css';
 @import '@fontsource/ibm-plex-sans-condensed/latin-400-italic.css';
 
@@ -12,7 +14,7 @@
   --focus: #D0F8E7;
   --error: #F0A6A6;
   --outline: 1px solid var(--mint);
-  --font-ui: 'IBM Plex Sans Condensed', sans-serif;
+  --font-ui: 'IBM Plex Mono', monospace;
   --font-writing: 'IBM Plex Sans', sans-serif;
   --space-1: 4px;
   --space-2: 8px;

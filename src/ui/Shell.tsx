@@ -17,20 +17,21 @@ export function Shell({ children, historyControls }: Props) {
       </div>
       <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => setShowInfo(!showInfo)} />
     </nav>
-    {showInfo && <Popover id="preview-info" title="An early chapter" onClose={closeInfo} triggerRef={infoRef}>
+    {showInfo && <Popover id="preview-info" title="About Terminal" onClose={closeInfo} triggerRef={infoRef}>
       <p>Terminal by Arlecchino</p><p>This preview introduces the workspace and basic writing. Your text stays in this window only and disappears when you close or reload it.</p>
       <p>Saving, archives, search, formatting controls, and preferences will arrive in later versions.</p>
     </Popover>}
     <div className="workspace">
+      <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>
       <header className="toolbar" aria-label="Writing tools">
-        <div className="font-preview" aria-label="Current writing font: IBM Plex Sans, 16 pixels"><span>IBM Plex Sans</span><span className="font-size">16</span></div>
+        <div className="font-preview" aria-label="Current writing font: IBM Plex Sans, 17 pixels"><span>IBM Plex Sans</span><span className="font-size">17</span></div>
         <span className="toolbar-divider" aria-hidden="true" />
         <div className="format-preview" aria-label="Formatting controls are not yet available"><button disabled title="Formatting arrives in a later version" aria-label="Bold — not yet available"><b>B</b></button><button disabled aria-label="Italic — not yet available"><i>I</i></button><button disabled aria-label="Underline — not yet available"><u>U</u></button></div>
         <div className="history-controls">{historyControls}</div>
-        <span className="save-status">Preview · not saved</span>
+        <span className="tools-label">WRITING TOOLS</span>
       </header>
       <main className="writing-surface" id="writing-workspace">{children}</main>
-      <footer className="workspace-footer"><span>TERMINAL <span className="publisher">/ ARLECCHINO</span></span><span id="preview-warning">Temporary writing · closes without saving</span></footer>
+      <footer className="workspace-footer"><span className="save-status">Preview · not saved</span><span id="preview-warning">Temporary writing · closes without saving</span></footer>
     </div>
   </div>;
 }

@@ -7,3 +7,5 @@ Oxlint 1.90.0 (MIT) supplies development-only linting compatible with TypeScript
 T-04 adds @fontsource/ibm-plex-sans and @fontsource/ibm-plex-sans-condensed 5.3.0 (OFL-1.1). Only the required Latin regular/upright and condensed italic styles are bundled by Vite. Fonts are loaded from local application assets, never a CDN. Original licenses are in each installed package's LICENSE file; redistributable copies are retained under docs/licenses.
 
 Previously installed SQL, table, text alignment, and text style packages remain reserved for their backlog issues; they are not enabled in this preview. No paid Tiptap services or hosted editor features are used.
+
+The authorized v0.2 visual implementation adds @fontsource/ibm-plex-mono 5.3.0 (OFL-1.1), locally bundled for interface labels. Its license is retained in docs/licenses/IBM-Plex-Mono.txt. No runtime network access is added.

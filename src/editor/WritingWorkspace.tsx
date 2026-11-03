@@ -41,10 +41,10 @@ export function WritingWorkspace() {
     <IconButton icon="redo" label="Redo" disabled={!history?.canRedo} onClick={() => editor?.chain().focus().redo().run()} />
   </>}>
     <div className="writing-column">
-      <p className="entry-meta">journal entry # — <span className="draft-label">draft</span></p>
+      <p className="entry-meta"><span className="entry-label">ENTRY</span><span className="draft-label">DRAFT</span></p>
       <input className="entry-title" aria-label="Entry title" aria-describedby="preview-warning" placeholder="Untitled" value={draft.title} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={event => setDraft(current => ({ ...current, title: event.target.value }))} />
       <div className="editor-wrap">
-        {history?.isEmpty && <span className="editor-placeholder" aria-hidden="true">A little space for your thoughts.</span>}
+        {history?.isEmpty && <span className="editor-placeholder" aria-hidden="true">Start writing…</span>}
         <EditorContent editor={editor} />
       </div>
     </div>
