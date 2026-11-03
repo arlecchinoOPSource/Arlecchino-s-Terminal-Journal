@@ -9,10 +9,12 @@ import { TableKit } from '@tiptap/extension-table';
 // exactly the same strings.
 export const FONT_FAMILIES = [
   { label: 'Plex Sans', value: null },
+  { label: 'Plex Serif', value: "'IBM Plex Serif', serif" },
+  { label: 'Literata', value: "'Literata', serif" },
   { label: 'Plex Mono', value: "'IBM Plex Mono', monospace" },
   { label: 'Plex Condensed', value: "'IBM Plex Sans Condensed', sans-serif" },
 ] as const;
-export const FONT_SIZES = ['14px', '17px', '20px', '24px'] as const;
+export const FONT_SIZES = ['12px', '14px', '16px', '17px', '18px', '20px', '24px', '28px', '32px'] as const;
 export const DEFAULT_FONT_SIZE = '17px';
 export const HEADING_LEVELS = [1, 2, 3] as const;
 export const ALIGNMENTS = ['left', 'center', 'right'] as const;

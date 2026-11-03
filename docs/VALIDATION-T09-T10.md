@@ -4,7 +4,7 @@ Scope: formatting toolbar (T-09) and basic table editing (T-10). Only synthetic 
 
 ## What changed
 
-- `src/editor/extensions.ts` enables headings 1–3, bullet/numbered lists, blockquotes, text alignment (left/center/right), a local font family/size extension limited to the bundled IBM Plex faces and four sizes, and Tiptap tables (no column resizing).
+- `src/editor/extensions.ts` enables headings 1–3, bullet/numbered lists, blockquotes, text alignment (left/center/right), a local font family/size extension limited to bundled faces (Plex Sans, Plex Serif, Literata, Plex Mono, Plex Sans Condensed) and nine sizes from 12 to 32 px, and Tiptap tables (no column resizing).
 - `src/editor/FormattingToolbar.tsx` replaces the disabled preview controls with a segmented strip: font/size; bold/italic/underline/strikethrough; paragraph style, lists, quote; alignment; table. Active formatting uses `aria-pressed` with a mint fill. Table row/column controls (`+ROW −ROW +COL −COL DEL`) appear only while the caret is inside a table. Tab/Shift+Tab move between cells; Tab in the last cell adds a row.
 - `src-tauri/src/journal.rs` accepts the new node types and marks, and checks each attribute against an allowlist (alignment values, heading level 1–3, font values identical to the editor's, cell spans/widths). Unknown nodes, marks, attributes or style values are still refused without writing.
 - Schema version stays 1: the change only adds node types and attributes, and entries saved before T-09 load unchanged.

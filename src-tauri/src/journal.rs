@@ -97,11 +97,15 @@ pub fn select(db: &mut Connection, id: Option<&str>) -> Result<Option<Entry>, St
     Ok(entry)
 }
 // Font values must match FONT_FAMILIES / FONT_SIZES in src/editor/extensions.ts.
-const FONT_FAMILIES: [&str; 2] = [
+const FONT_FAMILIES: [&str; 4] = [
+    "'IBM Plex Serif', serif",
+    "'Literata', serif",
     "'IBM Plex Mono', monospace",
     "'IBM Plex Sans Condensed', sans-serif",
 ];
-const FONT_SIZES: [&str; 4] = ["14px", "17px", "20px", "24px"];
+const FONT_SIZES: [&str; 9] = [
+    "12px", "14px", "16px", "17px", "18px", "20px", "24px", "28px", "32px",
+];
 
 fn small_int(v: &Value, min: i64, max: i64) -> bool {
     v.as_i64().is_some_and(|n| (min..=max).contains(&n))
