@@ -2,24 +2,29 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
-type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; onNew?: () => void; navigationDisabled?: boolean };
-export function Shell({ children, formattingControls, historyControls, status, onNew, navigationDisabled }: Props) {
-  const [showInfo, setShowInfo] = useState(false);
+type Panel = 'archives' | 'info' | null;
+type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; onNew?: () => void; navigationDisabled?: boolean; archive?: (close: () => void) => ReactNode };
+export function Shell({ children, formattingControls, historyControls, status, onNew, navigationDisabled, archive }: Props) {
+  const [panel, setPanel] = useState<Panel>(null);
   const infoRef = useRef<HTMLButtonElement>(null);
-  const closeInfo = useCallback(() => setShowInfo(false), []);
+  const archiveRef = useRef<HTMLButtonElement>(null);
+  const closePanel = useCallback(() => setPanel(null), []);
+  const toggle = (next: Exclude<Panel, null>) => setPanel(panel === next ? null : next);
+  const showInfo = panel === 'info';
   return <div className="app-shell">
     <nav className="rail" aria-label="Journal navigation">
       <span className="brand-mark" aria-label="Terminal">t<span>›</span></span>
       <div className="rail-actions">
         <IconButton icon="search" label="Search — available in a later version" disabled />
-        <IconButton icon="archive" label="Archives — available in a later version" disabled />
+        <IconButton ref={archiveRef} icon="archive" label="Archives" disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
         <IconButton icon="plus" label="New entry" disabled={navigationDisabled} onClick={onNew} />
       </div>
-      <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => setShowInfo(!showInfo)} />
+      <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => toggle('info')} />
     </nav>
-    {showInfo && <Popover id="preview-info" title="About Terminal" onClose={closeInfo} triggerRef={infoRef}>
+    {panel === 'archives' && archive && <Popover id="archive-panel" title="Archives" className="archive-popover" closeLabel="Close archives" onClose={closePanel} triggerRef={archiveRef}>{archive(closePanel)}</Popover>}
+    {showInfo && <Popover id="preview-info" title="About Terminal" closeLabel="Close preview information" onClose={closePanel} triggerRef={infoRef}>
       <p>Terminal by Arlecchino</p><p>Writing is stored locally on this device. Check the save status before closing.</p>
-      <p>Archives, search, and preferences will arrive in later versions.</p>
+      <p>Search and preferences will arrive in later versions.</p>
     </Popover>}
     <div className="workspace">
       <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>

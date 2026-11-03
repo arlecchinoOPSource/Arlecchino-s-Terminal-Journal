@@ -6,6 +6,7 @@ import { JournalController } from '../domain/journal-controller';
 import { repository } from '../persistence/repository';
 import { Shell } from '../ui/Shell';
 import { IconButton } from '../ui/IconButton';
+import { ArchivePanel } from '../ui/ArchivePanel';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
 
@@ -52,13 +53,13 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const error=state.error??lifecycleError;
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy}
+    archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}
     formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
     historyControls={<><IconButton icon="undo" label="Undo" disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
     <div className="writing-column">
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
       <div className="entry-navigation">
-        <label>OPEN ENTRY <select aria-label="Open entry" disabled={!state.ready||state.busy} value={state.entry?.id??''} onChange={e=>void controller.switchTo(e.target.value||null)}><option value="">New draft</option>{state.entries.map(entry=><option key={entry.id} value={entry.id}>#{entry.entry_number} · {entry.title||'Untitled'}</option>)}</select></label>
         <button type="button" disabled={!state.entry||state.busy} onClick={()=>dialog.current?.showModal()}>Delete entry</button>
       </div>
       <p className="entry-meta"><span className="entry-label">ENTRY</span><span className="draft-label">{state.entry?`#${state.entry.entry_number}`:'DRAFT'}</span></p>
