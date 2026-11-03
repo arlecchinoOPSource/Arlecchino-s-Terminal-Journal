@@ -109,7 +109,7 @@ dialog h2 { font-size: 1rem; }
 dialog form { display: flex; gap: 12px; justify-content: flex-end; }
 dialog .destructive, .storage-error .destructive { color: var(--error); border-color: var(--error); }
 select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
-.archive-popover { top: 12px; bottom: auto; left: 100px; width: min(320px,calc(100% - 116px)); max-height: calc(100% - 24px); display: flex; flex-direction: column; overflow: hidden; padding: 0; font-family: var(--font-ui); }
+.archive-popover { top: 50%; bottom: auto; left: 50%; transform: translate(-50%,-50%); width: min(360px,calc(100% - 24px)); max-height: min(520px, calc(100% - 24px)); display: flex; flex-direction: column; overflow: hidden; padding: 0; font-family: var(--font-ui); }
 .archive-popover header { margin: 0; flex-shrink: 0; }
 .archive-popover .archive-count { margin: 0; padding: 8px 12px; border-bottom: 1px solid var(--muted); color: var(--muted); font-size: .6875rem; letter-spacing: .06em; flex-shrink: 0; }
 .archive-popover .archive-empty { margin: 0; padding: 16px 12px 20px; font: .875rem/1.6 var(--font-writing); }
@@ -124,4 +124,19 @@ select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .archive-marker { font-size: .625rem; }
 .archive-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-writing); font-size: .875rem; }
 .archive-meta { color: var(--muted); font-size: .75rem; white-space: nowrap; }
-@media (max-width: 520px) { .archive-popover { top: 8px; left: 76px; width: calc(100% - 92px); max-height: calc(100% - 16px); } }
+@media (max-width: 520px) { .archive-popover { width: calc(100% - 16px); max-height: calc(100% - 16px); } }
+/* Fixed top edge so the panel grows downward while typing instead of jumping; centred when full. */
+.search-popover { top: max(12px, calc(50% - 220px)); bottom: auto; left: 50%; transform: translateX(-50%); width: min(480px,calc(100% - 24px)); max-height: min(440px, calc(100% - 24px)); display: flex; flex-direction: column; overflow: hidden; padding: 0; font-family: var(--font-ui); }
+.search-popover header { margin: 0; flex-shrink: 0; }
+.search-field { display: flex; align-items: center; gap: 8px; margin: 12px; padding: 0 10px; border: 1px solid var(--muted); background: var(--near-black); flex-shrink: 0; }
+.search-field:focus-within { border-color: var(--mint); outline: 2px solid var(--focus); outline-offset: 2px; }
+.search-field input { flex: 1; min-width: 0; min-height: 40px; border: 0; background: none; outline: none; font: .9375rem var(--font-writing); }
+.search-field input::placeholder { color: var(--muted); }
+.search-popover .search-message { margin: 0 12px; padding-bottom: 8px; color: var(--muted); font-size: .6875rem; letter-spacing: .06em; flex-shrink: 0; }
+.search-results { border-top: 1px solid var(--muted); }
+.search-results .archive-row { cursor: pointer; }
+.search-results .archive-row[aria-current='true'] { background: none; color: inherit; }
+.search-results .archive-row[aria-current='true'] .archive-meta { color: var(--muted); }
+.search-results .archive-row[aria-selected='true'] { background: var(--mint); color: var(--near-black); }
+.search-results .archive-row[aria-selected='true'] .archive-meta { color: var(--forest); }
+@media (max-width: 520px) { .search-popover { top: 8px; width: calc(100% - 16px); max-height: calc(100% - 16px); } }
