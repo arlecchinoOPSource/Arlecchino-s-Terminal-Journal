@@ -30,3 +30,7 @@ Interactive check in the Vite dev server with an in-memory mock: `Mod+K` from th
 - Screen readers (VoiceOver, NVDA) were not run; only the browser accessibility tree was reviewed.
 - Windows: Ctrl+N/Ctrl+K/Ctrl+O behaviour inside WebView2, and whether any WebView2 browser accelerator intercepts them first.
 - 200% text enlargement and the full native app by hand.
+
+## Writing page framing — November 4, 2026
+
+At the product owner's request, the space beside the writing column is now dark (Near Black) and the column is a Forest Black page whose text width is exactly the chosen writing width, with 48 px of padding each side (24 px under 760 px wide, 16 px under 520 px). The page fills the full height and scrolls with long entries. Measured for every writing width (560, 640, 720, 840) at 1400 × 860, 1100 × 780, 760 × 600 and 480 × 400: the text width matches the setting whenever the window allows, the dark margins are equal on both sides, and there is no horizontal scrolling. In narrow windows the page fills the available width.

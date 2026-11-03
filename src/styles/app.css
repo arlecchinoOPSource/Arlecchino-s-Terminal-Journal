@@ -35,8 +35,9 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .tool-text { width: auto; padding: 0 6px; font-size: .75rem; letter-spacing: .04em; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .tools-label { margin-left: auto; color: var(--muted); font-size: .75rem; letter-spacing: .06em; }
-.writing-surface { min-width: 0; overflow: auto; border: 1px solid var(--muted); border-top-color: var(--mint); background: var(--forest); padding: 32px 48px 64px; position: relative; }
-.writing-column { width: 100%; max-width: var(--writing-width); margin: 0 auto; }
+/* The page is the chosen writing width plus its padding; the space beside it stays dark. */
+.writing-surface { min-width: 0; overflow: auto; border: 1px solid var(--muted); border-top-color: var(--mint); background: var(--near-black); position: relative; --page-pad-x: 48px; }
+.writing-column { width: min(100%, calc(var(--writing-width) + 2 * var(--page-pad-x))); min-height: 100%; margin: 0 auto; padding: 32px var(--page-pad-x) 64px; background: var(--forest); border-inline: 1px solid #84ac9a40; }
 .entry-meta { display: flex; align-items: center; gap: 12px; font-size: .75rem; margin: 0 0 32px; color: var(--muted); letter-spacing: .08em; }
 .entry-meta::after { content: ''; flex: 1; border-top: 1px solid var(--muted); opacity: .45; }
 .entry-label { padding: 3px 10px; background: var(--mint); color: var(--near-black); }
@@ -75,7 +76,8 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 @media (max-width: 1240px) { .tools-label { display: none; } }
 @media (max-width: 760px) {
  .toolbar { gap: 8px; }
- .writing-surface { padding: 24px 24px 40px; }
+ .writing-surface { --page-pad-x: 24px; }
+ .writing-column { padding-top: 24px; padding-bottom: 40px; }
  .workspace-label { letter-spacing: .02em; }
 }
 @media (max-width: 520px) {
@@ -90,7 +92,8 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
  .tool-field > span { display: none; }
  .tool-field + .tool-field { margin-left: 4px; }
  .tool-field select { min-height: 30px; }
- .writing-surface { padding: 20px 16px 40px; }
+ .writing-surface { --page-pad-x: 16px; }
+ .writing-column { padding-top: 20px; }
  .entry-title { font-size: 1.5rem; }
  .entry-meta { margin-bottom: 24px; }
  .popover { left: 76px; width: calc(100% - 92px); }
