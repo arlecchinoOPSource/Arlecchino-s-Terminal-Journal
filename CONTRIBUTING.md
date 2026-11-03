@@ -5,7 +5,7 @@ Read the PRD, UI design system, architecture, and AGENTS.md before changing beha
 1. Select one issue and check its dependencies and acceptance criteria.
 2. Branch from current `main`: `feature/T-12-title-search`, `fix/T-08-save-error`, or `docs/T-01-specification`.
 3. Make a focused change, preserving user data and the accepted scope.
-4. Run checks appropriate to the change. Report commands, results, and any untested platform.
+4. Run `npm run check` (see docs/TESTING.md) and add tests for changed behaviour. A failing check means the change is not complete; do not open it for review or merge it. Report commands, results, and any untested platform.
 5. Open a pull request referencing the issue; describe behavior, validation, and material limitations.
 6. Review manually and merge only when the definition of done passes. Keep `main` stable.
 
