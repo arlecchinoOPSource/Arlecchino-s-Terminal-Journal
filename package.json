@@ -1,8 +1,8 @@
 {
   "name": "terminal-by-arlecchino",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "Preparation workspace for Terminal by Arlecchino; application initialization is T-03.",
+  "description": "Offline desktop journal — early writing preview",
   "license": "MIT",
   "type": "module",
   "engines": {
@@ -10,6 +10,9 @@
   },
   "packageManager": "npm@11.19.1",
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/ibm-plex-sans-condensed": "5.3.0",
     "@tauri-apps/api": "2.12.4",
     "@tauri-apps/plugin-sql": "2.6.0",
     "@tiptap/extension-table": "3.32.2",
@@ -26,7 +29,19 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.2.1",
+    "oxlint": "1.90.0",
     "typescript": "7.0.2",
     "vite": "8.3.5"
+  },
+  "scripts": {
+    "dev": "tauri dev",
+    "dev:web": "vite",
+    "build": "tauri build --no-bundle",
+    "build:web": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint --deny-warnings src tests vite.config.ts",
+    "test": "node --test tests/*.test.mjs",
+    "preview": "vite preview",
+    "tauri": "tauri"
   }
 }

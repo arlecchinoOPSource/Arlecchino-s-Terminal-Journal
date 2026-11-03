@@ -1,6 +1,6 @@
 # Terminal — technical architecture v0.1
 
-Status: accepted stack and product boundaries; implementation details below are guidance for T-03 onward. No application source exists yet.
+Status: accepted stack and product boundaries; implementation details below are guidance for T-03 onward. T-03 initializes the desktop shell; persistence remains deferred to T-06.
 
 ## ADR-001: Offline desktop architecture
 
@@ -39,7 +39,7 @@ Use versioned migrations. Validate complete versioned JSON backups before mutati
 - `tests/`: synthetic fixtures and integration/interaction tests.
 - `docs/`: product, design, architecture, development and release evidence.
 
-These are planned directories; no placeholder feature source is needed now.
+These boundaries are established by T-03. Feature implementations are added only with their authorized issues.
 
 ## Quality and release plan
 

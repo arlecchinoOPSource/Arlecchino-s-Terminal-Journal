@@ -4,7 +4,7 @@
 
 Terminal by Arlecchino is a minimal, offline-first journal for macOS and Windows. Read `docs/PRD-v0.1.md`, `docs/UI-DESIGN-SYSTEM-v0.2.md`, `docs/ARCHITECTURE.md`, and the selected backlog issue before work.
 
-This repository currently contains preparation only. Do not initialize app source, implement features, or run app generators until the user authorizes implementation. T-03 is the future initialization task. Work on one authorized issue at a time; do not silently implement adjacent issues.
+Implementation of T-03 through T-05 was authorized on November 3, 2026. Work on one authorized issue at a time; do not silently implement adjacent issues. Later backlog tasks still require authorization.
 
 ## Mandatory boundaries
 
