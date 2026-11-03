@@ -27,7 +27,7 @@ impl Default for Preferences {
     }
 }
 impl Preferences {
-    fn valid(&self) -> bool {
+    pub(crate) fn valid(&self) -> bool {
         FONTS.contains(&self.font.as_str())
             && SIZES.contains(&self.font_size)
             && WIDTHS.contains(&self.writing_width)

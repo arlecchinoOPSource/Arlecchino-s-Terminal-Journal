@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main local window: journal operations, editor preferences and close notification only.",
+  "description": "Main local window: journal operations, editor preferences, backup through native file dialogs and close notification only. No direct filesystem or dialog access.",
   "windows": [
     "main"
   ],
@@ -14,6 +14,10 @@
     "allow-journal-finish-exit",
     "allow-preferences-get",
     "allow-preferences-set",
+    "allow-backup-export",
+    "allow-backup-choose",
+    "allow-backup-restore",
+    "allow-backup-cancel",
     "core:event:allow-listen",
     "core:event:allow-unlisten"
   ]

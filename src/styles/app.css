@@ -174,3 +174,12 @@ select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 /* Focus rings on mint-filled surfaces need the dark colour to stay visible. */
 .popover header .icon-button:focus-visible, .archive-row[aria-current='true']:focus-visible, .settings-segmented label.selected input:focus-visible + span { outline-color: var(--near-black); }
 .popover header .icon-button:focus-visible { outline-offset: -4px; }
+.settings-data { margin-top: 8px; }
+.settings-data-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.settings-data-actions button { flex: 1 1 140px; min-height: 36px; padding: 4px 12px; background: var(--forest); border: 1px solid var(--muted); font-size: .75rem; }
+.settings-data-actions button:not(:disabled):hover, .settings-reset:not(:disabled):hover { background: var(--raised); }
+.dialog-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px; }
+dialog p { margin: 0 0 12px; font: .875rem/1.6 var(--font-writing); }
+.journal-notice { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; border: 1px solid var(--mint); padding: 12px; margin-bottom: 20px; font-size: .8125rem; }
+.journal-notice p { margin: 0; overflow-wrap: anywhere; }
+.journal-notice button { flex-shrink: 0; min-height: 36px; padding: 4px 12px; background: var(--forest); border: 1px solid var(--muted); font-size: .75rem; }
