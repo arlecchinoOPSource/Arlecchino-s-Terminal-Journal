@@ -1,4 +1,6 @@
 # TERMINAL — Visual Design System
+
+> Historical specification. Superseded for future UI work by [v0.2 — Personal archive terminal](UI-DESIGN-SYSTEM-v0.2.md), approved November 3, 2026. Retained to explain the original mockup and earlier implementation.
 **Design version:** 0.1
 **Reference:** Original Terminal interface and Arlecchino identity mockups
 
