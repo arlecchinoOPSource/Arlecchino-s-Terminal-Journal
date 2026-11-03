@@ -1,1 +1,1 @@
-Domain types and operations live here. Entry lifecycle is T-07.
+Domain operations. `journal-controller.ts` owns the entry lifecycle and serialized, debounced autosave (T-07/T-08).

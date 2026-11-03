@@ -270,6 +270,70 @@ mod tests {
         assert_eq!(save(&mut db, draft(2)).unwrap().unwrap().entry_number, 1);
     }
     #[test]
+    fn deleting_middle_entry_keeps_other_numbers_and_never_reuses() {
+        let mut db = db();
+        for n in 1..=3 {
+            save(&mut db, draft(n)).unwrap().unwrap();
+        }
+        let middle = get(&db, &draft(2).id).unwrap().unwrap();
+        delete(&mut db, &middle.id, middle.revision).unwrap();
+        let mut numbers: Vec<i64> = list(&db).unwrap().iter().map(|e| e.entry_number).collect();
+        numbers.sort();
+        assert_eq!(numbers, vec![1, 3]);
+        assert_eq!(get(&db, &draft(3).id).unwrap().unwrap().entry_number, 3);
+        assert_eq!(save(&mut db, draft(4)).unwrap().unwrap().entry_number, 4);
+    }
+    #[test]
+    fn selecting_entry_is_remembered_and_new_draft_clears_it() {
+        let mut db = db();
+        save(&mut db, draft(1)).unwrap();
+        save(&mut db, draft(2)).unwrap();
+        select(&mut db, Some(&draft(1).id)).unwrap();
+        assert_eq!(last(&db).unwrap().unwrap().id, draft(1).id);
+        select(&mut db, None).unwrap();
+        assert!(last(&db).unwrap().is_none());
+        assert!(select(&mut db, Some("00000000-0000-4000-8000-000000000099")).is_err());
+    }
+    #[test]
+    fn unsupported_document_is_rejected_without_writing() {
+        let mut db = db();
+        let mut bad = draft(1);
+        bad.content = serde_json::json!({"type":"doc","content":[{"type":"image","attrs":{"src":"https://example.invalid"}}]});
+        assert!(save(&mut db, bad).is_err());
+        assert!(list(&db).unwrap().is_empty());
+    }
+    #[test]
+    fn crash_child() {
+        let Ok(path) = std::env::var("TERMINAL_SYNTHETIC_CRASH_DB") else {
+            return;
+        };
+        let mut db = crate::storage::open(std::path::Path::new(&path)).unwrap();
+        save(&mut db, draft(1)).unwrap();
+        db.execute_batch("BEGIN IMMEDIATE; UPDATE entries SET title='Uncommitted synthetic edit';")
+            .unwrap();
+        // Exit immediately without running Connection destructors.
+        std::process::exit(0);
+    }
+    #[test]
+    fn abrupt_process_exit_preserves_committed_data_only() {
+        let path = std::env::temp_dir().join(format!(
+            "terminal-crash-synthetic-{}-{}.sqlite3",
+            std::process::id(),
+            now()
+        ));
+        let status = std::process::Command::new(std::env::current_exe().unwrap())
+            .args(["--exact", "journal::tests::crash_child"])
+            .env("TERMINAL_SYNTHETIC_CRASH_DB", &path)
+            .status()
+            .unwrap();
+        assert!(status.success());
+        {
+            let db = crate::storage::open(&path).unwrap();
+            assert_eq!(last(&db).unwrap().unwrap().title, "Synthetic");
+        }
+        std::fs::remove_file(path).unwrap();
+    }
+    #[test]
     fn reopen_preserves_document_and_last_entry() {
         let path = std::env::temp_dir().join(format!(
             "terminal-synthetic-{}-{}.sqlite3",

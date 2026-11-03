@@ -41,8 +41,8 @@ Windows builds, installation, Intel macOS, performance, persistence and crash re
 
 ## T-05 writing preview
 
-The editor stores versioned Tiptap JSON in React memory. It does not create a database or use localStorage. Test only disposable writing. Closing/reloading intentionally resets the draft. Search, archives, new entries, preferences, tables, and full formatting controls remain deferred. Inline bold/italic/underline/strike survive rich clipboard paste; unsupported nodes are not registered. Spellcheck/autocorrect are disabled in this preview to avoid sending writing through optional OS/browser writing services.
+T-05 introduced the editor; since T-06–T-08 entries are stored in native SQLite in the OS application-data folder (`journal.sqlite3`) and autosave after a short pause. Development and the installed app share that folder, so use only synthetic writing while developing. Search, archives, preferences, tables, and full formatting controls remain deferred. Inline bold/italic/underline/strike survive rich clipboard paste; unsupported nodes are not registered. Spellcheck/autocorrect are disabled to avoid sending writing through optional OS/browser writing services.
 
 VS Code also provides **Terminal → Run Task → Terminal: Run desktop preview** and **Terminal: Check**. The generated app for direct local testing is `src-tauri/target/release/bundle/macos/Terminal.app`. It is a locally built preview, not a signed/notarized distribution.
 
-See [validation evidence](VALIDATION-T03-T05.md). Vite reports a 500 kB chunk-size advisory for the combined editor/React bundle; this is not a failed build or a performance measurement. Splitting an always-needed editor solely to silence this warning is deferred until measurement.
+See validation evidence for [T-03–T-05](VALIDATION-T03-T05.md) and [T-06–T-08](VALIDATION-T06-T08.md). **Terminal: Native storage tests** runs the Rust SQLite and lifecycle tests. Vite reports a 500 kB chunk-size advisory for the combined editor/React bundle; this is not a failed build or a performance measurement. Splitting an always-needed editor solely to silence this warning is deferred until measurement.

@@ -1,6 +1,6 @@
 # Terminal — technical architecture v0.1
 
-Status: accepted stack and product boundaries; implementation details below are guidance for T-03 onward. T-03 initializes the desktop shell; persistence remains deferred to T-06.
+Status: accepted stack and product boundaries; implementation details below are guidance for T-03 onward. T-03 initializes the desktop shell; T-06–T-08 add native SQLite persistence (ADR-002).
 
 ## ADR-001: Offline desktop architecture
 
@@ -58,4 +58,4 @@ Use rusqlite with bundled SQLite behind typed Tauri commands instead of exposing
 
 Database: OS application-data directory / journal.sqlite3. Timestamps are UTC Unix milliseconds. Entry IDs originate as UUIDs in the client and are immutable; allocation uses an independent monotonic counter in a transaction. A revision integer detects stale writes. Versioned migrations use PRAGMA user_version in an immediate transaction, reject newer databases, and never reset existing data. SQLite uses WAL and synchronous FULL. Startup errors are returned safely to the UI without logging private writing.
 
-Ordinary edits debounce for 400 ms. A pending draft is not durable until commit succeeds; forced termination before that commit can lose the pending edit. A failed save retains dirty content, blocks entry switching/closing, and offers retry. Native window close and application Quit are intercepted so the frontend can flush before exit. No promise of recovery for an uncommitted edit is made.
+Ordinary edits debounce for 400 ms. A pending draft is not durable until commit succeeds; forced termination before that commit can lose the pending edit. A failed save retains dirty content, blocks entry switching/closing, and offers retry; after a refused close the user may explicitly choose Close without saving. Native window close and application Quit are intercepted so the frontend can flush before exit. No promise of recovery for an uncommitted edit is made.

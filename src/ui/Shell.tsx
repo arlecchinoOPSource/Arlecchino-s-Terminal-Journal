@@ -2,8 +2,8 @@ import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
-type Props = { children: ReactNode; historyControls?: ReactNode };
-export function Shell({ children, historyControls }: Props) {
+type Props = { children: ReactNode; historyControls?: ReactNode; status?: ReactNode; onNew?: () => void; navigationDisabled?: boolean };
+export function Shell({ children, historyControls, status, onNew, navigationDisabled }: Props) {
   const [showInfo, setShowInfo] = useState(false);
   const infoRef = useRef<HTMLButtonElement>(null);
   const closeInfo = useCallback(() => setShowInfo(false), []);
@@ -13,13 +13,13 @@ export function Shell({ children, historyControls }: Props) {
       <div className="rail-actions">
         <IconButton icon="search" label="Search — available in a later version" disabled />
         <IconButton icon="archive" label="Archives — available in a later version" disabled />
-        <IconButton icon="plus" label="New entry — available in a later version" disabled />
+        <IconButton icon="plus" label="New entry" disabled={navigationDisabled} onClick={onNew} />
       </div>
       <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => setShowInfo(!showInfo)} />
     </nav>
     {showInfo && <Popover id="preview-info" title="About Terminal" onClose={closeInfo} triggerRef={infoRef}>
-      <p>Terminal by Arlecchino</p><p>This preview introduces the workspace and basic writing. Your text stays in this window only and disappears when you close or reload it.</p>
-      <p>Saving, archives, search, formatting controls, and preferences will arrive in later versions.</p>
+      <p>Terminal by Arlecchino</p><p>Writing is stored locally on this device. Check the save status before closing.</p>
+      <p>Archives, search, formatting controls, and preferences will arrive in later versions.</p>
     </Popover>}
     <div className="workspace">
       <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>
@@ -31,7 +31,7 @@ export function Shell({ children, historyControls }: Props) {
         <span className="tools-label">WRITING TOOLS</span>
       </header>
       <main className="writing-surface" id="writing-workspace">{children}</main>
-      <footer className="workspace-footer"><span className="save-status">Preview · not saved</span><span id="preview-warning">Temporary writing · closes without saving</span></footer>
+      <footer className="workspace-footer"><span className="save-status">{status}</span><span id="preview-warning">LOCAL JOURNAL</span></footer>
     </div>
   </div>;
 }
