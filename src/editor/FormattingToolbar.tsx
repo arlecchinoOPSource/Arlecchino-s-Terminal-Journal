@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { useEditorState, type Editor } from '@tiptap/react';
 import { IconButton } from '../ui/IconButton';
-import { ALIGNMENTS, DEFAULT_FONT_SIZE, FONT_FAMILIES, FONT_SIZES, HEADING_LEVELS, type Alignment } from './extensions';
+import { ALIGNMENTS, FONT_FAMILIES, FONT_SIZES, HEADING_LEVELS, type Alignment } from './extensions';
 
 const isMac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 const mod = isMac ? '⌘' : 'Ctrl+';
@@ -23,7 +23,7 @@ export function FormattingToolbar({ editor, disabled }: Props) {
       canHeading: e.can().setHeading({ level: 1 }),
       align: (ALIGNMENTS.find(a => e.isActive({ textAlign: a })) ?? 'left') as Alignment,
       fontFamily: typeof style.fontFamily === 'string' ? style.fontFamily : '',
-      fontSize: typeof style.fontSize === 'string' ? style.fontSize : DEFAULT_FONT_SIZE,
+      fontSize: typeof style.fontSize === 'string' ? style.fontSize : '',
       inTable: e.isActive('table'),
       canDeleteRow: e.can().deleteRow(), canDeleteColumn: e.can().deleteColumn(),
     };
@@ -38,7 +38,8 @@ export function FormattingToolbar({ editor, disabled }: Props) {
         </select>
       </label>
       <label className="tool-field"><span>SIZE</span>
-        <select aria-label="Font size" disabled={off} value={active?.fontSize ?? DEFAULT_FONT_SIZE} onChange={e => run().setJournalFontSize(e.target.value === DEFAULT_FONT_SIZE ? null : e.target.value).run()}>
+        <select aria-label="Font size" disabled={off} value={active?.fontSize ?? ''} onChange={e => run().setJournalFontSize(e.target.value || null).run()}>
+          <option value="">Default</option>
           {FONT_SIZES.map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
         </select>
       </label>

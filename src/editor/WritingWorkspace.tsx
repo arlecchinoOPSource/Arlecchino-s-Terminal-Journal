@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -8,6 +8,9 @@ import { Shell } from '../ui/Shell';
 import { IconButton } from '../ui/IconButton';
 import { ArchivePanel } from '../ui/ArchivePanel';
 import { SearchPanel } from '../ui/SearchPanel';
+import { SettingsPanel } from '../ui/SettingsPanel';
+import { usePreferences } from '../ui/usePreferences';
+import { preferencesRepository } from '../persistence/preferences';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
 
@@ -16,6 +19,7 @@ export function WritingWorkspace() {
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const [lifecycleError,setLifecycleError]=useState<string|null>(null);
   const [closeBlocked,setCloseBlocked]=useState(false);
+  const prefs=usePreferences(preferencesRepository);
   useEffect(()=>{
     let disposed=false;
     let unlisten:(()=>void)|undefined;
@@ -35,10 +39,11 @@ export function WritingWorkspace() {
     void setup();
     return ()=>{disposed=true;unlisten?.();};
   },[controller]);
-  return <EditorSession key={state.draft.id} controller={controller} lifecycleError={lifecycleError} closeBlocked={closeBlocked} clearLifecycleError={()=>{setLifecycleError(null);setCloseBlocked(false);}} />;
+  return <EditorSession key={state.draft.id} controller={controller} lifecycleError={lifecycleError} closeBlocked={closeBlocked} clearLifecycleError={()=>{setLifecycleError(null);setCloseBlocked(false);}}
+    settings={<SettingsPanel preferences={prefs.preferences} error={prefs.error} onChange={prefs.update} />} />;
 }
 
-function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleError}:{controller:JournalController;lifecycleError:string|null;closeBlocked:boolean;clearLifecycleError:()=>void}) {
+function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleError,settings}:{controller:JournalController;lifecycleError:string|null;closeBlocked:boolean;clearLifecycleError:()=>void;settings:ReactNode}) {
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const dialog=useRef<HTMLDialogElement>(null);
   const editor=useEditor({
@@ -53,7 +58,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const history=useEditorState({editor,selector:({editor:current})=>({canUndo:current?.can().undo()??false,canRedo:current?.can().redo()??false,isEmpty:current?.isEmpty??true})});
   const error=state.error??lifecycleError;
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
-  return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy}
+  return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy} settings={settings}
     search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}

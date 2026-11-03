@@ -3,8 +3,8 @@ import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
 type Panel = 'search' | 'archives' | 'info' | null;
-type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; onNew?: () => void; navigationDisabled?: boolean; archive?: (close: () => void) => ReactNode; search?: (close: () => void) => ReactNode };
-export function Shell({ children, formattingControls, historyControls, status, onNew, navigationDisabled, archive, search }: Props) {
+type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; onNew?: () => void; navigationDisabled?: boolean; archive?: (close: () => void) => ReactNode; search?: (close: () => void) => ReactNode; settings?: ReactNode };
+export function Shell({ children, formattingControls, historyControls, status, onNew, navigationDisabled, archive, search, settings }: Props) {
   const [panel, setPanel] = useState<Panel>(null);
   const infoRef = useRef<HTMLButtonElement>(null);
   const archiveRef = useRef<HTMLButtonElement>(null);
@@ -20,13 +20,13 @@ export function Shell({ children, formattingControls, historyControls, status, o
         <IconButton ref={archiveRef} icon="archive" label="Archives" disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
         <IconButton icon="plus" label="New entry" disabled={navigationDisabled} onClick={onNew} />
       </div>
-      <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => toggle('info')} />
+      <IconButton ref={infoRef} icon="settings" label="Settings" className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
     </nav>
     {panel === 'search' && search && <Popover id="search-panel" title="Search titles" className="search-popover" closeLabel="Close search" onClose={closePanel} triggerRef={searchRef}>{search(closePanel)}</Popover>}
     {panel === 'archives' && archive && <Popover id="archive-panel" title="Archives" className="archive-popover" closeLabel="Close archives" onClose={closePanel} triggerRef={archiveRef}>{archive(closePanel)}</Popover>}
-    {showInfo && <Popover id="preview-info" title="About Terminal" closeLabel="Close preview information" onClose={closePanel} triggerRef={infoRef}>
-      <p>Terminal by Arlecchino</p><p>Writing is stored locally on this device. Check the save status before closing.</p>
-      <p>Preferences will arrive in a later version.</p>
+    {showInfo && <Popover id="settings-panel" title="Settings" className="settings-popover" closeLabel="Close settings" onClose={closePanel} triggerRef={infoRef}>
+      {settings}
+      <section className="settings-about" aria-label="About Terminal"><p className="settings-section">ABOUT</p><p>Terminal by Arlecchino. Writing and settings are stored locally on this device. Check the save status before closing.</p></section>
     </Popover>}
     <div className="workspace">
       <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>

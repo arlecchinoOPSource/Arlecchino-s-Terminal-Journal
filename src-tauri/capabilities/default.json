@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Main local window: journal operations and close notification only.",
+  "description": "Main local window: journal operations, editor preferences and close notification only.",
   "windows": [
     "main"
   ],
@@ -12,6 +12,8 @@
     "allow-journal-save",
     "allow-journal-delete",
     "allow-journal-finish-exit",
+    "allow-preferences-get",
+    "allow-preferences-set",
     "core:event:allow-listen",
     "core:event:allow-unlisten"
   ]

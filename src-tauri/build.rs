@@ -7,6 +7,8 @@ fn main() {
             "journal_save",
             "journal_delete",
             "journal_finish_exit",
+            "preferences_get",
+            "preferences_set",
         ]),
     ))
     .expect("could not build application permissions");
