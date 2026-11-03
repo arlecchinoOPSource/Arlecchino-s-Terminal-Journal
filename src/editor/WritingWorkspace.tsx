@@ -7,6 +7,7 @@ import { repository } from '../persistence/repository';
 import { Shell } from '../ui/Shell';
 import { IconButton } from '../ui/IconButton';
 import { ArchivePanel } from '../ui/ArchivePanel';
+import { SearchPanel } from '../ui/SearchPanel';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
 
@@ -53,6 +54,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const error=state.error??lifecycleError;
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy}
+    search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}
     formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
