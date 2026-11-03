@@ -34,6 +34,8 @@ First-time setup for UI tests: `npx playwright install chromium` (a development-
 | Keyboard shortcuts and focus | — | modifier mapping | shortcuts, focus return, inactive under dialogs |
 | Backup and restore | round-trip preserves everything; invalid files refused; failed restore rolls back | restore flushes first; failure leaves journal | confirmation with counts, Cancel default, journal reloads |
 | Entry export | file-name cleaning | HTML/text output, escaping | export includes unsaved edits, escapes markup |
+| Privacy: no logging, no network, reviewed dependencies, private files | owner-only folder and files (Unix) | logging/network source scan, pinned runtime dependencies | full session makes no request outside the app |
+| Large data and interruption | 5,000 entries and a 1 MB entry within limits; kill during restore; damaged database unchanged | — | 5,000-entry archive and a 140,000-word entry stay responsive |
 
 ## What the UI tests do not prove
 
@@ -44,3 +46,5 @@ UI tests run in Chromium against the Vite dev server with the native commands re
 - Use only synthetic text. Never use real journal content, real backups or personal paths.
 - Storage behaviour belongs in Rust tests against in-memory or disposable databases.
 - Prefer accessible locators in UI tests (`getByRole`, names users see) and wait on visible outcomes rather than timeouts.
+
+Performance measurements of release builds (startup, memory) are not part of `npm run check`; see [PERFORMANCE.md](PERFORMANCE.md) for the procedure and results.
