@@ -1,5 +1,7 @@
 mod backup;
 mod journal;
+#[cfg(feature = "startup-metrics")]
+mod metrics;
 mod preferences;
 mod storage;
 use std::sync::Mutex;
@@ -35,7 +37,8 @@ fn safe_file_name(name: &str, extension: &str) -> String {
     )
 }
 /// Writes next to the destination first, then renames, so an interrupted write never leaves half a file.
-fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> {
+/// `private` files (copies kept in the app-data folder) are readable by their owner only.
+fn write_atomically(path: &std::path::Path, bytes: &[u8], private: bool) -> Result<(), String> {
     let failed =
         |_| "The file could not be written. Choose another folder and try again.".to_string();
     let file_name = path
@@ -44,6 +47,9 @@ fn write_atomically(path: &std::path::Path, bytes: &[u8]) -> Result<(), String> 
         .to_string_lossy();
     let temporary = path.with_file_name(format!(".{file_name}.partial"));
     std::fs::write(&temporary, bytes).map_err(failed)?;
+    if private {
+        storage::restrict_to_owner(&temporary).map_err(failed)?;
+    }
     std::fs::rename(&temporary, path).map_err(|e| {
         let _ = std::fs::remove_file(&temporary);
         failed(e)
@@ -57,6 +63,8 @@ fn display_name(path: &std::path::Path) -> String {
 
 #[tauri::command]
 async fn journal_list(db: tauri::State<'_, Database>) -> Result<Vec<journal::Summary>, String> {
+    #[cfg(feature = "startup-metrics")]
+    metrics::journal_ready();
     let mut guard = db.0.lock().map_err(|_| "Storage is unavailable")?;
     journal::list(guard.as_mut().map_err(|e| e.clone())?)
 }
@@ -128,7 +136,7 @@ async fn backup_export(
     else {
         return Ok(None);
     };
-    write_atomically(&path, json.as_bytes())?;
+    write_atomically(&path, json.as_bytes(), false)?;
     Ok(Some(display_name(&path)))
 }
 #[tauri::command]
@@ -195,11 +203,18 @@ async fn backup_restore(
         .app_data_dir()
         .map_err(|_| "Could not locate the journal folder. Your journal has not been changed.")?
         .join("backups");
-    std::fs::create_dir_all(&folder).map_err(
-        |_| "Could not save a copy of the current journal. Your journal has not been changed.",
-    )?;
+    std::fs::create_dir_all(&folder)
+        .and_then(|_| storage::restrict_to_owner(&folder))
+        .map_err(
+            |_| "Could not save a copy of the current journal. Your journal has not been changed.",
+        )?;
     let copy = folder.join(format!("before-restore-{}.json", now_ms()));
-    write_atomically(&copy, backup::export(connection, now_ms())?.as_bytes()).map_err(
+    write_atomically(
+        &copy,
+        backup::export(connection, now_ms())?.as_bytes(),
+        true,
+    )
+    .map_err(
         |_| "Could not save a copy of the current journal. Your journal has not been changed.",
     )?;
     backup::restore(connection, &chosen)?;
@@ -247,6 +262,7 @@ async fn entry_export(
         } else {
             html.as_bytes()
         },
+        false,
     )?;
     Ok(Some(display_name(&path)))
 }
@@ -263,7 +279,16 @@ fn journal_finish_exit(app: tauri::AppHandle) {
     app.exit(0);
 }
 pub fn run() {
-    let app = tauri::Builder::default()
+    #[cfg(feature = "startup-metrics")]
+    metrics::start();
+    let builder = tauri::Builder::default();
+    #[cfg(feature = "startup-metrics")]
+    let builder = builder.on_page_load(|_, payload| {
+        if matches!(payload.event(), tauri::webview::PageLoadEvent::Finished) {
+            metrics::mark("page-loaded");
+        }
+    });
+    let app = builder
         .plugin(tauri_plugin_dialog::init())
         .manage(ExitAllowed(AtomicBool::new(false)))
         .manage(PendingRestore(Mutex::new(None)))
@@ -295,12 +320,15 @@ pub fn run() {
                     .app_data_dir()
                     .map_err(|_| "Could not locate journal folder")?;
                 std::fs::create_dir_all(&directory)
+                    .and_then(|_| storage::restrict_to_owner(&directory))
                     .map_err(|_| "Could not create journal folder")?;
                 storage::open(&directory.join("journal.sqlite3"))
                     .map_err(|_| "Could not open journal database")
             })()
             .map_err(str::to_string);
             app.manage(Database(Mutex::new(database)));
+            #[cfg(feature = "startup-metrics")]
+            metrics::mark("storage-opened");
             Ok(())
         })
         .build(tauri::generate_context!())

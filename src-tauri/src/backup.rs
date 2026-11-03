@@ -331,6 +331,98 @@ mod tests {
         assert_eq!(left[0].title, "Original");
     }
 
+    fn large_backup(entries: usize) -> Backup {
+        let paragraph = "Synthetic restore load. ".repeat(80);
+        Backup {
+            format: FORMAT.into(),
+            version: VERSION,
+            exported_at: 1,
+            next_entry_number: entries as i64 + 1,
+            entries: (1..=entries)
+                .map(|n| Entry {
+                    id: format!("00000000-0000-4000-9000-{n:012}"),
+                    entry_number: n as i64,
+                    title: format!("Restored {n}"),
+                    content: json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":paragraph}]}]}),
+                    schema_version: 1,
+                    created_at: 1,
+                    updated_at: 2,
+                    revision: 1,
+                })
+                .collect(),
+            preferences: None,
+        }
+    }
+    #[test]
+    fn restore_crash_child() {
+        let Ok(path) = std::env::var("TERMINAL_SYNTHETIC_RESTORE_DB") else {
+            return;
+        };
+        let backup = large_backup(20_000);
+        let mut db = crate::storage::open(std::path::Path::new(&path)).unwrap();
+        use std::io::Write;
+        println!("RESTORING");
+        std::io::stdout().flush().unwrap();
+        restore(&mut db, &backup).unwrap();
+        println!("RESTORED");
+    }
+    #[test]
+    fn killing_the_app_during_restore_never_leaves_a_partial_journal() {
+        use std::io::{BufRead, BufReader};
+        for delay_ms in [0u64, 40, 400, 6000] {
+            let path = std::env::temp_dir().join(format!(
+                "terminal-restore-crash-synthetic-{}-{delay_ms}.sqlite3",
+                std::process::id()
+            ));
+            {
+                let mut db = crate::storage::open(&path).unwrap();
+                for n in 1..=3 {
+                    journal::save(&mut db, draft(n, "Original", json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"keep"}]}]}))).unwrap();
+                }
+            }
+            let mut child = std::process::Command::new(std::env::current_exe().unwrap())
+                .args([
+                    "--exact",
+                    "backup::tests::restore_crash_child",
+                    "--nocapture",
+                ])
+                .env("TERMINAL_SYNTHETIC_RESTORE_DB", &path)
+                .stdout(std::process::Stdio::piped())
+                .spawn()
+                .unwrap();
+            let mut lines = BufReader::new(child.stdout.take().unwrap()).lines();
+            while let Some(Ok(line)) = lines.next() {
+                if line.contains("RESTORING") {
+                    break;
+                }
+            }
+            std::thread::sleep(std::time::Duration::from_millis(delay_ms));
+            let _ = child.kill();
+            let _ = child.wait();
+            let db = crate::storage::open(&path).unwrap();
+            let integrity: String = db
+                .query_row("PRAGMA integrity_check", [], |r| r.get(0))
+                .unwrap();
+            assert_eq!(integrity, "ok");
+            let titles: Vec<String> = journal::list(&db)
+                .unwrap()
+                .into_iter()
+                .map(|e| e.title)
+                .collect();
+            let original = titles.len() == 3 && titles.iter().all(|t| t == "Original");
+            let restored =
+                titles.len() == 20_000 && titles.iter().all(|t| t.starts_with("Restored"));
+            assert!(
+                original || restored,
+                "partial journal after kill at {delay_ms} ms: {} entries",
+                titles.len()
+            );
+            drop(db);
+            for suffix in ["", "-wal", "-shm"] {
+                let _ = std::fs::remove_file(format!("{}{suffix}", path.display()));
+            }
+        }
+    }
     #[test]
     fn empty_journal_backup_round_trips() {
         let source = db();

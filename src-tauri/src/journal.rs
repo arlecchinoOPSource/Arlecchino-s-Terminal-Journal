@@ -443,6 +443,77 @@ mod tests {
         }
         assert!(list(&db).unwrap().is_empty());
     }
+    /// Large-journal timings. Bounds are generous (debug build, shared CI machines);
+    /// `cargo test --release large_journal -- --nocapture` prints the measured times.
+    #[test]
+    fn large_journal_stays_responsive() {
+        use std::time::Instant;
+        let path = std::env::temp_dir().join(format!(
+            "terminal-large-synthetic-{}.sqlite3",
+            std::process::id()
+        ));
+        let mut db = crate::storage::open(&path).unwrap();
+        let fixture: Value =
+            serde_json::from_str(include_str!("../../tests/fixtures/formatted-entry.json"))
+                .unwrap();
+        let started = Instant::now();
+        {
+            let tx = db.transaction().unwrap();
+            for n in 1..=5_000u32 {
+                tx.execute(
+                    "INSERT INTO entries(id,entry_number,title,content,schema_version,created_at,updated_at) VALUES (?,?,?,?,1,?,?)",
+                    params![format!("00000000-0000-4000-a000-{n:012}"), n, format!("Synthetic entry {n}"), fixture.to_string(), 1_i64, i64::from(n)],
+                ).unwrap();
+            }
+            tx.execute("UPDATE entry_sequence SET next_number=5001", [])
+                .unwrap();
+            tx.commit().unwrap();
+        }
+        let seeded = started.elapsed();
+        let t = Instant::now();
+        let all = list(&db).unwrap();
+        let listed = t.elapsed();
+        assert_eq!(all.len(), 5_000);
+        assert_eq!(all[0].entry_number, 5_000);
+
+        // About 1 MB of text (roughly 170,000 words) in one entry.
+        let words = "synthetic ".repeat(100_000);
+        let big = Save {
+            id: "00000000-0000-4000-a000-999999999999".into(),
+            title: "Large synthetic entry".into(),
+            content: serde_json::json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":words}]}]}),
+            schema_version: 1,
+            revision: 0,
+        };
+        let t = Instant::now();
+        let saved = save(&mut db, big.clone()).unwrap().unwrap();
+        let first_save = t.elapsed();
+        let t = Instant::now();
+        let mut again = big;
+        again.revision = saved.revision;
+        save(&mut db, again).unwrap();
+        let resave = t.elapsed();
+        let t = Instant::now();
+        let loaded = get(&db, &saved.id).unwrap().unwrap();
+        let opened = t.elapsed();
+        assert_eq!(loaded.entry_number, 5_001);
+        println!(
+            "seed 5,000 entries {seeded:?}; list {listed:?}; save 1 MB entry {first_save:?}; re-save {resave:?}; open {opened:?}"
+        );
+        assert!(
+            listed.as_millis() < 1_500,
+            "listing 5,000 entries took {listed:?}"
+        );
+        assert!(
+            first_save.as_millis() < 3_000 && resave.as_millis() < 3_000,
+            "saving 1 MB took {first_save:?}/{resave:?}"
+        );
+        assert!(opened.as_millis() < 1_500, "opening 1 MB took {opened:?}");
+        drop(db);
+        for suffix in ["", "-wal", "-shm"] {
+            let _ = std::fs::remove_file(format!("{}{suffix}", path.display()));
+        }
+    }
     #[test]
     fn crash_child() {
         let Ok(path) = std::env::var("TERMINAL_SYNTHETIC_CRASH_DB") else {
