@@ -15,11 +15,14 @@ export function usePreferences(repo: PreferencesRepository) {
   const changed = useRef(false);
   const latest = useRef(preferences);
   latest.current = preferences;
+  const [generation, setGeneration] = useState(0);
   useEffect(() => {
     let active = true;
     repo.load().then(stored => { if (active && !changed.current) setPreferences(stored); }, (e: unknown) => { if (active) setError(message(e)); });
     return () => { active = false; };
-  }, [repo]);
+  }, [repo, generation]);
+  /** Re-reads stored preferences, e.g. after a backup restore replaced them. */
+  const reload = useCallback(() => { changed.current = false; setGeneration(g => g + 1); }, []);
   useEffect(() => {
     const root = document.documentElement;
     for (const [name, value] of Object.entries(preferenceStyles(preferences))) root.style.setProperty(name, value);
@@ -31,5 +34,5 @@ export function usePreferences(repo: PreferencesRepository) {
     setPreferences(next);
     queue.current = queue.current.then(() => repo.save(next)).then(() => setError(null), (e: unknown) => setError(message(e)));
   }, [repo]);
-  return { preferences, error, update };
+  return { preferences, error, update, reload };
 }

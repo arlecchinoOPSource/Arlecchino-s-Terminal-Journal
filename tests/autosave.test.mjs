@@ -59,3 +59,25 @@ test('storage startup failure is reported and editing stays disabled',async()=>{
   assert.equal(c.snapshot().status,'Storage unavailable');assert.equal(c.snapshot().error,'Could not open journal database');
   c.edit({title:'ignored'});assert.equal(c.snapshot().draft.title,'');
 });
+test('restore saves pending edits first, then reloads the replaced journal',async()=>{
+  const {repo,rows}=fixture();const c=new JournalController(repo,60000);await c.initialize();
+  const id=c.snapshot().draft.id;c.edit({title:'Pending before restore'});
+  const order=[];
+  const result=await c.replaceJournal(async()=>{order.push(rows.get(id)?.title);rows.clear();rows.set('restored',{id:'restored',entry_number:7,title:'Restored',content:{type:'doc',content:[]},schema_version:1,revision:1,created_at:1,updated_at:1});return 'copy.json';});
+  assert.equal(result,'copy.json');assert.deepEqual(order,['Pending before restore']);
+  assert.deepEqual(c.snapshot().entries.map(e=>e.title),['Restored']);
+  assert.equal(c.snapshot().busy,false);assert.equal(c.snapshot().ready,true);assert.notEqual(c.snapshot().draft.id,id);
+});
+test('a failed restore leaves the open journal and draft as they were',async()=>{
+  const {repo}=fixture();const c=new JournalController(repo,60000);await c.initialize();
+  c.edit({title:'Stays open'});const id=c.snapshot().draft.id;
+  await assert.rejects(c.replaceJournal(async()=>{throw new Error('Synthetic invalid backup');}),/Synthetic invalid backup/);
+  assert.equal(c.snapshot().draft.id,id);assert.equal(c.snapshot().draft.title,'Stays open');assert.equal(c.snapshot().busy,false);assert.equal(c.snapshot().ready,true);
+});
+test('restore is not attempted when pending edits cannot be saved',async()=>{
+  const {repo}=fixture();repo.save=async()=>{throw new Error('Synthetic disk error');};
+  const c=new JournalController(repo,60000);await c.initialize();c.edit({title:'Unsaved'});
+  let called=false;
+  await assert.rejects(c.replaceJournal(async()=>{called=true;}));
+  assert.equal(called,false);assert.equal(c.snapshot().draft.title,'Unsaved');assert.equal(c.snapshot().busy,false);
+});

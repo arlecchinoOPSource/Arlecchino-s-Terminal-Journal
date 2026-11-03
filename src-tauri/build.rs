@@ -9,6 +9,10 @@ fn main() {
             "journal_finish_exit",
             "preferences_get",
             "preferences_set",
+            "backup_export",
+            "backup_choose",
+            "backup_restore",
+            "backup_cancel",
         ]),
     ))
     .expect("could not build application permissions");

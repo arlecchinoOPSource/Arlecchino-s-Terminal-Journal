@@ -2,11 +2,11 @@ import { useId, type ReactNode } from 'react';
 import { isMacPlatform, SHORTCUT_HELP, shortcutLabel } from '../domain/shortcuts';
 import { DEFAULT_PREFERENCES, FONT_SIZE_RANGE, LINE_SPACINGS, WRITING_FONTS, WRITING_WIDTHS, type Preferences, type WritingFont } from '../domain/preferences';
 
-type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; children?: ReactNode };
+type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; data?: ReactNode; children?: ReactNode };
 const sizes = Array.from({ length: FONT_SIZE_RANGE.max - FONT_SIZE_RANGE.min + 1 }, (_, i) => FONT_SIZE_RANGE.min + i);
 
 /** Editor preferences. Every change applies at once and is saved on this device. */
-export function SettingsPanel({ preferences, error, onChange, children }: Props) {
+export function SettingsPanel({ preferences, error, onChange, data, children }: Props) {
   const id = useId();
   const mac = isMacPlatform();
   const isDefault = (Object.keys(DEFAULT_PREFERENCES) as (keyof Preferences)[]).every(k => preferences[k] === DEFAULT_PREFERENCES[k]);
@@ -28,6 +28,7 @@ export function SettingsPanel({ preferences, error, onChange, children }: Props)
       <button type="button" className="settings-reset" disabled={isDefault} onClick={() => onChange({ ...DEFAULT_PREFERENCES })}>Reset to defaults</button>
     </div>
     <p className={error ? 'settings-status settings-error' : 'settings-status'} role={error ? 'alert' : 'status'}>{error ?? 'Changes apply immediately and are saved on this device.'}</p>
+    {data}
     <section className="settings-keys" aria-labelledby={`${id}-keys`}>
       <p id={`${id}-keys`} className="settings-section">KEYBOARD</p>
       <dl>{SHORTCUT_HELP.map(s => <div key={s.label}><dt>{s.label}</dt><dd>{s.keys.map(k => shortcutLabel(k, mac)).join(' / ')}</dd></div>)}</dl>

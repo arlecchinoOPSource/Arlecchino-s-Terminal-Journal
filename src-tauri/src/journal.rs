@@ -211,15 +211,28 @@ fn has_text(v: &Value) -> bool {
             .and_then(Value::as_array)
             .is_some_and(|a| a.iter().any(has_text))
 }
+/// Shared by saving and backup restore: the entry fields a stored entry must satisfy.
+pub(crate) fn valid_entry_fields(
+    id: &str,
+    title: &str,
+    content: &Value,
+    schema_version: i64,
+) -> bool {
+    id.len() == 36
+        && id.chars().all(|c| c.is_ascii_hexdigit() || c == '-')
+        && title.len() <= 100_000
+        && content.to_string().len() <= 10_000_000
+        && schema_version == 1
+        && content.get("type").and_then(Value::as_str) == Some("doc")
+        && valid_node(content, 0)
+}
 pub fn save(db: &mut Connection, draft: Save) -> Result<Option<Entry>, String> {
-    if draft.id.len() != 36
-        || !draft.id.chars().all(|c| c.is_ascii_hexdigit() || c == '-')
-        || draft.title.len() > 100_000
-        || draft.content.to_string().len() > 10_000_000
-        || draft.schema_version != 1
-        || draft.content.get("type").and_then(Value::as_str) != Some("doc")
-        || !valid_node(&draft.content, 0)
-    {
+    if !valid_entry_fields(
+        &draft.id,
+        &draft.title,
+        &draft.content,
+        draft.schema_version,
+    ) {
         return Err("Unsupported journal document. Your writing has not been replaced.".into());
     }
     let tx = db

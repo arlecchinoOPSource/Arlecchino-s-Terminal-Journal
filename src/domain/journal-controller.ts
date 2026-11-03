@@ -61,6 +61,20 @@ export class JournalController {
     this.publish({busy:true});
     try {await this.flush();} catch(error) {this.publish({busy:false});throw error;}
   }
+  /**
+   * Saves pending edits, runs an action that replaces stored entries (restore),
+   * then reloads. If saving or the action fails, the current journal stays open.
+   */
+  async replaceJournal<T>(action: () => Promise<T>): Promise<T> {
+    if (this.state.busy || !this.state.ready) throw new Error('Wait for the current save to finish, then try again.');
+    this.publish({ busy: true });
+    try { await this.flush(); } catch (error) { this.publish({ busy: false }); throw error; }
+    let result: T;
+    try { result = await action(); } catch (error) { this.publish({ busy: false }); throw error; }
+    this.publish({ ready: false });
+    await this.initialize();
+    return result;
+  }
   async remove() {
     if(this.state.busy || !this.state.entry)return;
     this.publish({busy:true});
