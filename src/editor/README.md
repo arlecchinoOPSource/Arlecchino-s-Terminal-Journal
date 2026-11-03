@@ -1,1 +1,1 @@
-Tiptap integration begins in T-05.
+Tiptap basic editing is implemented in WritingWorkspace.tsx. Structured draft snapshots stay in React memory only. Formatting toolbar, tables, storage, and autosave remain separate backlog tasks. Native copy/paste uses the platform Edit menu and standard shortcuts.

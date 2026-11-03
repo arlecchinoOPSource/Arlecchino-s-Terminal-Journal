@@ -4,9 +4,9 @@ A private, lightweight writing environment that makes journaling effortless.
 
 ![Terminal identity](docs/reference/arlecchino-brand-mockup.png)
 
-**Status: early desktop development preview. No stable release yet.**
+**Status: T-03–T-05 desktop writing preview. No stable release yet. Writing is temporary and is not saved.**
 
-Terminal is planned as an offline-first desktop journal for macOS and Windows. Open it, write with a compact rich-text toolbar, and find previous entries through title search and a chronological archive. Writing stays in a local SQLite database. No accounts, cloud dependency, analytics, advertising, or AI processing of journal content.
+Terminal is planned as an offline-first desktop journal for macOS and Windows. Open it, write with a compact rich-text toolbar, and find previous entries through title search and a chronological archive. The planned release will store writing in a local SQLite database; this early preview uses memory only. No accounts, cloud dependency, analytics, advertising, or AI processing of journal content.
 
 ## Project documents
 
@@ -19,7 +19,7 @@ Terminal is planned as an offline-first desktop journal for macOS and Windows. O
 
 Tracking: [20 ordered issues](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/issues?q=is%3Aissue+sort%3Acreated-asc) · [five milestones](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/milestones) · [Terminal v1.0 project board](https://github.com/users/arlecchinoOPSource/projects/1).
 
-## Planned technology
+## Technology
 
 Tauri 2, React, TypeScript, Vite, Tiptap, and local SQLite. Distribution is planned through GitHub Releases after cross-platform testing. Supported OS versions and installer trust requirements will be verified before release.
 
@@ -35,7 +35,7 @@ The accepted design includes autosave, full versioned JSON backup/restore, and r
 
 ## Development
 
-Open this folder in VS Code and run `npm run dev` in its terminal. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
+Open this folder in VS Code and run `npm run dev` in its terminal, or select **Terminal → Run Task → Terminal: Run desktop preview**. Test the title, multiline writing, selection, copy/paste, and undo/redo. **Closing or reloading clears your writing.** Saving begins with later backlog tasks. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
 
 ## License
 

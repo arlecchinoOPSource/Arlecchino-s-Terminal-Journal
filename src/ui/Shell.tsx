@@ -30,7 +30,7 @@ export function Shell({ children, historyControls }: Props) {
         <span className="save-status">Preview · not saved</span>
       </header>
       <main className="writing-surface" id="writing-workspace">{children}</main>
-      <footer className="workspace-footer"><span>TERMINAL <span className="publisher">/ ARLECCHINO</span></span><span>Temporary writing · closes without saving</span></footer>
+      <footer className="workspace-footer"><span>TERMINAL <span className="publisher">/ ARLECCHINO</span></span><span id="preview-warning">Temporary writing · closes without saving</span></footer>
     </div>
   </div>;
 }
