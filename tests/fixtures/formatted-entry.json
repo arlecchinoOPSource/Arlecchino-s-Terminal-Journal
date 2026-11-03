@@ -188,6 +188,113 @@
    ]
   },
   {
+   "type": "table",
+   "content": [
+    {
+     "type": "tableRow",
+     "content": [
+      {
+       "type": "tableHeader",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Day"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableHeader",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Note"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "tableRow",
+     "content": [
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Monday"
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "type": "tableCell",
+       "attrs": {
+        "colspan": 1,
+        "rowspan": 1,
+        "colwidth": null,
+        "align": null
+       },
+       "content": [
+        {
+         "type": "paragraph",
+         "attrs": {
+          "textAlign": null
+         },
+         "content": [
+          {
+           "type": "text",
+           "text": "Café 日本語 🎸"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
    "type": "paragraph",
    "attrs": {
     "textAlign": null

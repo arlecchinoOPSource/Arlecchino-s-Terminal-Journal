@@ -32,6 +32,7 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .tool-button:not(:disabled):hover { background: var(--raised); border-color: var(--muted); }
 .tool-button[aria-pressed='true'] { background: var(--mint); color: var(--near-black); }
 .tool-button[aria-pressed='true']:disabled { opacity: .6; }
+.tool-text { width: auto; padding: 0 6px; font-size: .75rem; letter-spacing: .04em; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .tools-label { margin-left: auto; color: var(--muted); font-size: .75rem; letter-spacing: .06em; }
 .writing-surface { min-width: 0; overflow: auto; border: 1px solid var(--muted); border-top-color: var(--mint); background: var(--forest); padding: 32px 48px 64px; position: relative; }
@@ -64,6 +65,12 @@ button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2
 .journal-body ul, .journal-body ol { margin: 0 0 1em; padding-left: 1.6em; }
 .journal-body li > p { margin: 0 0 .25em; }
 .journal-body blockquote { margin: 0 0 1em; padding-left: 1em; border-left: 2px solid var(--muted); color: var(--focus); }
+.journal-body table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0 0 1em; }
+.journal-body th, .journal-body td { border: 1px solid var(--muted); padding: 6px 8px; vertical-align: top; min-width: 3em; position: relative; }
+.journal-body th { font-weight: 600; text-align: left; background: var(--raised); }
+.journal-body th p, .journal-body td p { margin: 0; }
+.journal-body .selectedCell::after { content: ''; position: absolute; inset: 0; background: #b0e2cc26; pointer-events: none; }
+.journal-body .tableWrapper { overflow-x: auto; }
 .editor-placeholder { position: absolute; top: 0; left: 0; pointer-events: none; color: var(--muted); font: 1.0625rem/1.65 var(--font-writing); }
 @media (max-width: 1240px) { .tools-label { display: none; } }
 @media (max-width: 760px) {

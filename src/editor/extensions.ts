@@ -2,6 +2,7 @@ import { Extension } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
+import { TableKit } from '@tiptap/extension-table';
 
 // Font choices are limited to locally bundled faces. Values are stored verbatim
 // in entry JSON, so the native validator in src-tauri/src/journal.rs must list
@@ -65,5 +66,6 @@ export function basicExtensions() {
     TextAlign.configure({ types: ['heading', 'paragraph'], alignments: [...ALIGNMENTS] }),
     TextStyle,
     JournalFont,
+    TableKit.configure({ table: { resizable: false, allowTableNodeSelection: false } }),
   ];
 }

@@ -115,11 +115,12 @@ fn valid_attr(kind: &str, key: &str, v: &Value) -> bool {
             (kind, key),
             ("paragraph" | "heading", "textAlign")
                 | ("orderedList", "start" | "type")
+                | ("tableCell" | "tableHeader", "colwidth" | "align")
                 | ("textStyle", "fontFamily" | "fontSize")
         );
     }
     match (kind, key) {
-        ("paragraph" | "heading", "textAlign") => {
+        ("paragraph" | "heading", "textAlign") | ("tableCell" | "tableHeader", "align") => {
             matches!(v.as_str(), Some("left" | "center" | "right"))
         }
         ("heading", "level") => small_int(v, 1, 3),
@@ -130,6 +131,10 @@ fn valid_attr(kind: &str, key: &str, v: &Value) -> bool {
             !t.is_empty()
                 && t.len() <= 24
                 && t.chars().all(|c| c.is_ascii_alphanumeric() || c == '-')
+        }),
+        ("tableCell" | "tableHeader", "colspan" | "rowspan") => small_int(v, 1, 1000),
+        ("tableCell" | "tableHeader", "colwidth") => v.as_array().is_some_and(|a| {
+            a.len() <= 1000 && a.iter().all(|w| w.is_null() || small_int(w, 0, 100_000))
         }),
         ("textStyle", "fontFamily") => v.as_str().is_some_and(|f| FONT_FAMILIES.contains(&f)),
         ("textStyle", "fontSize") => v.as_str().is_some_and(|f| FONT_SIZES.contains(&f)),
@@ -161,6 +166,10 @@ fn valid_node(v: &Value, depth: usize) -> bool {
             | "orderedList"
             | "listItem"
             | "blockquote"
+            | "table"
+            | "tableRow"
+            | "tableCell"
+            | "tableHeader"
     ) || !valid_attrs(kind, v)
     {
         return false;
@@ -365,7 +374,7 @@ mod tests {
         assert!(list(&db).unwrap().is_empty());
     }
     #[test]
-    fn formatted_document_round_trips() {
+    fn formatted_document_with_table_round_trips() {
         let mut db = db();
         let mut formatted = draft(1);
         formatted.content =

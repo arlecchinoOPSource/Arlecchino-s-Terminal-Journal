@@ -24,6 +24,8 @@ export function FormattingToolbar({ editor, disabled }: Props) {
       align: (ALIGNMENTS.find(a => e.isActive({ textAlign: a })) ?? 'left') as Alignment,
       fontFamily: typeof style.fontFamily === 'string' ? style.fontFamily : '',
       fontSize: typeof style.fontSize === 'string' ? style.fontSize : DEFAULT_FONT_SIZE,
+      inTable: e.isActive('table'),
+      canDeleteRow: e.can().deleteRow(), canDeleteColumn: e.can().deleteColumn(),
     };
   } });
   const off = disabled || !editor || !active;
@@ -62,6 +64,17 @@ export function FormattingToolbar({ editor, disabled }: Props) {
     <Group label="Alignment">
       {ALIGNMENTS.map(a => <IconToggle key={a} icon={`align-${a}`} label={`Align ${a}`} shortcut={`${mod}${shift}${{ left: 'L', center: 'E', right: 'R' }[a]}`} pressed={active?.align === a} disabled={off} onClick={() => run().setTextAlign(a).run()} />)}
     </Group>
+    <Group label="Table">
+      {!active?.inTable
+        ? <IconButton icon="table" label="Insert table (3 × 3 with header row)" disabled={off} onClick={() => run().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} />
+        : <>
+          <TextTool label="Add row below" disabled={off} onClick={() => run().addRowAfter().run()}>+ROW</TextTool>
+          <TextTool label="Delete row" disabled={off || !active.canDeleteRow} onClick={() => run().deleteRow().run()}>−ROW</TextTool>
+          <TextTool label="Add column right" disabled={off} onClick={() => run().addColumnAfter().run()}>+COL</TextTool>
+          <TextTool label="Delete column" disabled={off || !active.canDeleteColumn} onClick={() => run().deleteColumn().run()}>−COL</TextTool>
+          <TextTool label="Delete table" disabled={off} onClick={() => run().deleteTable().run()}>DEL</TextTool>
+        </>}
+    </Group>
   </>;
 }
 
@@ -76,4 +89,7 @@ function Toggle({ label, shortcut, pressed, disabled, onClick, children }: Toggl
 }
 function IconToggle({ icon, ...props }: ToggleProps & { icon: Parameters<typeof IconButton>[0]['icon'] }) {
   return <IconButton icon={icon} label={props.label} title={props.shortcut ? `${props.label} (${props.shortcut})` : props.label} aria-pressed={props.pressed ?? false} disabled={props.disabled} onMouseDown={keepSelection} onClick={props.onClick} className="tool-button" />;
+}
+function TextTool({ label, disabled, onClick, children }: { label: string; disabled: boolean; onClick: () => void; children: ReactNode }) {
+  return <button type="button" className="tool-button tool-text" aria-label={label} title={label} disabled={disabled} onMouseDown={keepSelection} onClick={onClick}>{children}</button>;
 }

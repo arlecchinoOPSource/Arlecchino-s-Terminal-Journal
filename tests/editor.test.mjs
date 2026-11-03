@@ -41,14 +41,14 @@ test('entries saved before formatting attributes existed still open unchanged', 
   assert.equal(document.firstChild.attrs.textAlign, null);
 });
 
-test('formatted entry with headings, lists, quote, alignment and fonts round-trips exactly', () => {
+test('formatted entry with headings, lists, quote, alignment, fonts and a table round-trips exactly', () => {
   const content = JSON.parse(readFileSync(new URL('./fixtures/formatted-entry.json', import.meta.url)));
   const document = schema.nodeFromJSON(content);
   document.check();
   assert.deepEqual(JSON.parse(JSON.stringify(document.toJSON())), content);
   const types = new Set();
   document.descendants(node => { types.add(node.type.name); });
-  for (const type of ['heading', 'bulletList', 'orderedList', 'blockquote']) assert.ok(types.has(type), type);
+  for (const type of ['heading', 'bulletList', 'orderedList', 'blockquote', 'table', 'tableHeader', 'tableCell']) assert.ok(types.has(type), type);
 });
 
 test('editor font choices match the native validator allowlist', () => {
