@@ -13,6 +13,8 @@ It provides a distraction-free writing environment with a small set of rich-text
 
 Terminal is designed for users who want the advantages of digital journaling without accounts, cloud dependencies, notifications, advertising, or unnecessary productivity features.
 
+Visual presentation follows [UI design system v0.2](UI-DESIGN-SYSTEM-v0.2.md). The revised terminal aesthetic preserves the left menu, right writing field, existing palette, and all functional/privacy boundaries below. This is presentation guidance, not an expanded feature scope.
+
 ### 2. Product Objectives
 
 1. Make starting a journal entry effortless.

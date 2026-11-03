@@ -12,6 +12,10 @@ Every issue should have:
 - Tests appropriate to the change.
 - No unrelated feature additions.
 
+## Design revision note — November 3, 2026
+
+[UI design system v0.2](UI-DESIGN-SYSTEM-v0.2.md) now governs future presentation work. Its documentation is authorized; implementation is not. T-04’s original shell work must not be represented as implementing the new revision. A future authorized visual pass must meet v0.2 section 10 without adding adjacent features or changing the left menu, right writing field, or palette.
+
 ## M0 — Foundation
 
 ### T-01 — Finalize product and design documentation
@@ -67,7 +71,7 @@ Every issue should have:
 - Handle window resizing.
 
 **Acceptance criteria:**
-- Interface closely matches the supplied mockups.
+- Interface matches the design specification authorized for that implementation. The original T-04 shell uses v0.1; a future v0.2 visual pass follows its reference interpretation and acceptance checklist.
 - Layout resizes correctly.
 - No writing or storage functionality is required yet.
 - UI components have consistent states.
