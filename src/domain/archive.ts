@@ -7,10 +7,8 @@ export function archiveOrder<T extends ArchiveItem>(entries: readonly T[]): T[] 
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
-/** Local calendar date as YYYY-MM-DD, or HH:MM for entries modified today. */
-export function archiveDate(updatedAt: number, now = Date.now()): string {
+/** Local modification date and time as YYYY-MM-DD HH:MM. */
+export function archiveDate(updatedAt: number): string {
   const d = new Date(updatedAt);
-  const today = new Date(now);
-  if (d.toDateString() === today.toDateString()) return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }

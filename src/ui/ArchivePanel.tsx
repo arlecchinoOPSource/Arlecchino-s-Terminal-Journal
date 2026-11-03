@@ -29,11 +29,11 @@ export function ArchivePanel({ entries, activeId, disabled, onSelect }: Props) {
         const current = entry.id === activeId;
         return <li key={entry.id}>
           <button type="button" className="archive-row" aria-current={current} aria-disabled={disabled}
-            aria-label={`Entry ${entry.entry_number}: ${entry.title || 'Untitled'}, modified ${archiveDate(entry.updated_at)}${current ? ', open now' : ''}`}
+            aria-label={`${entry.title || 'Untitled'}, modified ${archiveDate(entry.updated_at)}${current ? ', open now' : ''}`}
             onClick={() => { if (!disabled) onSelect(entry.id); }}>
             <span className="archive-marker" aria-hidden="true">{current ? '▶' : ''}</span>
             <span className="archive-title">{entry.title || 'Untitled'}</span>
-            <span className="archive-meta" aria-hidden="true"><span>#{entry.entry_number}</span><span>{archiveDate(entry.updated_at)}</span></span>
+            <span className="archive-meta" aria-hidden="true">{archiveDate(entry.updated_at)}</span>
           </button>
         </li>;
       })}

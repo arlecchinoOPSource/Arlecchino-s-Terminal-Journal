@@ -23,8 +23,7 @@ test('archive keeps every entry of a long journal', () => {
   assert.equal(ordered[0].entry_number, 2000);
 });
 
-test('archive dates show time for today and a calendar date otherwise', () => {
-  const now = new Date(2026, 10, 3, 18, 30).getTime();
-  assert.equal(archiveDate(new Date(2026, 10, 3, 9, 5).getTime(), now), '09:05');
-  assert.equal(archiveDate(new Date(2026, 0, 7, 23, 59).getTime(), now), '2026-01-07');
+test('archive rows show the local modification date and time', () => {
+  assert.equal(archiveDate(new Date(2026, 10, 3, 9, 5).getTime()), '2026-11-03 09:05');
+  assert.equal(archiveDate(new Date(2026, 0, 7, 23, 59).getTime()), '2026-01-07 23:59');
 });

@@ -123,5 +123,5 @@ select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .archive-row[aria-disabled='true'] { cursor: default; opacity: .6; }
 .archive-marker { font-size: .625rem; }
 .archive-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-writing); font-size: .875rem; }
-.archive-meta { display: flex; gap: 10px; color: var(--muted); font-size: .75rem; white-space: nowrap; }
+.archive-meta { color: var(--muted); font-size: .75rem; white-space: nowrap; }
 @media (max-width: 520px) { .archive-popover { top: 8px; left: 76px; width: calc(100% - 92px); max-height: calc(100% - 16px); } }
