@@ -30,3 +30,7 @@ Interactive check in the Vite dev server with an in-memory mock of synthetic ent
 - Search in the native app with real SQLite storage, by hand.
 - VoiceOver announcement of the combobox and results, Windows, and 200% text enlargement.
 - No search keyboard shortcut is added; shortcuts belong to a later backlog issue.
+
+## Overlay placement change — November 4, 2026
+
+At the product owner's request, Search and Archives now open in the middle of the app window instead of beside the rail / above the workspace (a deliberate departure from the v0.2 placement guidance). Archives (up to 360 × 520 px) is centred on both axes. Search (up to 480 × 440 px) is centred horizontally with a fixed top edge, so it grows downward while typing instead of jumping, and is vertically centred when its list is full. Both keep an 8–12 px margin from the window edge. Checked at 1100 × 780, 760 × 600 and 480 × 400: equal left/right margins and no horizontal scrolling.
