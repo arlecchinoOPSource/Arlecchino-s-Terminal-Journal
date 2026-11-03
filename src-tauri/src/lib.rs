@@ -205,6 +205,51 @@ async fn backup_restore(
     backup::restore(connection, &chosen)?;
     Ok(copy.display().to_string())
 }
+/// Saves one entry as a readable file. The person chooses HTML or plain text by the file name's extension.
+#[tauri::command]
+async fn entry_export(
+    app: tauri::AppHandle,
+    suggested_name: String,
+    html: String,
+    text: String,
+) -> Result<Option<String>, String> {
+    if html.len() > 64 * 1024 * 1024 || text.len() > 64 * 1024 * 1024 {
+        return Err("This entry is too large to export.".into());
+    }
+    let Some(mut path) = app
+        .dialog()
+        .file()
+        .set_title("Export entry")
+        .add_filter("Web page (HTML)", &["html", "htm"])
+        .add_filter("Plain text", &["txt"])
+        .set_file_name(safe_file_name(&suggested_name, "html"))
+        .blocking_save_file()
+        .and_then(|p| p.into_path().ok())
+    else {
+        return Ok(None);
+    };
+    let extension = path
+        .extension()
+        .map(|e| e.to_string_lossy().to_lowercase())
+        .unwrap_or_default();
+    let plain = extension == "txt" || extension == "text";
+    if !plain && extension != "html" && extension != "htm" {
+        path.set_extension(if extension.is_empty() {
+            "html".to_string()
+        } else {
+            format!("{extension}.html")
+        });
+    }
+    write_atomically(
+        &path,
+        if plain {
+            text.as_bytes()
+        } else {
+            html.as_bytes()
+        },
+    )?;
+    Ok(Some(display_name(&path)))
+}
 #[tauri::command]
 fn backup_cancel(pending: tauri::State<'_, PendingRestore>) {
     if let Ok(mut slot) = pending.0.lock() {
@@ -240,7 +285,8 @@ pub fn run() {
             backup_export,
             backup_choose,
             backup_restore,
-            backup_cancel
+            backup_cancel,
+            entry_export
         ])
         .setup(|app| {
             let database = (|| {
@@ -267,4 +313,20 @@ pub fn run() {
             let _ = app.emit_to("main", "journal-close-requested", ());
         }
     });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::safe_file_name;
+    #[test]
+    fn suggested_file_names_stay_plain() {
+        assert_eq!(
+            safe_file_name("Terminal backup 2026-11-04", "json"),
+            "Terminal backup 2026-11-04.json"
+        );
+        assert_eq!(safe_file_name("../../etc/passwd", "html"), "etcpasswd.html");
+        assert_eq!(safe_file_name("Notes.html", "html"), "Notes.html");
+        assert_eq!(safe_file_name("Café 日本語", "html"), "Café 日本語.html");
+        assert_eq!(safe_file_name("///", "json"), "Terminal.json");
+    }
 }
