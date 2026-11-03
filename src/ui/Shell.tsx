@@ -1,4 +1,5 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { ariaShortcut, isMacPlatform, matchShortcut, shortcutLabel } from '../domain/shortcuts';
 import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
@@ -11,16 +12,35 @@ export function Shell({ children, formattingControls, historyControls, status, o
   const searchRef = useRef<HTMLButtonElement>(null);
   const closePanel = useCallback(() => setPanel(null), []);
   const toggle = (next: Exclude<Panel, null>) => setPanel(panel === next ? null : next);
+  const mac = isMacPlatform();
+  const hint = (label: string, keys: string) => ({ label, title: `${label} (${shortcutLabel(keys, mac)})`, 'aria-keyshortcuts': ariaShortcut(keys, mac) });
+  // App shortcuts work from anywhere except while a modal dialog (e.g. delete confirmation) is open.
+  const actions = useRef({ onNew, navigationDisabled, search: !!search, archive: !!archive });
+  actions.current = { onNew, navigationDisabled, search: !!search, archive: !!archive };
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      const action = matchShortcut(event, mac);
+      if (!action || document.querySelector('dialog[open]')) return;
+      event.preventDefault();
+      const a = actions.current;
+      if (action === 'new-entry') { if (!a.navigationDisabled) { setPanel(null); a.onNew?.(); } return; }
+      const target = action === 'search' ? 'search' : action === 'archives' ? 'archives' : 'info';
+      if ((target === 'search' && !a.search) || (target === 'archives' && !a.archive)) return;
+      setPanel(current => current === target ? null : target);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mac]);
   const showInfo = panel === 'info';
   return <div className="app-shell">
     <nav className="rail" aria-label="Journal navigation">
-      <span className="brand-mark" aria-label="Terminal">t<span>›</span></span>
+      <span className="brand-mark" role="img" aria-label="Terminal">t<span>›</span></span>
       <div className="rail-actions">
-        <IconButton ref={searchRef} icon="search" label="Search titles" disabled={!search} aria-expanded={panel === 'search'} aria-controls="search-panel" onClick={() => toggle('search')} />
-        <IconButton ref={archiveRef} icon="archive" label="Archives" disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
-        <IconButton icon="plus" label="New entry" disabled={navigationDisabled} onClick={onNew} />
+        <IconButton ref={searchRef} icon="search" {...hint('Search titles', 'Mod+K')} disabled={!search} aria-expanded={panel === 'search'} aria-controls="search-panel" onClick={() => toggle('search')} />
+        <IconButton ref={archiveRef} icon="archive" {...hint('Archives', 'Mod+O')} disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
+        <IconButton icon="plus" {...hint('New entry', 'Mod+N')} disabled={navigationDisabled} onClick={onNew} />
       </div>
-      <IconButton ref={infoRef} icon="settings" label="Settings" className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
+      <IconButton ref={infoRef} icon="settings" {...hint('Settings', 'Mod+,')} className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
     </nav>
     {panel === 'search' && search && <Popover id="search-panel" title="Search titles" className="search-popover" closeLabel="Close search" onClose={closePanel} triggerRef={searchRef}>{search(closePanel)}</Popover>}
     {panel === 'archives' && archive && <Popover id="archive-panel" title="Archives" className="archive-popover" closeLabel="Close archives" onClose={closePanel} triggerRef={archiveRef}>{archive(closePanel)}</Popover>}
@@ -30,11 +50,11 @@ export function Shell({ children, formattingControls, historyControls, status, o
     </Popover>}
     <div className="workspace">
       <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>
-      <header className="toolbar" aria-label="Writing tools">
+      <section className="toolbar" aria-label="Writing tools">
         {formattingControls}
         <div className="history-controls">{historyControls}</div>
-        <span className="tools-label">WRITING TOOLS</span>
-      </header>
+        <span className="tools-label" aria-hidden="true">WRITING TOOLS</span>
+      </section>
       <main className="writing-surface" id="writing-workspace">{children}</main>
       <footer className="workspace-footer"><span className="save-status">{status}</span><span id="preview-warning">LOCAL JOURNAL</span></footer>
     </div>

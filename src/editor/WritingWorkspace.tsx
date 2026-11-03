@@ -13,6 +13,9 @@ import { usePreferences } from '../ui/usePreferences';
 import { preferencesRepository } from '../persistence/preferences';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
+import { ariaShortcut, isMacPlatform, shortcutLabel } from '../domain/shortcuts';
+
+const mac=isMacPlatform();
 
 export function WritingWorkspace() {
   const [controller] = useState(()=>new JournalController(repository));
@@ -63,7 +66,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>}
     formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
-    historyControls={<><IconButton icon="undo" label="Undo" disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
+    historyControls={<><IconButton icon="undo" label="Undo" title={`Undo (${shortcutLabel('Mod+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Z',mac)} disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" title={`Redo (${shortcutLabel('Mod+Shift+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Shift+Z',mac)} disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
     <div className="writing-column">
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
       <div className="entry-navigation">
