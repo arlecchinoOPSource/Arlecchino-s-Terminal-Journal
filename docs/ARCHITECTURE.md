@@ -10,6 +10,10 @@ Status: accepted stack and product boundaries; implementation details below are 
 
 **Consequences:** Rust and native prerequisites are needed. Platform builds require their respective toolchains. SQLite is not encryption; local account and disk protection remain the v1 security boundary. Signing/notarization and trusted Windows distribution require separate release preparation.
 
+## Visual specification
+
+[UI design system v0.2](UI-DESIGN-SYSTEM-v0.2.md) is the current presentation specification. Its terminal-console treatment does not change the stack, offline/privacy boundaries, storage contract, or feature scope. The November 3 aesthetic revision is documentation only; implementing it requires separate authorization.
+
 ## Planned boundaries
 
 React views (rail, toolbar, editor, overlays, settings) → application/domain operations → typed journal repository → Tauri/native SQLite integration. Tiptap owns editing behavior; its JSON document is persisted, not DOM or editor instances.

@@ -2,14 +2,16 @@
 
 ## Product and current stage
 
-Terminal by Arlecchino is a minimal, offline-first journal for macOS and Windows. Read `docs/PRD-v0.1.md`, `docs/UI-DESIGN-SYSTEM-v0.1.md`, `docs/ARCHITECTURE.md`, and the selected backlog issue before work.
+Terminal by Arlecchino is a minimal, offline-first journal for macOS and Windows. Read `docs/PRD-v0.1.md`, `docs/UI-DESIGN-SYSTEM-v0.2.md`, `docs/ARCHITECTURE.md`, and the selected backlog issue before work.
 
 This repository currently contains preparation only. Do not initialize app source, implement features, or run app generators until the user authorizes implementation. T-03 is the future initialization task. Work on one authorized issue at a time; do not silently implement adjacent issues.
 
 ## Mandatory boundaries
 
 - Use Tauri 2 + React + TypeScript + Vite + Tiptap + local SQLite. Explain and document any proposed architecture change before adopting it.
-- Preserve forest black `#16231D`, near black `#090B0C`, and terminal mint `#B0E2CC`, the thin outlined rail/toolbar/editor structure, and dominant writing surface.
+- Follow the current v0.2 personal archive terminal design: monospaced interface labels, compact segmented strips, square technical frames, and restrained mint-filled selections. Preserve forest black `#16231D`, near black `#090B0C`, and terminal mint `#B0E2CC` exactly.
+- Preserve the left menu order (Search, Archives, New entry; Settings below) and dominant right-hand writing field. Keep writing clear of scanlines, grids, glow, and decorative overlays. No fake telemetry, network state, security claims, or reference-derived features.
+- The November 3, 2026 aesthetic revision authorizes documentation and GitHub updates only. Do not implement the v0.2 redesign or change app code/assets/dependencies without a separate implementation request.
 - No accounts, servers, cloud sync, telemetry, ads, third-party AI processing, streaks, reminders, or unrelated productivity features.
 - No network dependency at app runtime. Bundle approved fonts/assets locally. Development dependency downloads do not justify runtime network features.
 - Never read, upload, log, or commit real journal content, credentials, signing keys, or backups. Use synthetic fixtures.
