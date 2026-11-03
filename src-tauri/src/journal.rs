@@ -391,6 +391,22 @@ mod tests {
         );
     }
     #[test]
+    fn archive_list_is_most_recently_modified_first() {
+        let mut db = db();
+        for n in 1..=3 {
+            save(&mut db, draft(n)).unwrap();
+        }
+        for (n, at) in [(1, 300), (2, 100), (3, 100)] {
+            db.execute(
+                "UPDATE entries SET updated_at=created_at+? WHERE id=?",
+                params![at, draft(n).id],
+            )
+            .unwrap();
+        }
+        let numbers: Vec<i64> = list(&db).unwrap().iter().map(|e| e.entry_number).collect();
+        assert_eq!(numbers, vec![1, 3, 2]);
+    }
+    #[test]
     fn pasted_list_types_are_accepted() {
         let mut db = db();
         let mut pasted = draft(1);
