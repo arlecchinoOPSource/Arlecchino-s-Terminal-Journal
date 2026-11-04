@@ -9,7 +9,7 @@ Implementation of T-03 through T-05 was authorized on November 3, 2026. Work on 
 ## Mandatory boundaries
 
 - Use Tauri 2 + React + TypeScript + Vite + Tiptap + local SQLite. Explain and document any proposed architecture change before adopting it.
-- Follow the current v0.3 "Terminal 84" design (`docs/UI-DESIGN-SYSTEM-v0.3.md`): blue-black framed panels, one phosphor-cyan accent (amber and rose only for attention and failure), Orbitron display lettering for the wordmark and panel titles, IBM Plex Mono interface labels. Use the colour tokens in `src/styles/tokens.css`; the v0.2 forest/mint palette was retired by the product owner on November 4, 2026.
+- Follow the current v0.3 "Terminal 84" design (`docs/UI-DESIGN-SYSTEM-v0.3.md`): green-black framed panels, one phosphor-green accent (amber and rose only for attention and failure), Orbitron display lettering for the wordmark and panel titles, IBM Plex Mono interface labels. Use the colour tokens in `src/styles/tokens.css`; the v0.2 forest/mint palette was retired by the product owner on November 4, 2026.
 - Preserve the left menu order (Search, Archives, New entry; Settings below) and dominant right-hand writing field. Keep the writing page clear of scanlines, grids, glow, and decorative overlays (these may appear only in the surrounding chrome). No fake telemetry, network state, security claims, or reference-derived content.
 - Visual changes beyond v0.3 require an explicit request from the product owner and an updated design document.
 - No accounts, servers, cloud sync, telemetry, ads, third-party AI processing, streaks, reminders, or unrelated productivity features.

@@ -15,28 +15,28 @@
 :root {
   color-scheme: dark;
   /* Surfaces, darkest to lightest */
-  --void: #04070A;      /* window canvas */
-  --gutter: #060B0E;    /* space beside the writing page */
-  --panel: #0A1116;     /* rail, toolbar, status bar, panels */
-  --page: #0C151A;      /* writing page */
-  --panel-2: #0F1A20;   /* inputs, hover, raised */
-  --tint: #11292A;      /* accent-tinted selection background */
+  --void: #050706;      /* window canvas */
+  --gutter: #070908;    /* space beside the writing page */
+  --panel: #0B0F0D;     /* rail, toolbar, status bar, panels */
+  --page: #0D1210;      /* writing page */
+  --panel-2: #121815;   /* inputs, hover, raised */
+  --tint: #10261E;      /* accent-tinted selection background */
   /* Lines */
-  --line: #18292F;      /* quiet rules */
-  --line-2: #24464C;    /* frames */
-  --line-3: #3F7A7E;    /* control borders (3:1) */
+  --line: #1A2420;      /* quiet rules */
+  --line-2: #284239;    /* frames */
+  --line-3: #43786A;    /* control borders (3:1) */
   /* Ink */
-  --text: #DDEFEA;
-  --text-2: #9FBDB6;
-  --muted: #7A9B95;
+  --text: #E0EFE8;
+  --text-2: #A2BDB1;
+  --muted: #7E9A8E;
   /* Signals */
-  --phosphor: #4FF0D0;     /* primary accent */
-  --phosphor-hi: #A6FFEE;  /* highlight, gradient top */
-  --phosphor-lo: #148E80;  /* gradient foot, dim accent */
-  --glow: rgba(79, 240, 208, .32);
+  --phosphor: #52F0BE;     /* primary accent */
+  --phosphor-hi: #B4FFE4;  /* highlight, gradient top */
+  --phosphor-lo: #16906C;  /* gradient foot, dim accent */
+  --glow: rgba(82, 240, 190, .32);
   --amber: #FFB648;        /* attention: unsaved, saving */
   --danger: #FF6B78;       /* failures and destructive actions */
-  --focus: #B9FFF1;
+  --focus: #C2FFE9;
 
   --font-ui: 'IBM Plex Mono', ui-monospace, monospace;
   --font-display: 'Orbitron', 'IBM Plex Sans Condensed', sans-serif;

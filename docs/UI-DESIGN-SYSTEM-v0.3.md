@@ -8,7 +8,7 @@ This version supersedes [v0.2](UI-DESIGN-SYSTEM-v0.2.md). It changes presentatio
 
 ## 1. Direction
 
-A night-shift CRT console: deep blue-black glass, one phosphor-cyan signal colour, thin framed panels, and a wide striped wordmark. The chrome carries the retro character; the writing page stays calm and highly legible.
+A night-shift CRT console: deep green-black glass, one phosphor-green signal colour, thin framed panels, and a wide striped wordmark. The chrome carries the retro character; the writing page stays calm and highly legible.
 
 ### What was taken from the references
 
@@ -18,7 +18,7 @@ A night-shift CRT console: deep blue-black glass, one phosphor-cyan signal colou
 | Framed panels with an inner rule | Rail, header, panels and dialogs use a 1px frame plus an inset hairline, a soft phosphor bloom, and glowing corner brackets (header, rail, Search, Archives, dialogs) |
 | CRT texture | Visible scanlines and a vignette on the canvas; fainter scanlines under chrome panels and in the gutter beside the page |
 | Thin framed loading bar | The segmented save indicator in the status bar (state only — never fake progress) |
-| One neon hue on near-black | Phosphor cyan `#4FF0D0`; amber and rose only for attention and failure |
+| One neon hue on near-black | Phosphor green `#52F0BE`; amber and rose only for attention and failure |
 
 ### What was deliberately left out
 
@@ -28,22 +28,24 @@ Fake surveillance or telemetry messages, brand parodies, "premium"/payment copy,
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `--void` | `#04070A` | Window canvas |
-| `--gutter` | `#060B0E` | Space beside the writing page |
-| `--panel` | `#0A1116` | Rail, header, toolbar, status bar, panels |
-| `--page` | `#0C151A` | Writing page |
-| `--panel-2` | `#0F1A20` | Inputs, hover, raised |
-| `--tint` | `#11292A` | Accent-tinted selection background |
-| `--line` / `--line-2` | `#18292F` / `#24464C` | Quiet rules / frames |
-| `--line-3` | `#3F7A7E` | Control borders (≥3:1 against their background) |
-| `--text` / `--text-2` / `--muted` | `#DDEFEA` / `#9FBDB6` / `#7A9B95` | Primary, secondary and meta text |
-| `--phosphor` | `#4FF0D0` | Accent: active state, focus of attention, wordmark |
-| `--phosphor-hi` / `--phosphor-lo` | `#A6FFEE` / `#148E80` | Gradient highlight and foot, dim accent |
+| `--void` | `#050706` | Window canvas |
+| `--gutter` | `#070908` | Space beside the writing page |
+| `--panel` | `#0B0F0D` | Rail, header, toolbar, status bar, panels |
+| `--page` | `#0D1210` | Writing page |
+| `--panel-2` | `#121815` | Inputs, hover, raised |
+| `--tint` | `#10261E` | Accent-tinted selection background |
+| `--line` / `--line-2` | `#1A2420` / `#284239` | Quiet rules / frames |
+| `--line-3` | `#43786A` | Control borders (≥3:1 against their background) |
+| `--text` / `--text-2` / `--muted` | `#E0EFE8` / `#A2BDB1` / `#7E9A8E` | Primary, secondary and meta text |
+| `--phosphor` | `#52F0BE` | Accent: active state, focus of attention, wordmark |
+| `--phosphor-hi` / `--phosphor-lo` | `#B4FFE4` / `#16906C` | Gradient highlight and foot, dim accent |
 | `--amber` | `#FFB648` | Unsaved changes and saving |
 | `--danger` | `#FF6B78` | Failures and destructive actions |
-| `--focus` | `#B9FFF1` | Keyboard focus rings |
+| `--focus` | `#C2FFE9` | Keyboard focus rings |
 
-Measured contrast (WCAG): primary text 14.8–16.9:1, secondary 8.8–10:1, meta 5.9–6.7:1, accent 12.4–14.1:1, amber ≥10:1, danger ≥6.4:1 on every surface. Control borders 3.6–3.9:1.
+Measured contrast (WCAG): primary text 13.4–17:1, secondary 7.9–10:1, meta 5.2–6.6:1, accent 11–14:1, amber ≥9.1:1, danger ≥5.8:1 on every surface including the selection tint. Control borders 3.1–4:1.
+
+On November 4, 2026 the owner asked for the app to look less blue: surfaces moved from blue-black to a neutral, faintly green black and the accent from cyan (`#4FF0D0`) to phosphor green (`#52F0BE`).
 
 ## 3. Typography
 
@@ -69,7 +71,7 @@ Measured contrast (WCAG): primary text 14.8–16.9:1, secondary 8.8–10:1, meta
 `assets/terminal-icon.svg` is the source, made of paths only so it does not depend on installed fonts. It is a rounded tile on the macOS 824 px grid within a 1024 px canvas, in the style of app-suite icons:
 - a bold phosphor rim with a gradient and glow;
 - a dark CRT screen with scanlines, a vignette, an inner frame and a glass sheen;
-- the italic `t` and upright `>` of the brand mark, with a shiny gradient, the wordmark's striped lower half and a soft glow.
+- the italic `t` and upright `>` of the brand mark, with a shiny gradient and a soft glow (solid, no stripes).
 
 It stays legible at 32 px.
 

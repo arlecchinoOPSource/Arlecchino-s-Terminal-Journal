@@ -4,12 +4,12 @@
   <defs>
     <clipPath id="tile"><rect x="100" y="100" width="824" height="824" rx="184"/></clipPath>
     <radialGradient id="screen" cx="50%" cy="44%" r="62%">
-      <stop offset="0" stop-color="#12383A"/>
-      <stop offset=".45" stop-color="#0A1D21"/>
-      <stop offset="1" stop-color="#03070A"/>
+      <stop offset="0" stop-color="#123526"/>
+      <stop offset=".45" stop-color="#0A1B14"/>
+      <stop offset="1" stop-color="#030605"/>
     </radialGradient>
     <pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse">
-      <rect width="8" height="3" fill="#4FF0D0" fill-opacity=".07"/>
+      <rect width="8" height="3" fill="#52F0BE" fill-opacity=".07"/>
     </pattern>
     <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
       <stop offset=".6" stop-color="#000" stop-opacity="0"/>
@@ -21,24 +21,16 @@
       <stop offset=".46" stop-color="#fff" stop-opacity="0"/>
     </linearGradient>
     <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#C9FFF4"/>
-      <stop offset=".35" stop-color="#4FF0D0"/>
-      <stop offset="1" stop-color="#148E80"/>
+      <stop offset="0" stop-color="#CFFFEC"/>
+      <stop offset=".35" stop-color="#52F0BE"/>
+      <stop offset="1" stop-color="#16906C"/>
     </linearGradient>
     <linearGradient id="ink" x1="0" y1="290" x2="0" y2="760" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#E4FFF9"/>
-      <stop offset=".42" stop-color="#7DF7DF"/>
-      <stop offset=".62" stop-color="#4FF0D0"/>
-      <stop offset="1" stop-color="#1AA593"/>
+      <stop offset="0" stop-color="#E6FFF4"/>
+      <stop offset=".42" stop-color="#80F7CF"/>
+      <stop offset=".62" stop-color="#52F0BE"/>
+      <stop offset="1" stop-color="#1AA57C"/>
     </linearGradient>
-    <!-- Solid upper half, horizontal cuts through the lower half (as in the wordmark). -->
-    <pattern id="cuts" width="1024" height="17" patternUnits="userSpaceOnUse" y="548">
-      <rect width="1024" height="11" fill="#fff"/>
-    </pattern>
-    <mask id="stripes" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
-      <rect width="1024" height="548" fill="#fff"/>
-      <rect y="548" width="1024" height="476" fill="url(#cuts)"/>
-    </mask>
     <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="wide"/>
       <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="tight"/>
@@ -66,12 +58,12 @@
     <rect x="100" y="100" width="824" height="824" fill="url(#scan)"/>
     <rect x="100" y="100" width="824" height="824" fill="url(#vignette)"/>
     <!-- Inner technical frame -->
-    <rect x="168" y="168" width="688" height="688" rx="120" fill="none" stroke="#4FF0D0" stroke-opacity=".16" stroke-width="3"/>
+    <rect x="168" y="168" width="688" height="688" rx="120" fill="none" stroke="#52F0BE" stroke-opacity=".16" stroke-width="3"/>
   </g>
 
-  <!-- Glyph: glow underneath, then shiny striped ink -->
-  <g fill="#4FF0D0" stroke="#4FF0D0" opacity=".55" filter="url(#glow)"><use href="#glyph"/></g>
-  <g fill="url(#ink)" stroke="url(#ink)" mask="url(#stripes)"><use href="#glyph"/></g>
+  <!-- Glyph: glow underneath, then shiny ink -->
+  <g fill="#52F0BE" stroke="#52F0BE" opacity=".55" filter="url(#glow)"><use href="#glyph"/></g>
+  <g fill="url(#ink)" stroke="url(#ink)"><use href="#glyph"/></g>
 
   <!-- Glass sheen over the upper half -->
   <rect x="100" y="100" width="824" height="824" rx="184" fill="url(#sheen)"/>
