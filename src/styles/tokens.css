@@ -11,33 +11,54 @@
 @import '@fontsource/orbitron/latin-900.css';
 
 /* Design system v0.3 — "Terminal 84" (docs/UI-DESIGN-SYSTEM-v0.3.md).
-   Text colours meet WCAG AA on every surface; control borders meet 3:1. */
+   Text colours meet WCAG AA on every surface; control borders meet 3:1.
+
+   Theme contract (T-22, docs/UI-DESIGN-SYSTEM-v2.0.md): every interface colour
+   is one of the four core roles or a token derived for this theme. Components
+   use these tokens only; app.css holds no theme colour literals. Values below
+   are Terminal Mint exactly as released in v1.0.0 — do not adjust them. */
 :root {
   color-scheme: dark;
+  /* Core roles (TERMINAL_V2_SPEC §3) */
+  --dominant: #52F0BE;           /* principal accent */
+  --dominant-rgb: 82, 240, 190;  /* same colour as channels, for alpha tints */
+  --default-line: #284239;       /* frames, dividers */
+  --background: #0B0F0D;         /* chrome: rail, header, toolbar, status bar, panels */
+  --text-drop: #050706;          /* darkest recess: canvas, inset fields */
+
   /* Surfaces, darkest to lightest */
-  --void: #050706;      /* window canvas */
+  --void: var(--text-drop);      /* window canvas */
   --gutter: #070908;    /* space beside the writing page */
-  --panel: #0B0F0D;     /* rail, toolbar, status bar, panels */
-  --page: #0D1210;      /* writing page */
+  --panel: var(--background);    /* rail, toolbar, status bar, panels */
+  --page: #0D1210;      /* writing page; lighter than the canvas in Mint */
   --panel-2: #121815;   /* inputs, hover, raised */
   --tint: #10261E;      /* accent-tinted selection background */
+  --shell-bloom: #0E1C17;  /* top of the shell's backdrop gradient */
+  --scrim-rgb: 3, 5, 4;  /* dims the window behind panels and dialogs */
   /* Lines */
   --line: #1A2420;      /* quiet rules */
-  --line-2: #284239;    /* frames */
+  --line-2: var(--default-line); /* frames */
   --line-3: #43786A;    /* control borders (3:1) */
   /* Ink */
+  --text-strong: #F3FBF7;  /* headings and table headers in the writing page */
   --text: #E0EFE8;
   --text-2: #A2BDB1;
   --muted: #7E9A8E;
   /* Signals */
-  --phosphor: #52F0BE;     /* primary accent */
+  --phosphor: var(--dominant);   /* primary accent */
   --phosphor-hi: #B4FFE4;  /* highlight, gradient top */
   --phosphor-lo: #16906C;  /* gradient foot, dim accent */
-  --glow: rgba(82, 240, 190, .32);
+  --glow: rgba(var(--dominant-rgb), .32);
   --amber: #FFB648;        /* attention: unsaved, saving */
   --danger: #FF6B78;       /* failures and destructive actions */
+  --danger-rgb: 255, 107, 120;
   --focus: #C2FFE9;
+  /* Select chevron, stroked in --dominant (a data URI cannot read custom properties). */
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2352F0BE' stroke-width='1.4'/%3E%3C/svg%3E");
+}
 
+/* Theme-independent tokens. */
+:root {
   --font-ui: 'IBM Plex Mono', ui-monospace, monospace;
   --font-display: 'Orbitron', 'IBM Plex Sans Condensed', sans-serif;
   --font-writing: 'IBM Plex Sans', sans-serif;
