@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isMacPlatform, SHORTCUT_HELP, shortcutLabel } from '../domain/shortcuts';
 import { DEFAULT_MOTION, MOTION_LEVELS, type MotionLevel } from '../domain/motion';
-import { applyMotion, motionRepository } from '../persistence/theme';
+import { applyMotion, motionRepository } from '../persistence/localSettings';
 import { DEFAULT_PREFERENCES, FONT_SIZE_RANGE, LINE_SPACINGS, WRITING_FONTS, WRITING_WIDTHS, type Preferences, type WritingFont } from '../domain/preferences';
 
 type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; data?: ReactNode; children?: ReactNode };
@@ -31,7 +31,7 @@ export function SettingsPanel({ preferences, error, onChange, data, children }: 
     </div>
     <p className={error ? 'settings-status settings-error' : 'settings-status'} role={error ? 'alert' : 'status'}>{error ?? 'Changes apply immediately and are saved on this device.'}</p>
     <MotionSetting name={`${id}-motion`} />
-    {data}
+    <div data-sound="text-edit">{data}</div>
     <section className="settings-keys" aria-labelledby={`${id}-keys`}>
       <p id={`${id}-keys`} className="settings-section">KEYBOARD</p>
       <dl>{SHORTCUT_HELP.map(s => <div key={s.label}><dt>{s.label}</dt><dd>{s.keys.map(k => shortcutLabel(k, mac)).join(' / ')}</dd></div>)}</dl>
