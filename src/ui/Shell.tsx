@@ -34,13 +34,13 @@ export function Shell({ children, formattingControls, historyControls, status, s
   const showInfo = panel === 'info';
   return <div className="app-shell">
     <nav className="rail" aria-label="Journal navigation">
-      <span className="brand-mark" role="img" aria-label="Terminal">t<span>›</span></span>
+      <span className="brand-mark" role="img" aria-label="Terminal">t<span>&gt;</span></span>
       <div className="rail-actions">
-        <IconButton ref={searchRef} icon="search" caption="Search" {...hint('Search titles', 'Mod+K')} disabled={!search} aria-expanded={panel === 'search'} aria-controls="search-panel" onClick={() => toggle('search')} />
-        <IconButton ref={archiveRef} icon="archive" caption="Archive" {...hint('Archives', 'Mod+O')} disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
-        <IconButton icon="plus" caption="New" {...hint('New entry', 'Mod+N')} disabled={navigationDisabled} onClick={onNew} />
+        <IconButton ref={searchRef} icon="search" {...hint('Search titles', 'Mod+K')} disabled={!search} aria-expanded={panel === 'search'} aria-controls="search-panel" onClick={() => toggle('search')} />
+        <IconButton ref={archiveRef} icon="archive" {...hint('Archives', 'Mod+O')} disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
+        <IconButton icon="plus" {...hint('New entry', 'Mod+N')} disabled={navigationDisabled} onClick={onNew} />
       </div>
-      <IconButton ref={infoRef} icon="settings" caption="Settings" {...hint('Settings', 'Mod+,')} className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
+      <IconButton ref={infoRef} icon="settings" {...hint('Settings', 'Mod+,')} className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
     </nav>
     {panel === 'search' && search && <Popover id="search-panel" title="Search titles" className="search-popover" scrim closeLabel="Close search" onClose={closePanel} triggerRef={searchRef}>{search(closePanel)}</Popover>}
     {panel === 'archives' && archive && <Popover id="archive-panel" title="Archives" className="archive-popover" scrim closeLabel="Close archives" onClose={closePanel} triggerRef={archiveRef}>{archive(closePanel)}</Popover>}
@@ -49,13 +49,13 @@ export function Shell({ children, formattingControls, historyControls, status, s
       <section className="settings-about" aria-label="About Terminal"><p className="settings-section">ABOUT</p><p>Terminal by Arlecchino. Writing and settings are stored locally on this device. Check the save status before closing.</p></section>
     </Popover>}
     <div className="workspace">
-      <header className="identity-strip"><span className="wordmark-glow"><span className="wordmark" data-text="TERMINAL">TERMINAL</span></span><span className="workspace-label" aria-hidden="true"><span className="prompt">&gt;</span> personal journal<span className="caret" /></span></header>
+      <header className="identity-strip"><span className="wordmark-glow"><span className="wordmark" data-text="TERMINAL">TERMINAL</span></span></header>
       <section className="toolbar" aria-label="Writing tools">
         {formattingControls}
         <div className="history-controls">{historyControls}</div>
       </section>
       <main className="writing-surface" id="writing-workspace">{children}</main>
-      <footer className="workspace-footer"><span className="save-status" data-tone={statusTone}><span className="save-meter" aria-hidden="true"><span /></span>{status}</span><span id="preview-warning">LOCAL JOURNAL · STORED ON THIS DEVICE</span></footer>
+      <footer className="workspace-footer"><span className="save-status" data-tone={statusTone}><span className="save-meter" aria-hidden="true"><span /></span>{status}</span></footer>
     </div>
   </div>;
 }

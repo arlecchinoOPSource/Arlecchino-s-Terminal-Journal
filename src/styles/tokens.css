@@ -43,7 +43,7 @@
   --font-writing: 'IBM Plex Sans', sans-serif;
   --radius: 3px;
   --ease: cubic-bezier(.2, .7, .2, 1);
-  --rail-width: 72px;
+  --rail-width: 56px;
   --writing-width: 720px;
   /* Writing preferences (T-13); overridden at runtime from saved settings. */
   --entry-font: 'IBM Plex Sans', sans-serif;

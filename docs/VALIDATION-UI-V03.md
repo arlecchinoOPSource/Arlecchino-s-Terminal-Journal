@@ -29,6 +29,11 @@ At the owner's request, after the first pass:
 - **More compact overall**: slimmer rail (72 px), header (44 px), toolbar (42 px, 30 px buttons) and status bar (28 px); tighter page, panel and settings spacing; a 28 px title. The writing area at 480 × 400 grew from 240 to 254 px; at 1100 × 780 the toolbar stays on one row.
 - The writing text itself remains free of glow, scanlines and overlays.
 
+## Owner tweaks — simpler header, rail and status bar
+
+- Removed the header's `> personal journal` prompt and the status bar's `LOCAL JOURNAL · STORED ON THIS DEVICE` text; the wordmark is centred in the header.
+- Rail buttons are icon-only, each in its own framed box; the rail narrowed from 72 to 56 px (48 px below 520 px wide). Names remain available to assistive technology and as tooltips.
+
 ## Bugs found and fixed during the refresh
 
 - **Focus race after New entry or delete.** The editor's delayed autofocus could close a panel opened by shortcut straight afterwards: ⌘K right after deleting showed Search and immediately hid it.

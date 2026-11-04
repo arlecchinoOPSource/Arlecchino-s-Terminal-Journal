@@ -83,5 +83,5 @@ test('reduced-motion preference stops every animation', async ({ page }) => {
   await page.evaluate(() => { document.querySelector('.save-status')!.setAttribute('data-tone', 'busy'); });
   const running = await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
   expect(running).toBe(0);
-  expect(await page.locator('.caret').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+  expect(await page.locator('.wordmark-glow').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
 });

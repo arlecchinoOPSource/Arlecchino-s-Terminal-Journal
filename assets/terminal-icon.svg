@@ -1,6 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#090B0C"/>
-  <rect x="66" y="66" width="380" height="380" fill="#16231D" stroke="#B0E2CC" stroke-width="10"/>
-  <path d="M228 135 191 310q-7 34 24 34h32l-8 36h-34q-67 0-51-70l37-175zm-81 65h136l-9 36H139z" fill="#B0E2CC"/>
-  <path d="m311 206 57 50-57 50" fill="none" stroke="#B0E2CC" stroke-width="18"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Terminal app icon (design v0.3 "Terminal 84"). Source for `npm run tauri icon`.
+       Tile follows the macOS 824px grid on a 1024 canvas; paths only, no fonts. -->
+  <defs>
+    <clipPath id="tile"><rect x="100" y="100" width="824" height="824" rx="184"/></clipPath>
+    <radialGradient id="screen" cx="50%" cy="44%" r="62%">
+      <stop offset="0" stop-color="#12383A"/>
+      <stop offset=".45" stop-color="#0A1D21"/>
+      <stop offset="1" stop-color="#03070A"/>
+    </radialGradient>
+    <pattern id="scan" width="8" height="8" patternUnits="userSpaceOnUse">
+      <rect width="8" height="3" fill="#4FF0D0" fill-opacity=".07"/>
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset=".6" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".55"/>
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity=".10"/>
+      <stop offset=".45" stop-color="#fff" stop-opacity=".02"/>
+      <stop offset=".46" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#C9FFF4"/>
+      <stop offset=".35" stop-color="#4FF0D0"/>
+      <stop offset="1" stop-color="#148E80"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="290" x2="0" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#E4FFF9"/>
+      <stop offset=".42" stop-color="#7DF7DF"/>
+      <stop offset=".62" stop-color="#4FF0D0"/>
+      <stop offset="1" stop-color="#1AA593"/>
+    </linearGradient>
+    <!-- Solid upper half, horizontal cuts through the lower half (as in the wordmark). -->
+    <pattern id="cuts" width="1024" height="17" patternUnits="userSpaceOnUse" y="548">
+      <rect width="1024" height="11" fill="#fff"/>
+    </pattern>
+    <mask id="stripes" maskUnits="userSpaceOnUse" x="0" y="0" width="1024" height="1024">
+      <rect width="1024" height="548" fill="#fff"/>
+      <rect y="548" width="1024" height="476" fill="url(#cuts)"/>
+    </mask>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="wide"/>
+      <feGaussianBlur in="SourceGraphic" stdDeviation="5" result="tight"/>
+      <feMerge><feMergeNode in="wide"/><feMergeNode in="tight"/></feMerge>
+    </filter>
+    <filter id="rimglow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="drop" x="-10%" y="-10%" width="120%" height="125%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000" flood-opacity=".38"/>
+    </filter>
+    <g id="glyph">
+      <!-- Italic "t" and an upright chevron, from the original mark, scaled to the 1024 grid. -->
+      <path transform="translate(22 24) scale(1.9)" d="M228 135 191 310q-7 34 24 34h32l-8 36h-34q-67 0-51-70l37-175zm-81 65h136l-9 36H139z"/>
+      <path transform="translate(22 24) scale(1.9)" d="m311 206 57 50-57 50" fill="none" stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+
+  <!-- Tile -->
+  <g filter="url(#drop)">
+    <rect x="100" y="100" width="824" height="824" rx="184" fill="url(#screen)"/>
+  </g>
+  <g clip-path="url(#tile)">
+    <rect x="100" y="100" width="824" height="824" fill="url(#scan)"/>
+    <rect x="100" y="100" width="824" height="824" fill="url(#vignette)"/>
+    <!-- Inner technical frame -->
+    <rect x="168" y="168" width="688" height="688" rx="120" fill="none" stroke="#4FF0D0" stroke-opacity=".16" stroke-width="3"/>
+  </g>
+
+  <!-- Glyph: glow underneath, then shiny striped ink -->
+  <g fill="#4FF0D0" stroke="#4FF0D0" opacity=".55" filter="url(#glow)"><use href="#glyph"/></g>
+  <g fill="url(#ink)" stroke="url(#ink)" mask="url(#stripes)"><use href="#glyph"/></g>
+
+  <!-- Glass sheen over the upper half -->
+  <rect x="100" y="100" width="824" height="824" rx="184" fill="url(#sheen)"/>
+
+  <!-- Bold glowing rim, Adobe-style -->
+  <rect x="116" y="116" width="792" height="792" rx="168" fill="none" stroke="url(#rim)" stroke-width="32" filter="url(#rimglow)"/>
 </svg>

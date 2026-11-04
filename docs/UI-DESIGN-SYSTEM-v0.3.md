@@ -18,7 +18,6 @@ A night-shift CRT console: deep blue-black glass, one phosphor-cyan signal colou
 | Framed panels with an inner rule | Rail, header, panels and dialogs use a 1px frame plus an inset hairline, a soft phosphor bloom, and glowing corner brackets (header, rail, Search, Archives, dialogs) |
 | CRT texture | Visible scanlines and a vignette on the canvas; fainter scanlines under chrome panels and in the gutter beside the page |
 | Thin framed loading bar | The segmented save indicator in the status bar (state only — never fake progress) |
-| `>` prompt lines | `> personal journal` with a blinking block caret in the header |
 | One neon hue on near-black | Phosphor cyan `#4FF0D0`; amber and rose only for attention and failure |
 
 ### What was deliberately left out
@@ -55,19 +54,37 @@ Measured contrast (WCAG): primary text 14.8–16.9:1, secondary 8.8–10:1, meta
 ## 4. Layout and components
 
 - **Density**: compact — 6px gaps between regions, 44px header, 42px toolbar with 30px buttons, 28px status bar, 20/44px page padding, 28px title.
-- **Rail** (72px): brand mark, then Search, Archive, New with visible captions, Settings at the bottom. The open panel's button shows a phosphor bar and tint. Captions hide below 520px.
-- **Header**: striped wordmark left, `> personal journal` prompt right (hidden below 760px).
+- **Rail** (56px): brand mark, then Search, Archives and New as icon-only buttons, each in its own framed 40px box, with Settings at the bottom. The open panel's box is tinted with a phosphor border and glow. Accessible names and tooltips carry the labels.
+- **Header**: the striped wordmark, centred. No other text.
 - **Toolbar**: one row at common window sizes; groups separated by hairlines; undo/redo pinned right. Active formatting uses a tint, phosphor ink and an inset bar. Below 520px it becomes one horizontally scrollable row.
 - **Writing page**: the chosen writing width plus padding, on a dark gutter, with a thin phosphor line along its top edge. Entry header row: `ENTRY` chip, number, created date, rule, then Export and Delete as compact ghost buttons (icon-only below 520px, names kept for assistive technology).
-- **Status bar**: framed save meter — full phosphor when saved, amber when unsaved, a moving amber segment while saving (static under reduced motion), rose on failure — plus the status text.
+- **Status bar**: framed save meter — full phosphor when saved, amber when unsaved, a moving amber segment while saving (static under reduced motion), rose on failure — plus the status text. No other text in the bar.
 - **Panels**: framed, with a sticky title bar in Orbitron. Search and Archives open centred over a dimmed window; Settings opens beside its rail button. Selected rows use the tint, a phosphor border and accent title.
 - **Dialogs**: same frame; destructive buttons in rose; Cancel remains the default.
 - **Corners**: 3px radius on frames and controls — square in character, softened slightly.
 - **Scrollbars**: thin, line-coloured.
 
+## 4a. App icon
+
+`assets/terminal-icon.svg` is the source, made of paths only so it does not depend on installed fonts. It is a rounded tile on the macOS 824 px grid within a 1024 px canvas, in the style of app-suite icons:
+- a bold phosphor rim with a gradient and glow;
+- a dark CRT screen with scanlines, a vignette, an inner frame and a glass sheen;
+- the italic `t` and upright `>` of the brand mark, with a shiny gradient, the wordmark's striped lower half and a soft glow.
+
+It stays legible at 32 px.
+
+Regenerate the platform icons after editing the SVG:
+
+```sh
+node scripts/render_icon.mjs assets/terminal-icon.svg assets/terminal-icon.png
+npx tauri icon assets/terminal-icon.png -o /tmp/terminal-icons   # then copy the desktop files over src-tauri/icons/
+```
+
+Only the desktop icon files already in `src-tauri/icons/` are kept; mobile icon sets are not added.
+
 ## 5. Motion
 
-Only state changes animate: 120–300ms colour and border transitions, the header caret blink, the saving sweep, and a single 1.1s "power-on" flicker of the wordmark at launch. `prefers-reduced-motion` disables all of them.
+Only state changes animate: 120–300ms colour and border transitions, the saving sweep, and a single 1.1s "power-on" flicker of the wordmark at launch. `prefers-reduced-motion` disables all of them.
 
 ## 6. Accessibility
 
