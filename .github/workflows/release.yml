@@ -8,7 +8,6 @@ name: Release builds
 # otherwise macOS builds are ad-hoc signed and Windows builds are unsigned.
 on:
   push:
-    branches: ['feature/T-20-release-acceptance']
     tags: ['v*']
   workflow_dispatch:
 
