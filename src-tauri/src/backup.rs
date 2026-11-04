@@ -209,6 +209,40 @@ mod tests {
             .collect()
     }
 
+    /// T-33: a synthetic backup in the 1.0.0 format restores exactly, and numbering continues
+    /// after the highest number 1.0 had used. Guards 2.x against breaking 1.0 backups.
+    #[test]
+    fn a_1_0_backup_restores_exactly() {
+        let file = include_str!("../../tests/fixtures/v1-backup.json");
+        let expected: serde_json::Value = serde_json::from_str(file).unwrap();
+        let mut target = db();
+        restore(&mut target, &parse(file.as_bytes()).unwrap()).unwrap();
+        for e in expected["entries"].as_array().unwrap() {
+            let got = journal::get(&target, e["id"].as_str().unwrap())
+                .unwrap()
+                .unwrap();
+            assert_eq!(got.entry_number, e["entry_number"].as_i64().unwrap());
+            assert_eq!(got.title, e["title"].as_str().unwrap());
+            assert_eq!(got.content, e["content"]);
+            assert_eq!(got.created_at, e["created_at"].as_i64().unwrap());
+            assert_eq!(got.updated_at, e["updated_at"].as_i64().unwrap());
+            assert_eq!(got.revision, e["revision"].as_i64().unwrap());
+        }
+        let prefs = preferences::get(&target).unwrap();
+        assert_eq!(
+            (
+                prefs.font.as_str(),
+                prefs.font_size,
+                prefs.writing_width,
+                prefs.line_spacing
+            ),
+            ("literata", 19, 640, 180)
+        );
+        // Numbers 2 and 4 were used in 1.0 and are never reused.
+        let next = journal::save(&mut target, draft(7, "First 2.0 entry", json!({"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","text":"new"}]}]}))).unwrap().unwrap();
+        assert_eq!(next.entry_number, 5);
+    }
+
     #[test]
     fn export_then_restore_preserves_entries_numbers_timestamps_and_rich_text() {
         let mut source = db();

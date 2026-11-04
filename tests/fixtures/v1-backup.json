@@ -1,0 +1,359 @@
+{
+ "format": "terminal-journal-backup",
+ "version": 1,
+ "exported_at": 1793700000000,
+ "next_entry_number": 5,
+ "entries": [
+  {
+   "id": "00000000-0000-4000-8000-0000000000a1",
+   "entry_number": 1,
+   "title": "Synthetic v1 formatted entry",
+   "content": {
+    "type": "doc",
+    "content": [
+     {
+      "type": "heading",
+      "attrs": {
+       "textAlign": null,
+       "level": 1
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Synthetic heading"
+       }
+      ]
+     },
+     {
+      "type": "heading",
+      "attrs": {
+       "textAlign": "center",
+       "level": 3
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Centered subheading"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "textAlign": "right"
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "bold"
+         }
+        ],
+        "text": "Bold"
+       },
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "italic"
+         }
+        ],
+        "text": " italic"
+       },
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "underline"
+         }
+        ],
+        "text": " underline"
+       },
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "strike"
+         }
+        ],
+        "text": " strike"
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "textAlign": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "textStyle",
+          "attrs": {
+           "fontFamily": "'IBM Plex Mono', monospace",
+           "fontSize": "20px"
+          }
+         }
+        ],
+        "text": "Mono 20"
+       },
+       {
+        "type": "text",
+        "marks": [
+         {
+          "type": "textStyle",
+          "attrs": {
+           "fontFamily": "'IBM Plex Sans Condensed', sans-serif",
+           "fontSize": null
+          }
+         }
+        ],
+        "text": " condensed"
+       }
+      ]
+     },
+     {
+      "type": "bulletList",
+      "content": [
+       {
+        "type": "listItem",
+        "content": [
+         {
+          "type": "paragraph",
+          "attrs": {
+           "textAlign": null
+          },
+          "content": [
+           {
+            "type": "text",
+            "text": "Bullet one"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "listItem",
+        "content": [
+         {
+          "type": "paragraph",
+          "attrs": {
+           "textAlign": null
+          },
+          "content": [
+           {
+            "type": "text",
+            "text": "Bullet two"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "orderedList",
+      "attrs": {
+       "start": 3,
+       "type": null
+      },
+      "content": [
+       {
+        "type": "listItem",
+        "content": [
+         {
+          "type": "paragraph",
+          "attrs": {
+           "textAlign": null
+          },
+          "content": [
+           {
+            "type": "text",
+            "text": "Third"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "blockquote",
+      "content": [
+       {
+        "type": "paragraph",
+        "attrs": {
+         "textAlign": null
+        },
+        "content": [
+         {
+          "type": "text",
+          "text": "Quoted synthetic line"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "table",
+      "content": [
+       {
+        "type": "tableRow",
+        "content": [
+         {
+          "type": "tableHeader",
+          "attrs": {
+           "colspan": 1,
+           "rowspan": 1,
+           "colwidth": null,
+           "align": null
+          },
+          "content": [
+           {
+            "type": "paragraph",
+            "attrs": {
+             "textAlign": null
+            },
+            "content": [
+             {
+              "type": "text",
+              "text": "Day"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "tableHeader",
+          "attrs": {
+           "colspan": 1,
+           "rowspan": 1,
+           "colwidth": null,
+           "align": null
+          },
+          "content": [
+           {
+            "type": "paragraph",
+            "attrs": {
+             "textAlign": null
+            },
+            "content": [
+             {
+              "type": "text",
+              "text": "Note"
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "type": "tableRow",
+        "content": [
+         {
+          "type": "tableCell",
+          "attrs": {
+           "colspan": 1,
+           "rowspan": 1,
+           "colwidth": null,
+           "align": null
+          },
+          "content": [
+           {
+            "type": "paragraph",
+            "attrs": {
+             "textAlign": null
+            },
+            "content": [
+             {
+              "type": "text",
+              "text": "Monday"
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "tableCell",
+          "attrs": {
+           "colspan": 1,
+           "rowspan": 1,
+           "colwidth": null,
+           "align": null
+          },
+          "content": [
+           {
+            "type": "paragraph",
+            "attrs": {
+             "textAlign": null
+            },
+            "content": [
+             {
+              "type": "text",
+              "text": "Café 日本語 🎸"
+             }
+            ]
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "type": "paragraph",
+      "attrs": {
+       "textAlign": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "After the table"
+       }
+      ]
+     }
+    ]
+   },
+   "schema_version": 1,
+   "created_at": 1793600000000,
+   "updated_at": 1793650000000,
+   "revision": 4
+  },
+  {
+   "id": "00000000-0000-4000-8000-0000000000a3",
+   "entry_number": 3,
+   "title": "Synthetic v1 café 日本語 🎸",
+   "content": {
+    "type": "doc",
+    "content": [
+     {
+      "type": "paragraph",
+      "attrs": {
+       "textAlign": null
+      },
+      "content": [
+       {
+        "type": "text",
+        "text": "Entry 2 and 4 were deleted in 1.0; their numbers must stay unused."
+       }
+      ]
+     }
+    ]
+   },
+   "schema_version": 1,
+   "created_at": 1793610000000,
+   "updated_at": 1793690000000,
+   "revision": 2
+  }
+ ],
+ "preferences": {
+  "font": "literata",
+  "font_size": 19,
+  "writing_width": 640,
+  "line_spacing": 180
+ }
+}
