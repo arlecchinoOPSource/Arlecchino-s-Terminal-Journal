@@ -164,6 +164,8 @@
   --motion-status: 140ms;   /* save meter fill and state flashes */
   --motion-sweep: 1s;       /* save meter sweep while a save is in progress */
   --motion-power-on: 1.1s;  /* one wordmark flicker at launch */
+  --motion-startup: 1.4s;   /* startup sequence; equals STARTUP_SEQUENCE_MS in src/domain/startup.ts */
+  --motion-startup-exit: 220ms; /* startup screen collapse; equals STARTUP_EXIT_MS */
   --steps-reveal: steps(4, jump-start);  /* panels open in four bands, the first at once */
   --steps-dialog: steps(5, jump-start);
   --steps-flash: steps(3, end);    /* active-control flash */

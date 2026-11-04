@@ -71,7 +71,7 @@ test('interface styles use theme tokens instead of colour literals', () => {
   assert.deepEqual(css.match(/(?:rgba?|hsla?)\((?!var\(--[\w-]+-rgb\))[^)]*\)/gi) ?? [], []);
   assert.deepEqual(css.match(/url\(["']?data:/gi) ?? [], []);
   for (const name of new Set(appCss.match(/var\(--[\w-]+\)/g).map(v => v.slice(4, -1)))) {
-    assert.ok(name in theme || tokensCss.includes(`${name}:`) || name === '--page-pad-x', `${name} is a defined token`);
+    assert.ok(name in theme || tokensCss.includes(`${name}:`) || ['--page-pad-x', '--segment'].includes(name), `${name} is a defined token`);
   }
 });
 

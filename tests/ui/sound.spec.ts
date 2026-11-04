@@ -4,7 +4,8 @@ import { installNativeMock, setMock } from './native-mock';
 // T-25–T-27: which bundled sound actually starts, observed by wrapping Web Audio in the page.
 async function recordSounds(page: Page, stored?: Record<string, unknown>) {
   await page.addInitScript(settings => {
-    if (settings) localStorage.setItem('terminal.sound', JSON.stringify(settings));
+    // The startup sound has its own tests (startup.spec.ts); keep it out of these recordings.
+    if (settings) localStorage.setItem('terminal.sound', JSON.stringify({ startup: false, ...settings }));
     const played: string[] = [];
     (window as unknown as { __played: string[] }).__played = played;
     const names = new WeakMap<object, string>();

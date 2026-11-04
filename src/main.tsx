@@ -11,4 +11,6 @@ applyTheme(themeRepository.load());
 applyMotion(motionRepository.load());
 // Settings only: no audio is loaded or started until a sound is first played.
 sounds.configure(soundRepository.load());
+// Once per launch; skipped if sound is off or the system does not let audio start yet.
+void sounds.playStartup();
 createRoot(root).render(<StrictMode><App /></StrictMode>);

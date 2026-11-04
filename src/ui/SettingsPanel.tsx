@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isMacPlatform, SHORTCUT_HELP, shortcutLabel } from '../domain/shortcuts';
 import { DEFAULT_MOTION, MOTION_LEVELS, type MotionLevel } from '../domain/motion';
-import { applyMotion, motionRepository } from '../persistence/localSettings';
+import { applyMotion, motionRepository, startupRepository } from '../persistence/localSettings';
+import { DEFAULT_STARTUP_SCREEN, type StartupScreen } from '../domain/startup';
 import { DEFAULT_PREFERENCES, FONT_SIZE_RANGE, LINE_SPACINGS, WRITING_FONTS, WRITING_WIDTHS, type Preferences, type WritingFont } from '../domain/preferences';
 
 type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; data?: ReactNode; children?: ReactNode };
@@ -53,12 +54,18 @@ function MotionSetting({ name }: { name: string }) {
     return () => query.removeEventListener('change', follow);
   }, []);
   const choose = (next: MotionLevel) => { applyMotion(next); motionRepository.save(next); setMotion(next); };
+  const [startup, setStartup] = useState<StartupScreen>(() => startupRepository.load());
+  const chooseStartup = (next: StartupScreen) => { startupRepository.save(next); setStartup(next); };
   return <section className="settings-motion" aria-label="Motion">
     <p className="settings-section">INTERFACE</p>
     <Segmented legend="Motion" name={name} options={MOTION_LEVELS} value={motion} defaultValue={DEFAULT_MOTION} onChange={choose} />
     <p className="settings-status">{osReduced ? 'Your system asks for reduced motion, so interface animations stay off.' : 'Reduced keeps colour fades only. Writing is never animated.'}</p>
+    <Segmented legend="Startup screen" name={`${name}-startup`} options={STARTUP_OPTIONS} value={startup} defaultValue={DEFAULT_STARTUP_SCREEN} onChange={chooseStartup} />
+    <p className="settings-status">{startup === 'on' ? 'Shown while the journal opens; any key skips it. Applies from the next launch.' : 'Terminal opens straight to your writing from the next launch.'} The startup sound is in Sounds.</p>
   </section>;
 }
+
+const STARTUP_OPTIONS = [{ value: 'on', label: 'On' }, { value: 'off', label: 'Off' }] as const;
 
 type Option<T> = { readonly value: T; readonly label: string };
 function Segmented<T extends string | number>({ legend, name, options, value, defaultValue, onChange }: { legend: string; name: string; options: readonly Option<T>[]; value: T; defaultValue: T; onChange: (value: T) => void }) {

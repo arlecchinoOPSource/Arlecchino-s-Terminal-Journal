@@ -7,6 +7,10 @@ export interface MockOptions {
   /** Number of the seeded entry (1-based) that the app reopens on launch. */
   openEntry?: number;
   preferences?: Record<string, unknown>;
+  /** Show the startup screen (off by default so other tests reach the editor at once). */
+  startup?: boolean;
+  /** Delay before the journal opens, or 'fail' to make opening it fail (startup tests). */
+  openJournal?: number | 'fail';
 }
 /** State the tests can inspect through `page.evaluate(() => window.__mock)`. */
 export interface MockState {
@@ -27,6 +31,7 @@ export interface MockState {
 export async function installNativeMock(page: Page, options: MockOptions = {}) {
   await page.addInitScript((opts: MockOptions) => {
     const KEY = 'terminal-native-mock';
+    if (!opts.startup) localStorage.setItem('terminal.startup', 'off');
     const doc = (text: string) => ({ type: 'doc', content: [{ type: 'paragraph', attrs: { textAlign: null }, content: text ? [{ type: 'text', text }] : [] }] });
     let state: MockState = JSON.parse(sessionStorage.getItem(KEY) ?? 'null') ?? (() => {
       const base = Date.UTC(2026, 10, 1, 9);
@@ -42,7 +47,11 @@ export async function installNativeMock(page: Page, options: MockOptions = {}) {
     const hasText = (v: unknown): boolean => typeof v === 'object' && v !== null && ((typeof (v as { text?: unknown }).text === 'string' && (v as { text: string }).text.trim() !== '') || ((v as { content?: unknown[] }).content ?? []).some(hasText));
     const summaries = () => Object.values(state.entries).sort((a, b) => b.updated_at - a.updated_at || b.entry_number - a.entry_number).map(({ id, entry_number, title, updated_at }) => ({ id, entry_number, title, updated_at }));
     const handlers: Record<string, (args: Record<string, unknown>) => unknown> = {
-      journal_list: () => summaries(),
+      journal_list: async () => {
+        if (opts.openJournal === 'fail') throw 'The journal could not be opened. Your journal has not been changed.';
+        if (typeof opts.openJournal === 'number') await new Promise(resolve => setTimeout(resolve, opts.openJournal as number));
+        return summaries();
+      },
       journal_last: () => (state.last && state.entries[state.last]) ?? null,
       journal_select: ({ id }) => { state.last = (id as string | null) ?? null; return state.last ? state.entries[state.last] ?? null : null; },
       journal_save: ({ draft }) => {
@@ -90,7 +99,7 @@ export async function installNativeMock(page: Page, options: MockOptions = {}) {
           state.calls.push(cmd);
           const handler = handlers[cmd];
           if (!handler) throw `Unmocked native command: ${cmd}`;
-          try { return handler(args); } finally { persist(); }
+          try { return await handler(args); } finally { persist(); }
         },
       },
     });

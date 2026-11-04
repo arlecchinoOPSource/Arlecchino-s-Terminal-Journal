@@ -8,7 +8,7 @@ Composed and exported by Arlecchino (product owner) in Ableton Live and supplied
 
 | Bundled file | Supplied as | Format | Length | Peak | Size | SHA-256 (first 16) | Used for |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| `arlecchino/startup.wav` | `startup - t.wav` | 44.1 kHz stereo 16-bit | 6.0 s | −5.6 dBFS | 1,058,480 B | `12be25273665b8ac` | Startup screen (T-31); stored and previewable now, not yet played at launch |
+| `arlecchino/startup.wav` | `startup - t.wav` | 44.1 kHz stereo 16-bit | 6.0 s | −5.6 dBFS | 1,058,480 B | `12be25273665b8ac` | Once per launch, through the sound manager, when Sound and Startup are on (T-31) |
 | `arlecchino/close.wav` | `endup - t.wav` | 44.1 kHz stereo 16-bit | 6.0 s | −6.2 dBFS | 1,058,480 B | `1888b65106658cd4` | Closing Terminal |
 | `arlecchino/error.wav` | `error.wav` | 44.1 kHz stereo 16-bit | 2.0 s (0.6 s audible) | −5.9 dBFS | 352,880 B | `fb25807b67c3f529` | Failed save, export, backup or restore |
 

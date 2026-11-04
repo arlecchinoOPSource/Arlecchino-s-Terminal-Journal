@@ -19,7 +19,8 @@
         "fullscreen": false,
         "label": "main",
         "minWidth": 480,
-        "minHeight": 400
+        "minHeight": 400,
+        "backgroundColor": "#050706"
       }
     ],
     "security": {
