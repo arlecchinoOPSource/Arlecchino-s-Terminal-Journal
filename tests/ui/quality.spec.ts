@@ -11,17 +11,36 @@ test('a full session makes no request outside the app', async ({ page }) => {
   });
   await installNativeMock(page, { entries: [{ title: 'Offline check' }], openEntry: 1 });
   await page.goto('/');
-  await page.getByRole('textbox', { name: 'Journal body' }).click();
+  const editor = page.getByRole('textbox', { name: 'Journal body' });
+  await editor.click();
   await page.keyboard.type(' typed offline');
   await page.getByRole('button', { name: /Insert table/ }).click();
+  // The editor command restores focus asynchronously. Complete that operation
+  // before opening a panel that dismisses itself when focus leaves it.
+  await expect(editor).toBeFocused();
+  await expect(page.locator('#storage-status')).toHaveText('Saved');
   await page.keyboard.press('ControlOrMeta+o');
+  const archives = page.getByRole('dialog', { name: 'Archives' });
+  await expect(archives).toBeVisible();
+  await expect(archives.locator('[aria-current="true"]')).toBeFocused();
   await page.keyboard.press('Escape');
+  await expect(archives).toHaveCount(0);
+  await expect(editor).toBeFocused();
   await page.keyboard.press('ControlOrMeta+k');
+  const search = page.getByRole('combobox', { name: 'Search entry titles' });
+  await expect(search).toBeFocused();
   await page.keyboard.type('offline');
   await page.keyboard.press('Escape');
+  await expect(search).toHaveCount(0);
+  await expect(editor).toBeFocused();
   await page.keyboard.press('ControlOrMeta+,');
   const settings = page.getByRole('dialog', { name: 'Settings' });
-  for (const font of ['plex-serif', 'literata', 'plex-mono']) await settings.locator('select').nth(0).selectOption(font);
+  await expect(settings).toBeVisible();
+  const fontSelect = settings.getByRole('combobox', { name: 'Font', exact: true });
+  for (const font of ['plex-serif', 'literata', 'plex-mono']) {
+    await fontSelect.selectOption(font);
+    await expect(fontSelect).toHaveValue(font);
+  }
   await expect(page.locator('#storage-status')).toHaveText('Saved');
   await page.evaluate(() => document.fonts.ready);
   expect(external).toEqual([]);

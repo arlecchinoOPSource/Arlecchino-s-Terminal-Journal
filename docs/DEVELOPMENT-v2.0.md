@@ -42,6 +42,8 @@ The existing `npm run check` suite passed on this Apple Silicon Mac with Xcode s
 
 Vite retains its existing >500 kB bundle-size warning (717.44 kB minified JS); this is baseline evidence, not a new performance improvement or a reason to broaden setup work. Browser test colour-output warnings were non-fatal. These checks do not establish Windows native installation, Intel Mac installation, screen-reader behaviour, production audio latency, or future v2 compatibility. Existing manual verification limits remain in the [v1 release checklist](RELEASE-CHECKLIST-v1.0.md).
 
+The first GitHub runs passed native tests on Linux, macOS, and Windows but exposed a Linux WebKit timeout in the existing full-session privacy test: rapid panel shortcuts raced focus/visibility before selecting a settings font. T-21 waits for editor-command focus restoration and explicit panel state between interactions, and checks each selected font by its accessible name. A subsequent local run exposed the same missing editor/selection synchronization in the table-entry test; that test now waits for editor focus, cell text, and the Tab destination before continuing. The external-request and saved-table assertions are unchanged; no app source or product behaviour is changed to bypass either test. Review the setup PR's latest CI result rather than treating the initial failed runs as passing.
+
 ## Release gates
 
 Reuse the existing CI and draft-release pipeline. CI now also runs on pushes to `development/v2.0.0`; all PRs already run the same suite. The release workflow and secrets are unchanged during setup. No v2 tag, installer, draft release, or publication is created now.
