@@ -10,7 +10,7 @@ Keep the rail order (Search, Archives, New entry, Settings below), dominant righ
 
 Available themes: Terminal Mint (default), Blue Monitor, Ember Orange, Amber Display. Theme choices apply to interface colours, never rewrite user-authored rich-text formatting. Derived tokens cover readable text, muted labels, focus, hover, active/disabled state, attention, errors, and glow.
 
-The four requested core roles are Dominant, Default Line, Background, and Text Drop. T-22 will establish their semantic mapping from the actual released CSS. Do not replace Mint with approximate colours from a screenshot or a proposed palette.
+The four requested core roles are Dominant, Default Line, Background, and Text Drop. T-22 established their semantic mapping from the actual released CSS (below). Do not replace Mint with approximate colours from a screenshot or a proposed palette.
 
 Released Mint source: `src/styles/tokens.css` at `v1.0.0` (`7071143`). Examples to preserve:
 
@@ -28,7 +28,38 @@ Released Mint source: `src/styles/tokens.css` at `v1.0.0` (`7071143`). Examples 
 | Failure / `--danger` | `#FF6B78` |
 | Focus / `--focus` | `#C2FFE9` |
 
-The conceptual Text Drop role describes a recessed writing surface, but in the released Mint CSS the writing page is lighter than the canvas. Preserve that measured baseline rather than darkening Mint to force a new role name. Resolve and document semantic aliases in T-22. Other palettes are implementation proposals until contrast and theme/state coverage pass T-24.
+The conceptual Text Drop role describes a recessed writing surface, but in the released Mint CSS the writing page is lighter than the canvas. Preserve that measured baseline rather than darkening Mint to force a new role name. The resolved aliases are recorded below. Other palettes are implementation proposals until contrast and theme/state coverage pass T-24.
+
+### Semantic token mapping (T-22)
+
+`src/styles/tokens.css` holds one theme block. It declares the four core roles, and every other themed token either aliases a role or is a derived value for that theme. `src/styles/app.css` uses tokens only; `tests/theme-tokens.test.mjs` fails on a colour literal there or in a component, and pins every Mint value to v1.0.0.
+
+| Spec role | Token | Mint | Component-facing alias | Used for |
+| --- | --- | --- | --- | --- |
+| Dominant | `--dominant` | `#52F0BE` | `--phosphor` | wordmark, active controls, caret, markers, corner brackets, segments |
+| Default Line | `--default-line` | `#284239` | `--line-2` | frames, dividers, scrollbar thumb |
+| Background | `--background` | `#0B0F0D` | `--panel` | rail, header, toolbar, status bar, panels, dialogs |
+| Text Drop | `--text-drop` | `#050706` | `--void` | window canvas and recessed fields (search field, segmented controls) |
+
+Derived tokens each theme must define:
+
+| Group | Tokens (Mint value) |
+| --- | --- |
+| Surfaces | `--gutter` `#070908`, `--page` `#0D1210`, `--panel-2` `#121815` (raised, hover), `--tint` `#10261E` (selected), `--shell-bloom` `#0E1C17` |
+| Lines | `--line` `#1A2420` (quiet rules), `--line-3` `#43786A` (control borders, 3:1) |
+| Ink | `--text-strong` `#F3FBF7`, `--text` `#E0EFE8`, `--text-2` `#A2BDB1`, `--muted` `#7E9A8E` |
+| Accent states | `--phosphor-hi` `#B4FFE4`, `--phosphor-lo` `#16906C`, `--focus` `#C2FFE9`, `--glow` (Dominant at 32%) |
+| Signals | `--amber` `#FFB648` (attention), `--danger` `#FF6B78` (failure) |
+| Alpha channels | `--dominant-rgb` `82, 240, 190`, `--danger-rgb` `255, 107, 120`, `--scrim-rgb` `3, 5, 4` |
+| Assets | `--select-arrow`: the select chevron as a data URI stroked in Dominant; a data URI cannot read custom properties, so each theme supplies its own |
+
+Alpha tints use `rgba(var(--dominant-rgb), a)`. The comma (legacy) form is deliberate: Chromium rounds legacy `rgba()` alpha to 8 bits but keeps `rgb(r g b / a)` alpha exact, so the modern form shifted Mint by 1/255 across the shell.
+
+**Surface difference.** The spec describes Text Drop as the darkest surface and the main writing area. In Mint the writing page (`--page`) is lighter than the canvas, gutter, and chrome. Text Drop therefore maps to the darkest measured surface, `--void`, which already serves the recessed fields; the writing page remains its own derived token, `--page`. Mint is not darkened to make the names line up. Other themes may set `--page` closer to Text Drop, subject to T-24 contrast checks.
+
+**Deliberately not themed.** Neutral black shadows and vignette (`rgba(0, 0, 0, a)`), the `#000` alpha stencils in masks, `color-scheme: dark`, and the HTML export stylesheet in `src/domain/export.ts`, which stays print-neutral for every theme. Journal documents store no colours, so a theme cannot rewrite them.
+
+**Left for T-23/T-24.** The search field's native clear button is tinted with `hue-rotate(120deg)`, which is tuned to Mint. Neither `index.html` nor the native window sets a background colour, so restoring a non-default theme without a flash belongs to T-23.
 
 ## Sounds
 
