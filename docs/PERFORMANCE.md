@@ -37,6 +37,21 @@ UI timings come from Chromium against the Vite dev server, not the desktop WebKi
 - Startup is dominated by the web view; journal size (0 vs 5,000 entries) made no measurable difference to startup.
 - Archives renders every row; 5,000 rows take about a second to appear. If journals much larger than this become common, a virtualized list would be the next improvement. No change was made now.
 
+## Terminal 2.0 motion check (T-30) — November 4, 2026
+
+Apple M5, macOS 26.5.1. Release builds with `startup-metrics` of v1.0.0 (temporary worktree) and of `feature/T-28-30-motion` (themes and motion, Mint, motion Full), measured back to back with `scripts/measure_release.py`, 7 launches per profile:
+
+| Profile | v1.0.0 page loaded / journal requested (median) | 2.0 branch | RSS after 5 s, v1 / 2.0 (range) |
+| --- | --- | --- | --- |
+| Empty journal | 236 / 314 ms | 215 / 291 ms | 225–234 / 216–239 MB |
+| 5,000 entries | 202 / 280 ms | 215 / 299 ms | 255–267 / 234–259 MB |
+
+The two builds are equal within run-to-run noise. Today's numbers for both are higher than the first table, which was measured on a different day, so compare builds only within one session.
+
+Idle CPU, sampled over 30 s after a 15 s settle with a scratch `ps` CPU-time sampler: v1.0.0 0.00 s, 2.0 branch 0.01 s (about 0.03% of one core), summed over the app and its WebKit processes. Sampling from 8 s after launch showed about 12% of one core in the 2.0 branch, because launch work was still finishing; settling longer removed it, and v1 was not sampled in that early window, so the two cannot be compared there.
+
+Browser checks (`tests/ui/motion.spec.ts`): typing 180 characters took 367–470 ms with motion Full against 427–457 ms with it Off in Chromium, and 463–502 ms against 607–627 ms in WebKit (Playwright pace included, two runs). No animation runs in the page while idle, and none ever targets the writing page.
+
 ## Reproducing
 
 ```sh

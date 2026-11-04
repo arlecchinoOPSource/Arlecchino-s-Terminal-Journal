@@ -40,7 +40,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .rail .icon-button:not(:disabled):hover { border-color: var(--phosphor-lo); color: var(--phosphor); }
 .rail .icon-button[aria-expanded='true'] { background: var(--tint); border-color: var(--phosphor); color: var(--phosphor); box-shadow: 0 0 12px rgba(var(--dominant-rgb), .25), inset 0 0 8px rgba(var(--dominant-rgb), .12); }
 .rail .icon-button[aria-expanded='true'] svg { filter: drop-shadow(0 0 6px var(--glow)); }
-.icon-button { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid transparent; border-radius: var(--radius); background: transparent; padding: 0; color: var(--text-2); transition: background-color .15s var(--ease), color .15s var(--ease), border-color .15s var(--ease); }
+.icon-button { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 40px; height: 40px; border: 1px solid transparent; border-radius: var(--radius); background: transparent; padding: 0; color: var(--text-2); transition: background-color var(--motion-state) var(--ease), color var(--motion-state) var(--ease), border-color var(--motion-state) var(--ease); }
 .icon-button:not(:disabled):hover { background: var(--panel-2); color: var(--text); }
 .rail-bottom { margin-top: auto; align-self: center; }
 
@@ -50,7 +50,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .identity-strip { position: relative; min-height: 44px; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 4px 14px; background-color: var(--panel); border: 1px solid var(--line-2); border-radius: var(--radius); box-shadow: inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--line), 0 0 18px rgba(var(--dominant-rgb), .07); }
 .wordmark-glow { display: inline-flex; filter: drop-shadow(0 0 2px rgba(var(--dominant-rgb), .7)) drop-shadow(0 0 14px rgba(var(--dominant-rgb), .4)); }
 /* Never starts fully transparent: if the window is inactive and WebKit pauses the animation, the logo stays visible. */
-.wordmark-glow.power-on { animation: power-on 1.1s steps(1) 1; }
+.wordmark-glow.power-on { animation: power-on var(--motion-power-on) steps(1) 1; }
 /* One flicker as the display "powers on" at launch; off under reduced motion. */
 @keyframes power-on { 0% { opacity: .35; } 12% { opacity: .9; } 18% { opacity: .2; } 30% { opacity: 1; } 38% { opacity: .5; } 46%, 100% { opacity: 1; } }
 .wordmark { font: 900 1.75rem/1 var(--font-display); letter-spacing: .05em; color: var(--phosphor);
@@ -68,12 +68,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focu
 .tool-field + .tool-field { margin-left: 6px; }
 select { appearance: none; -webkit-appearance: none; background-color: var(--panel-2); color: var(--text); border: 1px solid var(--line-3); border-radius: var(--radius); font: .8125rem var(--font-ui);
   background-image: var(--select-arrow);
-  background-repeat: no-repeat; background-position: right 9px center; padding: 2px 26px 2px 9px; transition: border-color .15s var(--ease); }
+  background-repeat: no-repeat; background-position: right 9px center; padding: 2px 26px 2px 9px; transition: border-color var(--motion-state) var(--ease); }
 select:not(:disabled):hover { border-color: var(--phosphor-lo); }
 select:disabled { opacity: .45; }
 option { background: var(--panel-2); color: var(--text); }
 .tool-field select { min-height: 28px; max-width: 150px; }
-.tool-button { width: 30px; height: 30px; padding: 5px; border: 1px solid transparent; border-radius: var(--radius); background: none; display: inline-flex; align-items: center; justify-content: center; font-size: .9375rem; color: var(--text-2); position: relative; transition: background-color .15s var(--ease), color .15s var(--ease); }
+.tool-button { width: 30px; height: 30px; padding: 5px; border: 1px solid transparent; border-radius: var(--radius); background: none; display: inline-flex; align-items: center; justify-content: center; font-size: .9375rem; color: var(--text-2); position: relative; transition: background-color var(--motion-state) var(--ease), color var(--motion-state) var(--ease); }
 .tool-button:not(:disabled):hover { background: var(--panel-2); color: var(--text); }
 /* Active formatting: tinted fill, accent ink and an inset bar, not colour alone. */
 .tool-button[aria-pressed='true'] { background: var(--tint); color: var(--phosphor); box-shadow: inset 0 -2px 0 var(--phosphor), 0 0 10px rgba(var(--dominant-rgb), .18); }
@@ -92,7 +92,7 @@ option { background: var(--panel-2); color: var(--text); }
 .entry-date { color: var(--muted); }
 .entry-rule { flex: 1 1 24px; min-width: 24px; border-top: 1px solid var(--line-2); }
 .entry-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-.ghost-button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 3px 9px; border: 1px solid var(--line-2); border-radius: var(--radius); background: transparent; color: var(--text-2); font: .6875rem var(--font-ui); letter-spacing: .06em; text-transform: uppercase; transition: border-color .15s var(--ease), color .15s var(--ease), background-color .15s var(--ease); }
+.ghost-button { display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 3px 9px; border: 1px solid var(--line-2); border-radius: var(--radius); background: transparent; color: var(--text-2); font: .6875rem var(--font-ui); letter-spacing: .06em; text-transform: uppercase; transition: border-color var(--motion-state) var(--ease), color var(--motion-state) var(--ease), background-color var(--motion-state) var(--ease); }
 .ghost-button svg { width: 15px; height: 15px; }
 .ghost-button:not(:disabled):hover { border-color: var(--phosphor-lo); color: var(--phosphor); background: var(--panel-2); }
 .ghost-button.danger-hover:not(:disabled):hover { border-color: var(--danger); color: var(--danger); }
@@ -105,7 +105,7 @@ option { background: var(--panel-2); color: var(--text); }
 .journal-body:focus { outline: none; }
 /* Focus is shown by the caret and a slim bar in the page margin, never by a box over the writing. */
 .journal-body:focus-visible { outline: none; }
-.editor-wrap::before { content: ''; position: absolute; left: calc(-1 * min(28px, var(--page-pad-x) - 6px)); top: 4px; bottom: 4px; width: 1px; background: var(--phosphor-lo); opacity: 0; transition: opacity .15s var(--ease); }
+.editor-wrap::before { content: ''; position: absolute; left: calc(-1 * min(28px, var(--page-pad-x) - 6px)); top: 4px; bottom: 4px; width: 1px; background: var(--phosphor-lo); opacity: 0; transition: opacity var(--motion-state) var(--ease); }
 .editor-wrap:focus-within::before { opacity: .9; }
 .journal-body p { margin: 0 0 1em; }
 .journal-body p:last-child { margin-bottom: 0; }
@@ -132,11 +132,11 @@ option { background: var(--panel-2); color: var(--text); }
 /* A small framed bar in the spirit of the references; it shows state, never fake progress. */
 .save-meter { position: relative; width: 60px; height: 10px; border: 1px solid var(--line-3); border-radius: 1px; overflow: hidden; }
 /* Segmented like the references' loading bars. */
-.save-meter > span { position: absolute; inset: 2px; background: var(--phosphor); box-shadow: 0 0 8px var(--glow); -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); transition: background-color .2s var(--ease), right .3s var(--ease); }
+.save-meter > span { position: absolute; inset: 2px; background: var(--phosphor); box-shadow: 0 0 8px var(--glow); -webkit-mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); mask-image: repeating-linear-gradient(90deg, #000 0 5px, transparent 5px 7px); transition: background-color var(--motion-status) var(--ease), right var(--motion-status) steps(4, end); }
 .save-status[data-tone='idle'] .save-meter > span { right: 100%; }
 .save-status[data-tone='pending'] .save-meter { border-color: var(--amber); }
 .save-status[data-tone='pending'] .save-meter > span { background: var(--amber); right: 60%; box-shadow: none; }
-.save-status[data-tone='busy'] .save-meter > span { background: var(--amber); right: auto; width: 35%; box-shadow: none; animation: meter-sweep 1s var(--ease) infinite; }
+.save-status[data-tone='busy'] .save-meter > span { background: var(--amber); right: auto; width: 35%; box-shadow: none; animation: meter-sweep var(--motion-sweep) steps(8, end) infinite; }
 .save-status[data-tone='error'] { color: var(--danger); }
 .save-status[data-tone='error'] .save-meter { border-color: var(--danger); }
 .save-status[data-tone='error'] .save-meter > span { background: var(--danger); box-shadow: none; }
@@ -163,7 +163,7 @@ option { background: var(--panel-2); color: var(--text); }
 .archive-popover .archive-empty { margin: 0; padding: 18px 16px 22px; color: var(--text-2); font: .875rem/1.6 var(--font-writing); }
 .archive-list { list-style: none; margin: 0; padding: 4px; overflow-y: auto; min-height: 0; }
 .archive-list li + li { margin-top: 1px; }
-.archive-row { width: 100%; min-height: 38px; display: grid; grid-template-columns: 14px minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 5px 10px 5px 8px; border: 1px solid transparent; border-radius: var(--radius); background: none; text-align: left; font-size: .75rem; color: var(--text); font-variant-numeric: tabular-nums; transition: background-color .12s var(--ease), border-color .12s var(--ease); }
+.archive-row { width: 100%; min-height: 38px; display: grid; grid-template-columns: 14px minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 5px 10px 5px 8px; border: 1px solid transparent; border-radius: var(--radius); background: none; text-align: left; font-size: .75rem; color: var(--text); font-variant-numeric: tabular-nums; transition: background-color var(--motion-state) var(--ease), border-color var(--motion-state) var(--ease); }
 .archive-row:hover { background: var(--panel-2); }
 .archive-row:focus-visible { outline-offset: -2px; }
 .archive-row[aria-current='true'] { background: var(--tint); border-color: var(--phosphor-lo); }
@@ -176,7 +176,7 @@ option { background: var(--panel-2); color: var(--text); }
 /* Fixed top edge so the panel grows downward while typing instead of jumping; centred when full. */
 .search-popover { top: max(12px, calc(50% - 230px)); bottom: auto; left: 50%; transform: translateX(-50%); width: min(520px,calc(100% - 24px)); max-height: min(460px, calc(100% - 24px)); display: flex; flex-direction: column; overflow: hidden; padding: 0; font-family: var(--font-ui); }
 .search-popover header { margin: 0; flex-shrink: 0; }
-.search-field { display: flex; align-items: center; gap: 10px; margin: 10px 10px 6px; padding: 0 12px; border: 1px solid var(--line-3); border-radius: var(--radius); background: var(--void); flex-shrink: 0; transition: border-color .15s var(--ease), box-shadow .15s var(--ease); }
+.search-field { display: flex; align-items: center; gap: 10px; margin: 10px 10px 6px; padding: 0 12px; border: 1px solid var(--line-3); border-radius: var(--radius); background: var(--void); flex-shrink: 0; transition: border-color var(--motion-state) var(--ease), box-shadow var(--motion-state) var(--ease); }
 .search-field > span { color: var(--phosphor); font-size: 1rem; }
 .search-field:focus-within { border-color: var(--phosphor); box-shadow: 0 0 0 3px rgba(var(--dominant-rgb), .15), 0 0 18px rgba(var(--dominant-rgb), .12); }
 .search-field input { flex: 1; min-width: 0; min-height: 38px; border: 0; background: none; outline: none; font: 1rem var(--font-writing); color: var(--text); }
@@ -214,7 +214,7 @@ option { background: var(--panel-2); color: var(--text); }
 .settings-segmented > div { display: flex; flex-wrap: wrap; gap: 2px; padding: 2px; border: 1px solid var(--line-3); border-radius: var(--radius); background: var(--void); }
 .settings-segmented label { flex: 1 1 auto; position: relative; display: flex; min-height: 30px; }
 .settings-segmented input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.settings-segmented span { flex: 1; display: flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 2px; font-size: .75rem; white-space: nowrap; color: var(--text-2); transition: background-color .12s var(--ease), color .12s var(--ease); }
+.settings-segmented span { flex: 1; display: flex; align-items: center; justify-content: center; padding: 4px 8px; border-radius: 2px; font-size: .75rem; white-space: nowrap; color: var(--text-2); transition: background-color var(--motion-state) var(--ease), color var(--motion-state) var(--ease); }
 .settings-segmented label:hover span { background: var(--panel-2); color: var(--text); }
 .settings-segmented label.selected span { background: var(--tint); color: var(--phosphor); box-shadow: inset 0 -2px 0 var(--phosphor); }
 .settings-segmented input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: -2px; }
@@ -232,7 +232,7 @@ option { background: var(--panel-2); color: var(--text); }
 
 /* ── Buttons, dialogs, notices ─────────────────────────────────────────── */
 .settings-reset, .settings-data-actions button, .journal-notice button, .storage-error button, dialog button {
-  min-height: 32px; padding: 5px 12px; border: 1px solid var(--line-3); border-radius: var(--radius); background: var(--panel-2); color: var(--text); font: .75rem var(--font-ui); letter-spacing: .06em; transition: border-color .15s var(--ease), color .15s var(--ease), background-color .15s var(--ease); }
+  min-height: 32px; padding: 5px 12px; border: 1px solid var(--line-3); border-radius: var(--radius); background: var(--panel-2); color: var(--text); font: .75rem var(--font-ui); letter-spacing: .06em; transition: border-color var(--motion-state) var(--ease), color var(--motion-state) var(--ease), background-color var(--motion-state) var(--ease); }
 .settings-data-actions button { flex: 1 1 140px; }
 .settings-reset:not(:disabled):hover, .settings-data-actions button:not(:disabled):hover, .journal-notice button:hover, .storage-error button:not(:disabled):hover, dialog button:not(.destructive):hover { border-color: var(--phosphor); color: var(--phosphor); }
 dialog .destructive, .storage-error .destructive { color: var(--danger); border-color: var(--danger); background: rgba(var(--danger-rgb), .08); }
@@ -254,6 +254,30 @@ dialog form, .dialog-actions { display: flex; gap: 10px; justify-content: flex-e
 /* Focus rings on tinted or accent surfaces need the light ring to stand off the edge. */
 .archive-row[aria-current='true']:focus-visible { outline-color: var(--focus); }
 .popover header .icon-button:focus-visible { outline-offset: -2px; }
+
+/* ── Motion (T-28/T-29) ──────────────────────────────────────────────────── */
+/* Durations and step counts live in tokens.css. Nothing here touches the writing page,
+   delays input, or runs while idle: every animation is triggered by a state change. */
+/* Press: an instant 1px drop with a two-step highlight, released as soon as the pointer is. */
+:is(.icon-button, .tool-button, .ghost-button, .settings-reset, .settings-data-actions button, .journal-notice button, .storage-error button, dialog button):not(:disabled):active { transform: translateY(1px); filter: brightness(1.35); animation: press-flash var(--motion-press) steps(2, end); }
+@keyframes press-flash { from { filter: brightness(1.8); } }
+/* A control switching on flashes in three steps, like a lamp coming up. */
+.rail .icon-button[aria-expanded='true'], .tool-button[aria-pressed='true'], .settings-segmented label.selected span, .search-results .archive-row[aria-selected='true'], .archive-row[aria-current='true'] { animation: control-on var(--motion-state) var(--steps-flash); }
+@keyframes control-on { 0% { filter: brightness(1.9); } 50% { filter: brightness(1.3); } 100% { filter: none; } }
+/* Panels open top-down in bands; dialogs open outward from a centre line, like a CRT. */
+.popover { animation: panel-in var(--motion-popover) var(--steps-reveal); }
+@keyframes panel-in { from { clip-path: inset(0 0 100% 0); opacity: .5; } to { clip-path: inset(0); opacity: 1; } }
+dialog[open] { animation: dialog-in var(--motion-dialog) var(--steps-dialog); }
+@keyframes dialog-in { from { clip-path: inset(50% 0 50% 0); } to { clip-path: inset(0); } }
+.popover-scrim { animation: fade-in var(--motion-popover) var(--ease); }
+dialog[open]::backdrop { animation: fade-in var(--motion-dialog) var(--ease); }
+@keyframes fade-in { from { opacity: 0; } }
+/* Save meter: fills in segments (see .save-meter), flashes once when saved, blinks twice on failure. */
+.save-status[data-tone='ok'] .save-meter > span { animation: status-flash var(--motion-status) var(--steps-flash); }
+@keyframes status-flash { 0% { filter: brightness(2); } 100% { filter: none; } }
+/* The blink starts lit, so failure is visible from the first frame. */
+.save-status[data-tone='error'] .save-meter { animation: status-alert calc(var(--motion-status) * 2) steps(1, end) 2; }
+@keyframes status-alert { 0%, 100% { opacity: 1; } 50% { opacity: .35; } }
 
 /* ── Smaller windows ───────────────────────────────────────────────────── */
 @media (max-width: 960px) {
@@ -287,7 +311,16 @@ dialog form, .dialog-actions { display: flex; gap: 10px; justify-content: flex-e
   .search-popover { top: 8px; }
   .settings-row select { width: auto; min-width: 0; flex: 1; }
 }
+/* Reduced: no movement, flashes, sweeps or stepped reveals; short colour fades remain. */
+:root[data-motion='reduced'] *, :root[data-motion='reduced'] *::before, :root[data-motion='reduced'] *::after, :root[data-motion='reduced'] ::backdrop { animation: none !important; }
+:root[data-motion='reduced'] *:active { transform: none !important; }
+:root[data-motion='reduced'] .save-status[data-tone='busy'] .save-meter > span { left: 0; }
+/* Off, and any OS request for reduced motion (which an app setting cannot override): nothing moves. */
+:root[data-motion='off'] *, :root[data-motion='off'] *::before, :root[data-motion='off'] *::after, :root[data-motion='off'] ::backdrop { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+:root[data-motion='off'] *:active { transform: none !important; }
+:root[data-motion='off'] .save-status[data-tone='busy'] .save-meter > span { left: 0; }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+  *, *::before, *::after, ::backdrop { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+  *:active { transform: none !important; }
   .save-status[data-tone='busy'] .save-meter > span { left: 0; }
 }
