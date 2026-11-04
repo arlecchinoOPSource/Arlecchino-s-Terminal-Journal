@@ -114,6 +114,17 @@ fn small_int(v: &Value, min: i64, max: i64) -> bool {
 /// always means "default". Anything else is refused so imported or pasted
 /// content cannot smuggle styles, URLs or markup into stored entries.
 fn valid_attr(kind: &str, key: &str, v: &Value) -> bool {
+    if kind == "doc" {
+        return match key {
+            "titleFontFamily" => {
+                v.is_null() || v.as_str().is_some_and(|f| FONT_FAMILIES.contains(&f))
+            }
+            "titleFontSize" => v.is_null() || v.as_str().is_some_and(|f| FONT_SIZES.contains(&f)),
+            "titleAlign" => matches!(v.as_str(), Some("left" | "center" | "right")),
+            "titleBold" | "titleItalic" | "titleUnderline" | "titleStrike" => v.is_boolean(),
+            _ => false,
+        };
+    }
     if v.is_null() {
         return matches!(
             (kind, key),
@@ -381,6 +392,20 @@ mod tests {
         select(&mut db, None).unwrap();
         assert!(last(&db).unwrap().is_none());
         assert!(select(&mut db, Some("00000000-0000-4000-8000-000000000099")).is_err());
+    }
+    #[test]
+    fn title_styles_round_trip_and_reject_unsafe_values() {
+        let mut db = db();
+        let mut d = draft(1);
+        d.content["attrs"] = serde_json::json!({"titleFontFamily":"'Literata', serif","titleFontSize":"24px","titleBold":true,"titleAlign":"center"});
+        let expected = d.content.clone();
+        let saved = save(&mut db, d).unwrap().unwrap();
+        assert_eq!(get(&db, &saved.id).unwrap().unwrap().content, expected);
+        let mut bad = draft(2);
+        bad.content["attrs"] =
+            serde_json::json!({"titleFontFamily":"url(https://example.invalid)"});
+        assert!(save(&mut db, bad).is_err());
+        assert_eq!(list(&db).unwrap().len(), 1);
     }
     #[test]
     fn unsupported_document_is_rejected_without_writing() {

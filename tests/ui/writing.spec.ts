@@ -110,3 +110,27 @@ test('deleting asks first, names the entry, and removes it from archives and sea
   await page.getByRole('combobox', { name: 'Search entry titles' }).fill('lisbon');
   await expect(page.getByRole('listbox', { name: 'Matching entries' }).getByRole('option')).toHaveText([/Lisbon keep/]);
 });
+
+test('title font, size, emphasis and alignment persist independently of body formatting', async ({ page }) => {
+  await installNativeMock(page);
+  await page.goto('/');
+  const title=page.getByRole('textbox',{name:'Entry title'});
+  await title.fill('Synthetic styled title');
+  await page.getByRole('combobox',{name:'Font family',exact:true}).selectOption("'Literata', serif");
+  await page.getByRole('combobox',{name:'Font size',exact:true}).selectOption('24px');
+  await page.getByRole('button',{name:'Bold',exact:true}).click();
+  await page.getByRole('button',{name:'Align center',exact:true}).click();
+  await expect(title).toHaveCSS('font-size','24px');
+  await expect(title).toHaveCSS('font-weight','700');
+  await expect(title).toHaveCSS('text-align','center');
+  await body(page).click();
+  await page.keyboard.type('Body remains separate');
+  await expect(status(page)).toHaveText('Saved');
+  await page.reload();
+  await expect(title).toHaveValue('Synthetic styled title');
+  await expect(title).toHaveCSS('font-size','24px');
+  await expect(title).toHaveCSS('font-family', /Literata/);
+  await expect(title).toHaveCSS('font-weight','700');
+  await expect(body(page)).toContainText('Body remains separate');
+  await expect(body(page).locator('strong')).toHaveCount(0);
+});

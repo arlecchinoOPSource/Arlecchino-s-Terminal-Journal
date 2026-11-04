@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { type CSSProperties, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -98,11 +98,14 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const dialog=useRef<HTMLDialogElement>(null);
   const typing=useTypingSounds();
+  const [titleFocused,setTitleFocused]=useState(false);
+  const titleStyle=state.draft.content.attrs??{};
+  const changeTitleStyle=(patch:Record<string,unknown>)=>controller.edit({content:{...controller.snapshot().draft.content,attrs:{...controller.snapshot().draft.content.attrs,...patch}}});
   const editor=useEditor({
     extensions:basicExtensions(),content:state.draft.content,autofocus:false,
     editable:state.ready&&!state.busy,
     editorProps:{attributes:{class:'journal-body',role:'textbox','aria-label':'Journal body','aria-multiline':'true','aria-describedby':'storage-status',spellcheck:'false',autocorrect:'off',autocapitalize:'off'}},
-    onUpdate:({editor:current})=>{typing.changed();controller.edit({content:current.getJSON()});},
+    onUpdate:({editor:current})=>{typing.changed();controller.edit({content:{...current.getJSON(),attrs:controller.snapshot().draft.content.attrs}});},
   });
   // Toggling editability must not emit an update; otherwise opening or switching
   // an entry would autosave unchanged content and reorder the archive.
@@ -140,7 +143,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
     search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>} statusTone={tone}
-    formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
+    formattingControls={<FormattingToolbar titleStyle={titleFocused?titleStyle:undefined} onTitleStyleChange={changeTitleStyle} editor={editor} disabled={!state.ready||state.busy} />}
     historyControls={<><IconButton icon="undo" label="Undo" title={`Undo (${shortcutLabel('Mod+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Z',mac)} disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" title={`Redo (${shortcutLabel('Mod+Shift+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Shift+Z',mac)} disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
     <div className="writing-column" onKeyDownCapture={typing.onKeyDownCapture} onCompositionEnd={typing.onCompositionEnd}>
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
@@ -155,8 +158,8 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
         </div>
       </div>
       {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
-      <input className="entry-title" aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>{typing.changed();controller.edit({title:e.target.value});}} />
-      <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<EditorContent editor={editor}/></div>
+      <input className="entry-title" onFocus={()=>setTitleFocused(true)} style={{fontFamily:titleStyle.titleFontFamily??undefined,fontSize:titleStyle.titleFontSize??undefined,fontWeight:titleStyle.titleBold?'bold':undefined,fontStyle:titleStyle.titleItalic?'italic':undefined,textDecoration:[titleStyle.titleUnderline?'underline':'',titleStyle.titleStrike?'line-through':''].join(' '),textAlign:titleStyle.titleAlign??'left'} as CSSProperties} aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>{typing.changed();controller.edit({title:e.target.value});}} />
+      <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<div onFocusCapture={()=>setTitleFocused(false)}><EditorContent editor={editor}/></div></div>
     </div>
     {restoreDialog}
     <dialog ref={dialog} aria-labelledby="delete-title"><h2 id="delete-title">Delete “{state.draft.title.trim()||'Untitled'}”?</h2><p>This removes the entry from this device and from Archives and Search. It cannot be undone. To keep a copy, cancel and use Export entry first.</p><form method="dialog"><button autoFocus>Cancel</button><button className="destructive" onClick={()=>void controller.remove()}>Delete entry</button></form></dialog>

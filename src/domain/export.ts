@@ -10,6 +10,12 @@ const alignments = new Set(['left', 'center', 'right']);
 const safeFont = (v: unknown) => typeof v === 'string' && /^['A-Za-z ,-]+$/.test(v) ? v : null;
 const safeSize = (v: unknown) => typeof v === 'string' && /^\d{1,2}px$/.test(v) ? v : null;
 
+function titleStyle(content: JSONContent): string {
+  const a=content.attrs??{};
+  const styles=[safeFont(a.titleFontFamily)&&`font-family: ${safeFont(a.titleFontFamily)}`,safeSize(a.titleFontSize)&&`font-size: ${safeSize(a.titleFontSize)}`,typeof a.titleBold==='boolean'&&`font-weight: ${a.titleBold?'bold':'normal'}`,typeof a.titleItalic==='boolean'&&`font-style: ${a.titleItalic?'italic':'normal'}`,(a.titleUnderline===true||a.titleStrike===true)&&`text-decoration: ${[a.titleUnderline===true?'underline':'',a.titleStrike===true?'line-through':''].filter(Boolean).join(' ')}`,alignments.has(a.titleAlign)&&`text-align: ${a.titleAlign}`].filter(Boolean).join('; ');
+  return styles?` style="${escapeHtml(styles)}"`:'';
+}
+
 function inlineHtml(node: JSONContent): string {
   if (node.type === 'hardBreak') return '<br>';
   if (node.type !== 'text') return '';
@@ -73,7 +79,7 @@ th p, td p, li p { margin: 0; }
 </head>
 <body>
 <article>
-<h1>${escapeHtml(title)}</h1>
+<h1${titleStyle(entry.content)}>${escapeHtml(title)}</h1>
 <p class="meta">Written ${escapeHtml(stamp(entry.created_at))} · Last changed ${escapeHtml(stamp(entry.updated_at))} · Exported from Terminal</p>
 ${children(entry.content, blockHtml)}</article>
 </body>
