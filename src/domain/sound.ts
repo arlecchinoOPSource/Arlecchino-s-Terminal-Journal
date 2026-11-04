@@ -13,7 +13,7 @@ export const SOUND_EVENTS = [
   { id: 'textEdit', label: 'Text edit', description: 'Export, delete and dialogs' },
   { id: 'error', label: 'Error', description: 'When something fails' },
   { id: 'close', label: 'Close', description: 'When Terminal closes' },
-  { id: 'startup', label: 'Startup', description: 'With the startup screen (coming in a later update)' },
+  { id: 'startup', label: 'Startup', description: 'Once when Terminal starts' },
 ] as const;
 export type SoundEvent = (typeof SOUND_EVENTS)[number]['id'];
 

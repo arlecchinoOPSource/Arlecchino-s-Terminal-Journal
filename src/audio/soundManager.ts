@@ -30,6 +30,7 @@ export class SoundManager {
   private keyVoices: AudioBufferSourceNode[] = [];
   private readonly eventVoices = new Map<string, AudioBufferSourceNode>();
   private lastKey = -1;
+  private startupPlayed = false;
 
   private readonly assets: SoundAssets;
   private readonly createContext: () => AudioContext | null;
@@ -91,6 +92,33 @@ export class SoundManager {
     const url = keyboard ? this.assets.keyboard[target].key[0] : this.assets.events[target];
     if (!url) return;
     this.startEvent('preview', url, 'preview', curve(this.settings.volume) * curve(keyboard ? this.settings.keyboardVolume : this.settings.interfaceVolume));
+  }
+
+  /**
+   * The startup sound, at most once per launch. It plays only if audio can start right
+   * away: a context the system keeps suspended is skipped rather than allowed to play
+   * the sound later, at the first click or keystroke.
+   */
+  async playStartup(): Promise<boolean> {
+    const s = this.settings;
+    if (this.startupPlayed) return false;
+    this.startupPlayed = true;
+    if (!s.enabled || !s.startup || s.interfaceVolume === 0 || s.volume === 0) return false;
+    const context = this.ensure();
+    if (!context) return false;
+    const wait = (ms: number) => new Promise<null>(resolve => setTimeout(() => resolve(null), ms));
+    if (context.state === 'suspended') await Promise.race([context.resume().catch(() => {}), wait(300)]);
+    const buffer = await Promise.race([this.buffer(this.assets.events.startup), wait(1500)]);
+    if (!buffer || context.state !== 'running' || !this.interfaceBus || !this.settings.enabled || !this.settings.startup) return false;
+    try {
+      const source = context.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.interfaceBus);
+      this.stopSource(this.eventVoices.get('startup'));
+      this.eventVoices.set('startup', source);
+      source.start();
+      return true;
+    } catch { return false; }
   }
 
   /**

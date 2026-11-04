@@ -1,5 +1,6 @@
 import { DEFAULT_MOTION, parseMotion, type MotionLevel } from '../domain/motion';
 import { parseSoundSettings, type SoundSettings } from '../domain/sound';
+import { DEFAULT_STARTUP_SCREEN, parseStartupScreen, type StartupScreen } from '../domain/startup';
 import { DEFAULT_THEME, parseTheme, type ThemeId } from '../domain/themes';
 
 /**
@@ -39,6 +40,7 @@ export type ThemeRepository = LocalSetting<ThemeId>;
 export const themeRepository: ThemeRepository = localSetting('terminal.theme', parseTheme, DEFAULT_THEME);
 export const motionRepository: LocalSetting<MotionLevel> = localSetting('terminal.motion', parseMotion, DEFAULT_MOTION);
 /** Missing (for example after upgrading from 1.0) means sound off. */
+export const startupRepository: LocalSetting<StartupScreen> = localSetting('terminal.startup', parseStartupScreen, DEFAULT_STARTUP_SCREEN);
 export const soundRepository: LocalSetting<SoundSettings> = localJsonSetting('terminal.sound', parseSoundSettings);
 
 /** Shows the theme on the whole window. */

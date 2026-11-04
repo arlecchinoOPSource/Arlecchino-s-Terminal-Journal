@@ -29,12 +29,17 @@ const statusTone=(status:string)=>status==='Saved'?'ok':status==='Empty draft'?'
 const errorText=(e:unknown)=>e instanceof Error?e.message:typeof e==='string'?e:'Something went wrong. Your journal has not been changed.';
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;};
 
-export function WritingWorkspace() {
+import type { Readiness } from '../domain/startup';
+
+export function WritingWorkspace({onReadiness}:{onReadiness?:(readiness:Readiness)=>void}={}) {
   const [controller] = useState(()=>new JournalController(repository));
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const [lifecycleError,setLifecycleError]=useState<string|null>(null);
   const [closeBlocked,setCloseBlocked]=useState(false);
   const prefs=usePreferences(preferencesRepository);
+  // The startup screen waits for this: the journal opened, or it could not be opened.
+  const readiness:Readiness=state.ready?'ready':state.error||lifecycleError?'error':'starting';
+  useEffect(()=>{onReadiness?.(readiness);},[onReadiness,readiness]);
   const [backup,setBackup]=useState<BackupStatus>({kind:'idle'});
   const [preview,setPreview]=useState<RestorePreview|null>(null);
   const [notice,setNotice]=useState<string|null>(null);

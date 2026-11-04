@@ -137,6 +137,29 @@ Rules: animations are triggered only by state changes, so nothing runs while idl
 
 Centred TERMINAL wordmark, thin technical framing, chosen theme, a segmented readiness indicator, and Arlecchino's original sound when enabled. Use real readiness or clearly indeterminate progress, never fabricated percentages or artificial delays. Asset failures cannot block the editor; real database initialization errors remain visible. Animation and sound are independently controllable.
 
+### Startup screen (T-31, T-32)
+
+The screen covers the app while the journal opens underneath. It contains:
+
+- a small **ARLECCHINO** label;
+- the large **TERMINAL** wordmark, with the same gradient, scan-cut mask and glow as the header, as the focal point;
+- a 12-segment meter;
+- one line of status: OPENING JOURNAL, then READY.
+
+It sits in a bracketed frame on the shell's backdrop and uses the chosen theme from the first frame. The theme is applied before React renders, and the native window background is near-black (`#050706`), so the window never flashes white or Mint.
+
+| Situation | What happens |
+| --- | --- |
+| Motion Full | The frame opens from a centre line, the wordmark powers on, and a lit band sweeps the meter until the journal is open. The meter then fills and the screen collapses (220 ms). The sequence lasts 1.4 s and runs while the journal opens; any key or click skips it. |
+| Motion Reduced or Off, or OS reduced motion | Static screen; it leaves as soon as the journal is open, with no minimum time. |
+| Journal slow to open | After 4 s the text changes to STILL OPENING THE JOURNAL. |
+| Journal cannot open | The screen leaves at once, and the app's error with **Retry opening storage** is shown. |
+| Anything else | The screen closes itself after 10 s whatever happens. If the screen itself fails, it removes itself. |
+| Startup screen Off (Settings → Interface) | Terminal opens straight to the editor. |
+| Startup sound | Played once per launch through the sound manager when Sound and Startup are on. It plays only if the audio device starts immediately, never late on a first click. It is independent of the screen. |
+
+The meter never shows a percentage, because initialization has no measurable fraction.
+
 ## Verification gates
 
 T-24 covers every theme and state, text/control contrast, scaling, and focus. T-30 measures input, sound, motion, and idle behaviour before startup work. T-33 covers native platform and v1 compatibility evidence. A browser screenshot alone cannot prove persistence, input latency, native startup audio, or installation.
