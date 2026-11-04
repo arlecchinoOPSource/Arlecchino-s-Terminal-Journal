@@ -65,6 +65,15 @@ Use a machine (or fresh user account / VM) that has never run Terminal. Record t
 - [ ] Archives, Search, Settings, backup export/restore and entry export all work.
 - [ ] Move the app to the Trash. The journal stays in `~/Library/Application Support/com.arlecchino.terminal/` until removed manually.
 
+**Terminal 2.0 additions** (both platforms)
+
+- [ ] Upgrade: install 2.0 over 1.0 with a synthetic 1.0 journal. Entries, numbers, formatting and writing settings are unchanged; the theme is Mint; sound is off.
+- [ ] Themes: all four apply at once and are still chosen after relaunch, with no flash of another theme.
+- [ ] Sounds: switch Sound on and hear each preview, typing in both packs, a click in each area, and the error sound (for example, export to a read-only folder).
+- [ ] Startup: the screen shows and gives way; the startup sound plays at launch if the system allows it.
+- [ ] Close: quit with Sound on. The window hides at once, the close sound finishes, and the app exits; relaunch during the sound.
+- [ ] Motion: Reduced and Off, and the system's reduce-motion setting, stop the animations.
+
 **Windows**
 
 - [ ] Run `-setup.exe` (note any SmartScreen prompt); confirm it installs without administrator rights.
