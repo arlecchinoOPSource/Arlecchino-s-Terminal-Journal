@@ -8,6 +8,8 @@ const port = 4319;
 export default defineConfig({
   testDir: 'tests/ui',
   fullyParallel: true,
+  // Archive/long-entry timing checks must not compete for the CI runner's CPU.
+  workers: process.env.CI ? 1 : undefined,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
