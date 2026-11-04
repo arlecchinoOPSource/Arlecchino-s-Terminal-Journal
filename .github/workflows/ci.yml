@@ -4,7 +4,7 @@ name: CI
 # and nothing is published; release builds and installers belong to T-19.
 on:
   push:
-    branches: [main]
+    branches: [main, development/v2.0.0]
   pull_request:
   workflow_dispatch:
   # Reused by the release workflow so a release is only built from a passing commit.

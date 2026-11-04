@@ -2,6 +2,8 @@
 
 Read the PRD, UI design system, architecture, and AGENTS.md before changing behavior. Application implementation is underway for explicitly authorized backlog issues.
 
+For Terminal 2.0, also read `docs/TERMINAL_V2_SPEC.md`, `docs/BACKLOG-v2.0.md`, and `docs/DEVELOPMENT-v2.0.md`. Base v2 feature branches on `development/v2.0.0` and target that branch for review; `main` remains the stable release line. The initial setup PR targets `main` because it contains planning and CI configuration only. Do not merge unfinished v2 feature code to `main`.
+
 1. Select one issue and check its dependencies and acceptance criteria.
 2. Branch from current `main`: `feature/T-12-title-search`, `fix/T-08-save-error`, or `docs/T-01-specification`.
 3. Make a focused change, preserving user data and the accepted scope.

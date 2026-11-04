@@ -23,6 +23,8 @@ Terminal stores entries in a local SQLite database. There are no accounts, analy
 
 ## Development
 
+**Next release: Terminal 2.0.0 — The Sensory Update.** Preparation is tracked separately from the published 1.0.0 app. Read the [2.0 specification](docs/TERMINAL_V2_SPEC.md), [ordered backlog](docs/BACKLOG-v2.0.md), and [development guide](docs/DEVELOPMENT-v2.0.md). Themes → sounds → motion → startup, followed by regression and release checks. Word/DOCX support is deferred to 3.0.
+
 Install the [development prerequisites](docs/DEVELOPMENT.md), run `npm ci`, then `npm run dev` to open the desktop app. Run `npm run check` for the regression suite. Use synthetic entries for testing and bug reports.
 
 [Architecture](docs/ARCHITECTURE.md) · [Design system](docs/UI-DESIGN-SYSTEM-v0.3.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)

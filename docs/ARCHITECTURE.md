@@ -12,6 +12,8 @@ Status: accepted stack and product boundaries; implementation details below are 
 
 ## Visual specification
 
+For the 2.0 target, also read [TERMINAL_V2_SPEC.md](TERMINAL_V2_SPEC.md) and [UI-DESIGN-SYSTEM-v2.0.md](UI-DESIGN-SYSTEM-v2.0.md). The existing v1 storage/privacy contract remains the baseline. The sensory extension is planning guidance until its assigned issues are implemented.
+
 [UI design system v0.3](UI-DESIGN-SYSTEM-v0.3.md) is the current presentation specification. Its terminal-console treatment does not change the stack, offline/privacy boundaries, storage contract, or feature scope. The November 3 aesthetic revision is documentation only; implementing it requires separate authorization.
 
 ## Planned boundaries
@@ -59,3 +61,9 @@ Use rusqlite with bundled SQLite behind typed Tauri commands instead of exposing
 Database: OS application-data directory / journal.sqlite3. Timestamps are UTC Unix milliseconds. Entry IDs originate as UUIDs in the client and are immutable; allocation uses an independent monotonic counter in a transaction. A revision integer detects stale writes. Versioned migrations use PRAGMA user_version in an immediate transaction, reject newer databases, and never reset existing data. SQLite uses WAL and synchronous FULL. Startup errors are returned safely to the UI without logging private writing.
 
 Ordinary edits debounce for 400 ms. A pending draft is not durable until commit succeeds; forced termination before that commit can lose the pending edit. A failed save retains dirty content, blocks entry switching/closing, and offers retry; after a refused close the user may explicitly choose Close without saving. Native window close and application Quit are intercepted so the frontend can flush before exit. No promise of recovery for an uncommitted edit is made.
+
+## ADR-003: 2.0 sensory boundaries (planned)
+
+Keep the Tauri/React/Tiptap/rusqlite architecture and existing journal schema. Add semantic theme definitions, one optional local audio manager, shared motion policy, and a startup readiness presentation as separate concerns. Effects must never own journal writes, block commits, record input text, or bypass initialization errors. New preferences need validated, backward-compatible defaults; upgrading users stay silent. Database-schema changes are not part of 2.0 scope and require a documented necessity and regression evidence.
+
+Prefer existing browser/CSS capabilities before adding dependencies; no audio or animation package is selected during setup. Check actual native webview audio behaviour during the assigned issues. A missing effect can degrade to silence/static display; a failed journal initialization must remain a visible recoverable error. Startup is the last feature because it composes the completed theme, audio, and motion systems.
