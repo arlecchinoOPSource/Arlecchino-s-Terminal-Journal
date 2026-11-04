@@ -2,11 +2,11 @@
 
 All notable changes to Terminal. Versions follow the app version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
 
-## Unreleased — 0.1.0 (first preview)
+## 1.0.0 — pending release acceptance
 
 **Writing**
 - Distraction-free editor with headings, lists, quotes, bold/italic/underline/strikethrough, alignment, fonts, sizes and tables.
-- Automatic saving with an honest save status; nothing is lost when switching entries or closing.
+- Automatic saving with an honest save status; pending writes flush before switching or closing; forced termination can interrupt an uncommitted edit.
 - Entry numbers that are never reused.
 
 **Finding entries**

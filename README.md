@@ -4,9 +4,11 @@ A private, lightweight writing environment that makes journaling effortless.
 
 ![Terminal identity](docs/reference/arlecchino-brand-mockup.png)
 
-**Status: T-03–T-05 desktop writing preview. No stable release yet. Writing is temporary and is not saved.**
+**Release candidate for Terminal 1.0.** Terminal saves journal entries to a local SQLite database. Write a title or paragraph, wait for **Saved**, then quit and reopen to continue. Use Archives or title search to return to earlier entries.
 
-Terminal is planned as an offline-first desktop journal for macOS and Windows. Open it, write with a compact rich-text toolbar, and find previous entries through title search and a chronological archive. The planned release will store writing in a local SQLite database; this early preview uses memory only. No accounts, cloud dependency, analytics, advertising, or AI processing of journal content.
+## Installation
+
+Get published installers from the [official releases](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases). For macOS, open the universal DMG and drag Terminal to Applications. For Windows x64, run the per-user setup executable or use the MSI. A machine missing WebView2 may need a one-time runtime download. See the [installation and signing notes](docs/RELEASE.md) for platform requirements. Until the stable release appears, the candidate is available for testing from source.
 
 ## Project documents
 
@@ -27,15 +29,15 @@ Tauri 2, React, TypeScript, Vite, Tiptap, and local SQLite. Distribution is plan
 
 ![Original workspace mockup](docs/reference/terminal-workspace-mockup.png)
 
-The image above is the original layout reference. The current [v0.3 "Terminal 84" design](docs/UI-DESIGN-SYSTEM-v0.3.md) keeps the left menu and right writing area and gives them a retro-futuristic console treatment: blue-black framed panels, a phosphor-cyan accent, a striped Orbitron wordmark, and a calm writing page.
+The image above is the original layout reference. The current [v0.3 "Terminal 84" design](docs/UI-DESIGN-SYSTEM-v0.3.md) keeps the left menu and right writing area and gives them a retro-futuristic console treatment: green-black framed panels, a phosphor-green accent, a striped Orbitron wordmark, and a calm writing page.
 
 ## Privacy and data ownership
 
-The accepted design includes autosave, full versioned JSON backup/restore, and readable individual-entry export. Local storage is not automatically encrypted; v1 relies on operating-system account permissions and disk protection. No private journal data belongs in this repository or issue reports.
+Terminal keeps writing on the device without accounts, analytics, or cloud sync. The database relies on operating-system permissions and disk encryption. Exported JSON backups, HTML and text files contain readable writing. Keep those files in a location you control. Uninstalling the app leaves the journal in the operating system’s application-data folder. See [storage locations](docs/RELEASE.md#clean-machine-checklist).
 
 ## Development
 
-Open this folder in VS Code and run `npm run dev` in its terminal, or select **Terminal → Run Task → Terminal: Run desktop preview**. Test the title, multiline writing, selection, copy/paste, and undo/redo. **Closing or reloading clears your writing.** Saving begins with later backlog tasks. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
+Open this folder in VS Code and run `npm run dev` in its terminal, or select **Terminal → Run Task → Terminal: Run desktop preview**. Test the title, multiline writing, selection, copy/paste, and undo/redo. Use synthetic writing to test autosave, reopen, export and restore. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
 
 ## License
 
