@@ -1,5 +1,7 @@
-import { useId, type ReactNode } from 'react';
+import { useEffect, useId, useState, type ReactNode } from 'react';
 import { isMacPlatform, SHORTCUT_HELP, shortcutLabel } from '../domain/shortcuts';
+import { DEFAULT_MOTION, MOTION_LEVELS, type MotionLevel } from '../domain/motion';
+import { applyMotion, motionRepository } from '../persistence/theme';
 import { DEFAULT_PREFERENCES, FONT_SIZE_RANGE, LINE_SPACINGS, WRITING_FONTS, WRITING_WIDTHS, type Preferences, type WritingFont } from '../domain/preferences';
 
 type Props = { preferences: Preferences; error: string | null; onChange: (patch: Partial<Preferences>) => void; data?: ReactNode; children?: ReactNode };
@@ -28,6 +30,7 @@ export function SettingsPanel({ preferences, error, onChange, data, children }: 
       <button type="button" className="settings-reset" disabled={isDefault} onClick={() => onChange({ ...DEFAULT_PREFERENCES })}>Reset to defaults</button>
     </div>
     <p className={error ? 'settings-status settings-error' : 'settings-status'} role={error ? 'alert' : 'status'}>{error ?? 'Changes apply immediately and are saved on this device.'}</p>
+    <MotionSetting name={`${id}-motion`} />
     {data}
     <section className="settings-keys" aria-labelledby={`${id}-keys`}>
       <p id={`${id}-keys`} className="settings-section">KEYBOARD</p>
@@ -37,8 +40,28 @@ export function SettingsPanel({ preferences, error, onChange, data, children }: 
   </div>;
 }
 
-type Option = { readonly value: number; readonly label: string };
-function Segmented({ legend, name, options, value, defaultValue, onChange }: { legend: string; name: string; options: readonly Option[]; value: number; defaultValue: number; onChange: (value: number) => void }) {
+const osReducedQuery = () => window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/** Interface animation level, stored on this device beside the theme (not a journal preference). */
+function MotionSetting({ name }: { name: string }) {
+  const [motion, setMotion] = useState<MotionLevel>(() => motionRepository.load());
+  const [osReduced, setOsReduced] = useState(() => osReducedQuery().matches);
+  useEffect(() => {
+    const query = osReducedQuery();
+    const follow = () => setOsReduced(query.matches);
+    query.addEventListener('change', follow);
+    return () => query.removeEventListener('change', follow);
+  }, []);
+  const choose = (next: MotionLevel) => { applyMotion(next); motionRepository.save(next); setMotion(next); };
+  return <section className="settings-motion" aria-label="Motion">
+    <p className="settings-section">INTERFACE</p>
+    <Segmented legend="Motion" name={name} options={MOTION_LEVELS} value={motion} defaultValue={DEFAULT_MOTION} onChange={choose} />
+    <p className="settings-status">{osReduced ? 'Your system asks for reduced motion, so interface animations stay off.' : 'Reduced keeps colour fades only. Writing is never animated.'}</p>
+  </section>;
+}
+
+type Option<T> = { readonly value: T; readonly label: string };
+function Segmented<T extends string | number>({ legend, name, options, value, defaultValue, onChange }: { legend: string; name: string; options: readonly Option<T>[]; value: T; defaultValue: T; onChange: (value: T) => void }) {
   return <fieldset className="settings-segmented">
     <legend>{legend} <span>default: {options.find(o => o.value === defaultValue)?.label}</span></legend>
     <div>{options.map(o => <label key={o.value} className={o.value === value ? 'selected' : ''}>

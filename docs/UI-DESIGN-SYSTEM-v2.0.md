@@ -84,6 +84,34 @@ Optional, local, centrally managed, and immediately muteable. Existing 1.0 users
 
 Mechanical, segmented, precise feedback. Centralize timing: button feedback 60–120 ms, control state 100–160 ms, popovers 120–200 ms, dialogs 140–220 ms as starting ranges. Prefer CSS and transform/opacity. OS reduced motion takes precedence over enabling full effects in the app. Never delay typing/saving or animate journal text.
 
+### Motion tokens and patterns (T-28, T-29)
+
+Every duration in `app.css` comes from `src/styles/tokens.css`, and `tests/motion.test.mjs` fails on a literal. Motion is CSS only, with no library.
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `--motion-press` | 80 ms | two-step press highlight |
+| `--motion-state` | 130 ms | hover and selection colour changes, active-control flash |
+| `--motion-popover` | 160 ms | Search, Archives, Themes, Settings reveal and scrim fade |
+| `--motion-dialog` | 180 ms | confirmation dialog reveal and backdrop fade |
+| `--motion-status` | 140 ms | save meter segment fill, saved flash, failure blink |
+| `--motion-sweep` | 1 s | save meter sweep, only while a save is running |
+| `--motion-power-on` | 1.1 s | one wordmark flicker at launch (unchanged from v1) |
+| `--steps-reveal` / `--steps-dialog` / `--steps-flash` | `steps(4, jump-start)` / `steps(5, jump-start)` / `steps(3, end)` | segmented timing |
+
+| Pattern | Applied to | How it moves |
+| --- | --- | --- |
+| Press | rail, toolbar, ghost, settings, notice and dialog buttons | instant 1px drop, two-step highlight; no delay before the action |
+| Control on | rail button opening its panel, active formatting, selected segment, highlighted search/theme row, open archive row | three-step brightness flash |
+| Panel reveal | every popover | top-down in four bands (`clip-path`) with an opacity lift; the first band shows at once |
+| Dialog reveal | `<dialog>` | opens outward from a centre line in five steps, like a CRT |
+| Overlay fade | popover scrim, dialog backdrop | opacity only |
+| Save meter | footer status | fills in segments; flashes once when saved; blinks twice on failure, starting lit; stepped sweep while saving |
+
+Rules: animations are triggered only by state changes, so nothing runs while idle. Movement uses `clip-path`, opacity, filter, and a 1px transform, so nothing shifts layout. Panels and dialogs take focus immediately and are interactive from the first frame. Closing is instant, because delaying an unmount would hold back focus and state. Nothing inside the writing page animates.
+
+**Motion levels.** Settings → Interface → Motion: **Full** (default), **Reduced** (colour fades only: no flashes, reveals, sweeps, flicker, or press drop), **Off** (no transitions or animations). The choice is stored locally like the theme (`terminal.motion`) and applied before the first render. The OS reduced-motion setting turns everything off and cannot be overridden by Full; Settings says so when it is active. Themes do not change motion.
+
 ## Startup, implemented last
 
 Centred TERMINAL wordmark, thin technical framing, chosen theme, a segmented readiness indicator, and Arlecchino's original sound when enabled. Use real readiness or clearly indeterminate progress, never fabricated percentages or artificial delays. Asset failures cannot block the editor; real database initialization errors remain visible. Animation and sound are independently controllable.

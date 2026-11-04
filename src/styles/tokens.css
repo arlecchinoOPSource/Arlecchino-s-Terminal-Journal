@@ -152,6 +152,21 @@
   --font-writing: 'IBM Plex Sans', sans-serif;
   --radius: 3px;
   --ease: cubic-bezier(.2, .7, .2, 1);
+
+  /* Motion (T-28, docs/UI-DESIGN-SYSTEM-v2.0.md). Every duration in app.css
+     comes from here. Stepped timing gives the mechanical, segmented character;
+     smooth easing is kept for colour and opacity. data-motion on <html> and the
+     OS reduced-motion setting switch decorative motion off (end of app.css). */
+  --motion-press: 80ms;     /* button press feedback (60–120) */
+  --motion-state: 130ms;    /* hover, selection, active-control changes (100–160) */
+  --motion-popover: 160ms;  /* Search, Archives, Themes, Settings panels (120–200) */
+  --motion-dialog: 180ms;   /* confirmation dialogs (140–220) */
+  --motion-status: 140ms;   /* save meter fill and state flashes */
+  --motion-sweep: 1s;       /* save meter sweep while a save is in progress */
+  --motion-power-on: 1.1s;  /* one wordmark flicker at launch */
+  --steps-reveal: steps(4, jump-start);  /* panels open in four bands, the first at once */
+  --steps-dialog: steps(5, jump-start);
+  --steps-flash: steps(3, end);    /* active-control flash */
   --rail-width: 56px;
   --writing-width: 720px;
   /* Writing preferences (T-13); overridden at runtime from saved settings. */
