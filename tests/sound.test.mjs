@@ -10,15 +10,16 @@ const assets = {
   keyboard: { thock: { key: ['t1', 't2', 't3'], space: 'tspace', enter: 'tenter', backspace: 'tback' }, clicky: { key: ['c1'], space: 'cspace', enter: 'center', backspace: 'cback' } },
 };
 function fakeAudio({ state = 'running', duration = 6, failDecode = [] } = {}) {
-  const log = { started: [], stopped: [], loads: [], contexts: 0 };
-  const gain = () => ({ gain: { value: 1 }, connect() {} });
+  const log = { started: [], stopped: [], loads: [], contexts: 0, disconnected:0, sources:[] };
+  const gain = () => ({ gain: { value: 1 }, connect() {}, disconnect() {log.disconnected++;} });
   const context = {
     state, currentTime: 0, destination: {},
     resume: async () => { context.state = 'running'; },
     createGain: gain,
     decodeAudioData: async data => { if (failDecode.includes(data.url)) throw new Error('bad'); return { url: data.url, duration }; },
     createBufferSource() {
-      const source = { buffer: null, playbackRate: { value: 1 }, onended: null, connect() {}, start() { log.started.push(source.buffer.url); }, stop() { log.stopped.push(source.buffer.url); } };
+      const source = { buffer: null, playbackRate: { value: 1 }, onended: null, connect() {}, disconnect() {log.disconnected++;}, start() { log.started.push(source.buffer.url); }, stop() { log.stopped.push(source.buffer.url); } };
+      log.sources.push(source);
       return source;
     },
   };
@@ -156,4 +157,52 @@ test('bundled sounds are small 16-bit PCM WAV files and every one is credited', 
     assert.ok(statSync(new URL(file, root)).size <= (file.startsWith('arlecchino/') ? 1_100_000 : 30_000), file);
     assert.ok(credits.includes(file.replace(/key-\d+\.wav$/, 'key-')), `${file} is listed in AUDIO-ASSETS-v2.0.md`);
   }
+});
+
+test('audio resumes interrupted contexts', async()=>{
+  const {manager,context,log}=fakeAudio();
+  manager.configure(on());manager.play('iconMenu');await settle();
+  context.state='interrupted';manager.play('typesetting');await settle();
+  assert.equal(context.state,'running');assert.ok(log.started.includes('type'));
+});
+
+test('closed audio contexts are replaced and sounds are decoded for the new context',async()=>{
+  const first=fakeAudio();const second=fakeAudio();let calls=0;
+  const manager=new SoundManager(assets,()=>++calls===1?first.context:second.context,async url=>({url}));
+  manager.configure(on());manager.play('iconMenu');await settle();
+  first.context.state='closed';manager.play('typesetting');await settle();
+  assert.equal(calls,2);assert.ok(second.log.started.includes('type'));
+  manager.configure({...DEFAULT_SOUND});manager.play('iconMenu');await settle();
+  assert.deepEqual(second.log.started,['type']);
+});
+
+test('a temporary decode failure is retried on the next interaction', async()=>{
+  const failed=['icon'];const {manager,log}=fakeAudio({failDecode:failed});
+  manager.configure(on());manager.play('iconMenu');await settle();
+  assert.equal(log.started.length,0);failed.length=0;
+  manager.play('iconMenu');await settle();assert.ok(log.started.includes('icon'));
+});
+
+test('audio creation failure does not permanently disable later attempts',async()=>{
+  const healthy=fakeAudio();let attempts=0;
+  const manager=new SoundManager(assets,()=> ++attempts===1?null:healthy.context,async url=>({url}));
+  manager.configure(on());manager.play('iconMenu');await settle();
+  manager.play('iconMenu');await settle();assert.ok(healthy.log.started.includes('icon'));
+});
+
+test('finished cues disconnect their source and per-cue gain nodes',async()=>{
+  const {manager,log}=fakeAudio();manager.configure(on());
+  manager.play('iconMenu');await settle();
+  const before=log.disconnected;log.sources[0].onended({});
+  assert.equal(log.disconnected-before,2);
+});
+
+test('a cached cue waits for asynchronous context recovery',async()=>{
+  const {manager,context,log}=fakeAudio();manager.configure(on());
+  manager.play('iconMenu');await settle();log.started.length=0;
+  context.state='suspended';let resume;
+  const recovered=new Promise(resolve=>{resume=()=>{context.state='running';resolve();};});
+  context.resume=()=>recovered;
+  manager.play('iconMenu');await settle();assert.deepEqual(log.started,[]);
+  resume();await settle();assert.deepEqual(log.started,['icon']);
 });

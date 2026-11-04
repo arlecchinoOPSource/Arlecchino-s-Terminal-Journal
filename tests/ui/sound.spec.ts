@@ -132,8 +132,10 @@ test('the Silent pack and the master switch silence everything at once', async (
   await page.waitForTimeout(250);
   expect(await played(page)).toEqual([]);
   await page.getByRole('button', { name: 'Sounds', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Sounds' }).getByRole('switch', { name: 'Sound' }).uncheck();
+  // Let the menu cue start before muting: mute correctly cancels pending decodes.
   await expect.poll(() => played(page)).toEqual(['ui/icon-menu.wav']);
+  await page.getByRole('dialog', { name: 'Sounds' }).getByRole('switch', { name: 'Sound' }).uncheck();
+  expect(await played(page)).toEqual(['ui/icon-menu.wav']);
   await clear(page);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'Archives' }).click();

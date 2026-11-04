@@ -77,3 +77,9 @@ Prefer existing browser/CSS capabilities before adding dependencies; no audio or
 ## Issue #60: title formatting
 
 The entry title remains plain searchable text. Whole-title presentation is stored as allowlisted `titleFontFamily`, `titleFontSize`, `titleBold`, `titleItalic`, `titleUnderline`, `titleStrike`, and `titleAlign` attributes on the existing rich-text document root. Body updates preserve these attributes. No SQL migration is needed. Old entries without them retain defaults; new styled backups need this updated reader because older strict validators do not recognize these attributes. Native validation accepts only bundled fonts, supported sizes, boolean emphasis and left/center/right alignment. HTML export escapes text and renders safe title styles; plain-text export stays plain text.
+
+## Issue #62: audio recovery and fullscreen exit
+
+Recover the singleton sound manager on the next interaction from suspended/interrupted audio, closed contexts and transient initialization/decoding failures. Failed buffers are not permanently cached. Playback against stale/non-running contexts is skipped instead of queued; ended cues disconnect their source and per-cue gain. No polling or private-text diagnostics are added. See the documented [Web Audio interrupted state](https://developer.mozilla.org/en-US/docs/Web/API/BaseAudioContext/state).
+
+After successful journal flushing, native fullscreen close exits without the optional close-sound tail to avoid retaining an empty fullscreen Space. Windowed close keeps the existing capped tail; failed saves still prevent this exit path. Fullscreen sound truncation is intentional. Native device interruption and macOS Space behavior need the manual checks in MANUAL-TEST-62.md.
