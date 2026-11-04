@@ -76,9 +76,13 @@ test('tables can be inserted, navigated with Tab, grown and saved', async ({ pag
   await page.goto('/');
   await body(page).click();
   await page.getByRole('button', { name: /Insert table/ }).click();
+  await expect(body(page)).toBeFocused();
   await page.keyboard.type('Day');
+  await expect(body(page).locator('th').first()).toHaveText('Day');
   await page.keyboard.press('Tab');
+  await expect.poll(() => body(page).evaluate(() => window.getSelection()?.anchorNode?.parentElement?.closest<HTMLTableCellElement>('th, td')?.cellIndex)).toBe(1);
   await page.keyboard.type('Note');
+  await expect(body(page).locator('th').nth(1)).toHaveText('Note');
   await page.getByRole('button', { name: 'Add row below' }).click();
   await page.getByRole('button', { name: 'Add column right' }).click();
   await expect(body(page).locator('table tr')).toHaveCount(4);

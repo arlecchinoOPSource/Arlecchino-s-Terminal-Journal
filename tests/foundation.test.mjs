@@ -11,6 +11,8 @@ test('native shell grants no filesystem, shell, or network capabilities', () => 
 test('production policy excludes remote scripts and connections', () => {
   const config = JSON.parse(readFileSync(new URL('../src-tauri/tauri.conf.json', import.meta.url)));
   assert.ok(config.app.security.csp.includes("script-src 'self'"));
-  assert.ok(config.app.security.csp.includes('connect-src ipc: http://ipc.localhost;'));
+  // 'self' lets Web Audio fetch the bundled sound files; no external host is allowed.
+  assert.ok(config.app.security.csp.includes("connect-src 'self' ipc: http://ipc.localhost;"));
+  assert.ok(!/connect-src[^;]*(http:\/\/(?!ipc\.localhost)|\*)/.test(config.app.security.csp));
   assert.ok(!config.app.security.csp.includes('https:'));
 });

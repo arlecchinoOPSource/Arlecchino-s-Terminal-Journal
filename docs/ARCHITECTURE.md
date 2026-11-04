@@ -12,6 +12,8 @@ Status: accepted stack and product boundaries; implementation details below are 
 
 ## Visual specification
 
+For the 2.0 target, also read [TERMINAL_V2_SPEC.md](TERMINAL_V2_SPEC.md) and [UI-DESIGN-SYSTEM-v2.0.md](UI-DESIGN-SYSTEM-v2.0.md). The existing v1 storage/privacy contract remains the baseline. The sensory extension is planning guidance until its assigned issues are implemented.
+
 [UI design system v0.3](UI-DESIGN-SYSTEM-v0.3.md) is the current presentation specification. Its terminal-console treatment does not change the stack, offline/privacy boundaries, storage contract, or feature scope. The November 3 aesthetic revision is documentation only; implementing it requires separate authorization.
 
 ## Planned boundaries
@@ -59,3 +61,15 @@ Use rusqlite with bundled SQLite behind typed Tauri commands instead of exposing
 Database: OS application-data directory / journal.sqlite3. Timestamps are UTC Unix milliseconds. Entry IDs originate as UUIDs in the client and are immutable; allocation uses an independent monotonic counter in a transaction. A revision integer detects stale writes. Versioned migrations use PRAGMA user_version in an immediate transaction, reject newer databases, and never reset existing data. SQLite uses WAL and synchronous FULL. Startup errors are returned safely to the UI without logging private writing.
 
 Ordinary edits debounce for 400 ms. A pending draft is not durable until commit succeeds; forced termination before that commit can lose the pending edit. A failed save retains dirty content, blocks entry switching/closing, and offers retry; after a refused close the user may explicitly choose Close without saving. Native window close and application Quit are intercepted so the frontend can flush before exit. No promise of recovery for an uncommitted edit is made.
+
+## ADR-003: 2.0 sensory boundaries (planned)
+
+Keep the Tauri/React/Tiptap/rusqlite architecture and existing journal schema. Add semantic theme definitions, one optional local audio manager, shared motion policy, and a startup readiness presentation as separate concerns. Effects must never own journal writes, block commits, record input text, or bypass initialization errors. New preferences need validated, backward-compatible defaults; upgrading users stay silent. Database-schema changes are not part of 2.0 scope and require a documented necessity and regression evidence.
+
+The interface theme (T-23) is kept in the webview's local storage behind `src/persistence/theme.ts`, not in the SQLite settings table: it must be read synchronously before the first render to avoid a wrong-theme flash, it is not journal data, and keeping it out of `Preferences` leaves the backup format and the v1 settings record unchanged. Losing it only resets the theme to Mint.
+
+Sound (T-25–T-27) is one Web Audio manager, `src/audio/soundManager.ts`, used through the `sounds` instance in `src/audio/sounds.ts`. Its settings are stored like the theme (`terminal.sound`, parsed field by field with safe defaults; missing means off). The audio context is created on the first sound, not at launch, and files are decoded only for what the settings can play. Every call returns at once and failures are silent. To decode bundled files, the content security policy now allows `connect-src 'self'` (the app's own origin only); the privacy test permits `fetch` only in the sound manager and checks that every sound comes from `src/assets/sounds`. The close sound needed one native change: `journal_finish_exit` takes an optional `lingerMs` and, when given, hides the window and exits after at most 6.5 s. The journal is always saved before it is called.
+
+The startup screen (T-31, T-32) is a React overlay in `App`. `WritingWorkspace` reports readiness from the journal controller: ready, or an initialization error. The pure rules in `src/domain/startup.ts` decide when the screen leaves, and the screen never blocks or delays initialization. Its on/off setting is stored locally (`terminal.startup`). The startup sound is requested once in `main.tsx`. The main window's `backgroundColor` prevents a white first frame.
+
+Prefer existing browser/CSS capabilities before adding dependencies; no audio or animation package is selected during setup. Check actual native webview audio behaviour during the assigned issues. A missing effect can degrade to silence/static display; a failed journal initialization must remain a visible recoverable error. Startup is the last feature because it composes the completed theme, audio, and motion systems.

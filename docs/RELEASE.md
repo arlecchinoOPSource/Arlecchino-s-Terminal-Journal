@@ -9,7 +9,9 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`) from a ta
 | macOS 11+ (Apple Silicon and Intel, universal) | `macos-15` | `Terminal.app` (zipped as `.app.tar.gz`) and a `.dmg` |
 | Windows 10/11 x64 | `windows-2025` | NSIS installer (`-setup.exe`, per-user, no admin) and an `.msi` |
 
-The Windows installers include the WebView2 bootstrapper. On the rare machine without WebView2 (preinstalled on Windows 11 and current Windows 10), installing it needs a one-time download. Terminal itself never uses the network.
+The Windows installers include the WebView2 bootstrapper. On the rare machine without WebView2 (preinstalled on Windows 11 and current Windows 10), installing it needs a one-time download. Terminal's own code never uses the network.
+
+**WebView2 on Windows.** On Windows, the interface runs inside Microsoft Edge WebView2, a system component that Microsoft updates and controls. In the 2.0.0 candidate test, WebView2's browser process opened HTTPS connections to Microsoft servers within a few seconds of most launches. Terminal's own process opened none. Terminal does not configure, trigger or receive these connections, and what they carry was not inspected. See [VALIDATION-T33.md](VALIDATION-T33.md#windows-findings). Following the owner's decision of November 4, 2026, this is documented rather than changed through WebView2 settings. macOS uses the system WebKit, and no sockets were seen there.
 
 ## Steps
 
@@ -64,6 +66,15 @@ Use a machine (or fresh user account / VM) that has never run Terminal. Record t
 - [ ] Quit with ⌘Q and relaunch: the entry reopens with its formatting.
 - [ ] Archives, Search, Settings, backup export/restore and entry export all work.
 - [ ] Move the app to the Trash. The journal stays in `~/Library/Application Support/com.arlecchino.terminal/` until removed manually.
+
+**Terminal 2.0 additions** (both platforms)
+
+- [ ] Upgrade: install 2.0 over 1.0 with a synthetic 1.0 journal. Entries, numbers, formatting and writing settings are unchanged; the theme is Mint; sound is off.
+- [ ] Themes: all four apply at once and are still chosen after relaunch, with no flash of another theme.
+- [ ] Sounds: switch Sound on and hear each preview, typing in both packs, a click in each area, and the error sound (for example, export to a read-only folder).
+- [ ] Startup: the screen shows and gives way; the startup sound plays at launch if the system allows it.
+- [ ] Close: quit with Sound on. The window hides at once, the close sound finishes, and the app exits; relaunch during the sound.
+- [ ] Motion: Reduced and Off, and the system's reduce-motion setting, stop the animations.
 
 **Windows**
 

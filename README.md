@@ -2,7 +2,7 @@
 
 A private desktop journal for macOS and Windows. Write in rich text, find an older entry by title, and take your journal with you as a backup. Terminal saves to your device and works offline.
 
-**[Download Terminal 1.0.0](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases/tag/v1.0.0)**
+**[Download Terminal 2.0.0](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases/tag/v2.0.0)**
 
 | Your computer | Choose this download | Install |
 | --- | --- | --- |
@@ -19,9 +19,11 @@ Downloads are under **Assets** on the release page. The source archives are for 
 
 ## Where your writing lives
 
-Terminal stores entries in a local SQLite database. There are no accounts, analytics, ads, or cloud sync. The journal relies on your operating system’s account permissions and disk encryption. Exported backups contain readable writing. Keep them somewhere you control. Uninstalling Terminal leaves your journal on the device. [Storage locations and uninstall details](docs/RELEASE.md#clean-machine-checklist)
+Terminal stores entries in a local SQLite database. There are no accounts, analytics, ads, or cloud sync. On Windows, Terminal's interface runs in Microsoft Edge WebView2, a system component. WebView2 can make its own connections to Microsoft, which Terminal doesn't control ([details](docs/RELEASE.md#what-gets-built)). The journal relies on your operating system’s account permissions and disk encryption. Exported backups contain readable writing. Keep them somewhere you control. Uninstalling Terminal leaves your journal on the device. [Storage locations and uninstall details](docs/RELEASE.md#clean-machine-checklist)
 
 ## Development
+
+**Next release: Terminal 2.0.0 — The Sensory Update** (release candidate in review; not yet published). See the [changelog](CHANGELOG.md) for what it adds. Read the [2.0 specification](docs/TERMINAL_V2_SPEC.md), [ordered backlog](docs/BACKLOG-v2.0.md), and [development guide](docs/DEVELOPMENT-v2.0.md). Themes → sounds → motion → startup, followed by regression and release checks. Word/DOCX support is deferred to 3.0.
 
 Install the [development prerequisites](docs/DEVELOPMENT.md), run `npm ci`, then `npm run dev` to open the desktop app. Run `npm run check` for the regression suite. Use synthetic entries for testing and bug reports.
 
