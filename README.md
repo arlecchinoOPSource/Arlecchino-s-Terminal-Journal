@@ -19,7 +19,7 @@ Downloads are under **Assets** on the release page. The source archives are for 
 
 ## Where your writing lives
 
-Terminal stores entries in a local SQLite database. There are no accounts, analytics, ads, or cloud sync. The journal relies on your operating system’s account permissions and disk encryption. Exported backups contain readable writing. Keep them somewhere you control. Uninstalling Terminal leaves your journal on the device. [Storage locations and uninstall details](docs/RELEASE.md#clean-machine-checklist)
+Terminal stores entries in a local SQLite database. There are no accounts, analytics, ads, or cloud sync. On Windows, Terminal's interface runs in Microsoft Edge WebView2, a system component. WebView2 can make its own connections to Microsoft, which Terminal doesn't control ([details](docs/RELEASE.md#what-gets-built)). The journal relies on your operating system’s account permissions and disk encryption. Exported backups contain readable writing. Keep them somewhere you control. Uninstalling Terminal leaves your journal on the device. [Storage locations and uninstall details](docs/RELEASE.md#clean-machine-checklist)
 
 ## Development
 

@@ -30,6 +30,7 @@ All notable changes to Terminal. Versions follow the app version in `package.jso
 **Known limitations**
 - Installers are not signed or notarized unless signing secrets are configured (see docs/RELEASE.md).
 - Windows, Intel Macs, screen readers, IME input and dictation have not been verified by hand.
+- On Windows, the Microsoft Edge WebView2 component that runs Terminal's interface opens its own HTTPS connections to Microsoft. Terminal's code makes no network requests (see docs/RELEASE.md).
 - Whether the startup sound plays depends on the system allowing audio before the first click; if not, it is skipped.
 
 ## 1.0.0 — November 4, 2026
