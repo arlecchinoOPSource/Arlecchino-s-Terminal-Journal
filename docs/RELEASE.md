@@ -9,7 +9,9 @@ Releases are built by GitHub Actions (`.github/workflows/release.yml`) from a ta
 | macOS 11+ (Apple Silicon and Intel, universal) | `macos-15` | `Terminal.app` (zipped as `.app.tar.gz`) and a `.dmg` |
 | Windows 10/11 x64 | `windows-2025` | NSIS installer (`-setup.exe`, per-user, no admin) and an `.msi` |
 
-The Windows installers include the WebView2 bootstrapper. On the rare machine without WebView2 (preinstalled on Windows 11 and current Windows 10), installing it needs a one-time download. Terminal itself never uses the network.
+The Windows installers include the WebView2 bootstrapper. On the rare machine without WebView2 (preinstalled on Windows 11 and current Windows 10), installing it needs a one-time download. Terminal's own code never uses the network.
+
+**WebView2 on Windows.** On Windows, the interface runs inside Microsoft Edge WebView2, a system component that Microsoft updates and controls. In the 2.0.0 candidate test, WebView2's browser process opened HTTPS connections to Microsoft servers within a few seconds of most launches. Terminal's own process opened none. Terminal does not configure, trigger or receive these connections, and what they carry was not inspected. See [VALIDATION-T33.md](VALIDATION-T33.md#windows-findings). Following the owner's decision of November 4, 2026, this is documented rather than changed through WebView2 settings. macOS uses the system WebKit, and no sockets were seen there.
 
 ## Steps
 

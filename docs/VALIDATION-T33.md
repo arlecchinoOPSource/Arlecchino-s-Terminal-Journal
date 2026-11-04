@@ -2,7 +2,7 @@
 
 Scope: v1-to-v2 regression and cross-platform tests ([#47](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/issues/47)). Run on `feature/T-33-verification`, which stacks every 2.0 feature branch (#50–#54) because they are not merged yet. Repeat the release checks on the merged `development/v2.0.0` commit that will be released.
 
-**Status: partly done. Windows now has a native test run and installer checks, which found WebView2 network connections (see [Windows findings](#windows-findings)). The owner's decision on that finding, assistive technology, and the owner's listening and launch checks are still open, so this does not close T-33.**
+**Status: partly done. Windows now has a native test run and installer checks. They found WebView2 network connections, which the owner chose to document (see [Windows findings](#windows-findings)). Assistive technology and the owner's listening and launch checks are still open, so this does not close T-33.**
 
 ## Compatibility evidence
 
@@ -53,17 +53,17 @@ AMD Ryzen 5 3600, Windows 11 Pro 10.0.26200, 15.9 GB RAM, WebView2 Runtime 156.0
 | Forced kill (`Stop-Process -Force`), then relaunch (×5) | Reopens every time; `integrity_check` ok, `user_version` 1, tables `entries`, `entry_sequence`, `settings`. |
 | Existing journal under a different installer (NSIS journal opened by the MSI build) | Opens; integrity ok. |
 | Uninstall (NSIS `uninstall.exe /S`; `msiexec /x`) | Exit 0; entry and executable removed; journal folder kept, as documented in [RELEASE.md](RELEASE.md). |
-| Network | **Not offline: see below.** |
+| Network | `terminal-journal.exe` opens none. The WebView2 runtime does: see below. |
 
 ### Windows findings
 
-- **WebView2 opens HTTPS connections on launch.** On 6 of the 7 sampled launches (NSIS and MSI), the WebView2 browser process (`msedgewebview2.exe`, the main process, no `--type`) in Terminal's process tree opened TCP connections to Microsoft addresses on port 443 within 2–4 s: `40.99.10.114`, `40.99.33.130`, `40.99.33.178`, `40.104.20.2`, `40.104.210.2`, `52.98.189.242`. `terminal-journal.exe` and the renderer opened none; nothing listened locally. Reverse DNS gives no names. This comes from the WebView2 runtime, not Terminal's code, but it contradicts "Terminal itself never uses the network" on Windows. The repo sets no WebView2 browser arguments. **The owner must decide** whether to find and disable the responsible WebView2 features (an architecture change under AGENTS.md), or document the behaviour, before the "no network" claim holds on Windows.
+- **WebView2 opens HTTPS connections on launch.** On 6 of the 7 sampled launches (NSIS and MSI), the WebView2 browser process (`msedgewebview2.exe`, the main process, no `--type`) in Terminal's process tree opened TCP connections to Microsoft addresses on port 443 within 2–4 s: `40.99.10.114`, `40.99.33.130`, `40.99.33.178`, `40.104.20.2`, `40.104.210.2`, `52.98.189.242`. `terminal-journal.exe` and the renderer opened none; nothing listened locally. Reverse DNS gives no names. This comes from the WebView2 runtime, not Terminal's code, but it contradicted "Terminal itself never uses the network" on Windows. The repo sets no WebView2 browser arguments. **Owner decision, November 4, 2026: document it, without changing WebView2 settings.** RELEASE.md, README.md and the 2.0.0 CHANGELOG known limitations now say that Terminal's own code makes no network requests and that WebView2 can make its own connections to Microsoft.
 - **SmartScreen was not exercised.** The installers were downloaded with `gh run download` and installed silently, so they had no Mark of the Web; the "Windows protected your PC" prompt documented in RELEASE.md was not seen.
 - **Not checked on Windows:** typing, saving, export, restore, themes, motion and sounds in the native window (no native UI driver here); WebView2 audio, the startup sound and the close sound; Narrator, IME and text scaling.
 
 ## Still open before T-33 can close
 
-- **Windows:** the owner's decision on the WebView2 network connections above, and the hands-on native checks in the last bullet of Windows findings.
+- **Windows:** the hands-on native checks in the last bullet of Windows findings.
 - **Clean installation:** a `.dmg` on a clean Mac. Windows NSIS and MSI clean installs are recorded above.
 - **The owner's hands-on checks:**
   - sounds audible, including startup without a gesture and close with the window hidden
