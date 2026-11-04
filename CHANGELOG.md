@@ -2,7 +2,7 @@
 
 All notable changes to Terminal. Versions follow the app version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
 
-## 1.0.0 — pending release acceptance
+## 1.0.0 — November 4, 2026
 
 **Writing**
 - Distraction-free editor with headings, lists, quotes, bold/italic/underline/strikethrough, alignment, fonts, sizes and tables.
