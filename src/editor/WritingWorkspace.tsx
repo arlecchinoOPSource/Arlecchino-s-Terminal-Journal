@@ -19,6 +19,8 @@ import { exportEntryFile } from '../persistence/entryExport';
 import { basicExtensions } from './extensions';
 import { FormattingToolbar } from './FormattingToolbar';
 import { ariaShortcut, isMacPlatform, shortcutLabel } from '../domain/shortcuts';
+import { sounds } from '../audio/sounds';
+import { useTypingSounds } from '../audio/useTypingSounds';
 
 const mac=isMacPlatform();
 const entryDate=(ms:number)=>new Date(ms).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}).toUpperCase();
@@ -42,12 +44,12 @@ export function WritingWorkspace() {
       await controller.flush();
       const saved=await backupRepository.exportBackup(`Terminal backup ${today()}`);
       setBackup(saved?{kind:'done',message:`Backup saved as “${saved}”.`}:{kind:'idle'});
-    } catch(e){setBackup({kind:'error',message:errorText(e)});}
+    } catch(e){sounds.play('error');setBackup({kind:'error',message:errorText(e)});}
   }
   async function chooseRestore(){
     setBackup({kind:'working',message:'Checking the backup…'});
     try {const chosen=await backupRepository.chooseBackup();setBackup({kind:'idle'});setPreview(chosen);}
-    catch(e){setBackup({kind:'error',message:errorText(e)});}
+    catch(e){sounds.play('error');setBackup({kind:'error',message:errorText(e)});}
   }
   function cancelRestore(){setPreview(null);setBackup({kind:'idle',message:'Restore cancelled. Your journal has not been changed.'});void backupRepository.cancelRestore().catch(()=>{});}
   async function confirmRestore(){
@@ -69,7 +71,8 @@ export function WritingWorkspace() {
         if(isTauri()) {
           unlisten=await listen('journal-close-requested',()=>{
             if(closing)return;closing=true;
-            void controller.prepareClose().then(()=>invoke('journal_finish_exit')).catch(()=>{setCloseBlocked(true);setLifecycleError('Close cancelled: save failed. Your writing is still here. Retry saving before closing.');}).finally(()=>{closing=false;});
+            // Saved first; the close sound then finishes with the window hidden (lingerMs, capped natively).
+            void controller.prepareClose().then(async()=>{const lingerMs=await sounds.playClose();await invoke('journal_finish_exit',{lingerMs});}).catch(()=>{setCloseBlocked(true);setLifecycleError('Close cancelled: save failed. Your writing is still here. Retry saving before closing.');}).finally(()=>{closing=false;});
           });
           if(disposed){unlisten();return;}
         }
@@ -89,11 +92,12 @@ export function WritingWorkspace() {
 function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleError,settings,restoreDialog,notice,dismissNotice}:{controller:JournalController;lifecycleError:string|null;closeBlocked:boolean;clearLifecycleError:()=>void;settings:ReactNode;restoreDialog:ReactNode;notice:string|null;dismissNotice:()=>void}) {
   const state=useSyncExternalStore(controller.subscribe,controller.snapshot);
   const dialog=useRef<HTMLDialogElement>(null);
+  const typing=useTypingSounds();
   const editor=useEditor({
     extensions:basicExtensions(),content:state.draft.content,autofocus:false,
     editable:state.ready&&!state.busy,
     editorProps:{attributes:{class:'journal-body',role:'textbox','aria-label':'Journal body','aria-multiline':'true','aria-describedby':'storage-status',spellcheck:'false',autocorrect:'off',autocapitalize:'off'}},
-    onUpdate:({editor:current})=>controller.edit({content:current.getJSON()}),
+    onUpdate:({editor:current})=>{typing.changed();controller.edit({content:current.getJSON()});},
   });
   // Toggling editability must not emit an update; otherwise opening or switching
   // an entry would autosave unchanged content and reorder the archive.
@@ -110,6 +114,9 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   },[editor,state.ready,state.busy]);
   const history=useEditorState({editor,selector:({editor:current})=>({canUndo:current?.can().undo()??false,canRedo:current?.can().redo()??false,isEmpty:current?.isEmpty??true})});
   const error=state.error??lifecycleError;
+  const tone=statusTone(state.status);
+  // A failure sounds once as it appears; repeats of the same sound replace each other.
+  useEffect(()=>{if(error||tone==='error')sounds.play('error');},[error,tone]);
   const [exporting,setExporting]=useState(false);
   const [exportStatus,setExportStatus]=useState<{text:string;error?:boolean}|null>(null);
   async function exportEntry(){
@@ -120,17 +127,17 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
       const exportable={title:draft.title,content:draft.content,created_at:entry.created_at,updated_at:entry.updated_at};
       const saved=await exportEntryFile(exportFileStem(draft.title),entryToHtml(exportable),entryToText(exportable));
       if(saved)setExportStatus({text:`Exported as “${saved}”.`});
-    } catch(e){setExportStatus({text:e instanceof Error?e.message:typeof e==='string'?e:'The entry could not be exported.',error:true});}
+    } catch(e){sounds.play('error');setExportStatus({text:e instanceof Error?e.message:typeof e==='string'?e:'The entry could not be exported.',error:true});}
     finally {setExporting(false);}
   }
   async function retry(){clearLifecycleError();if(!state.ready)await controller.initialize();else await controller.flush().catch(()=>{});}
   return <Shell onNew={()=>void controller.switchTo(null)} navigationDisabled={!state.ready||state.busy} settings={settings}
     search={state.ready?close=><SearchPanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
     archive={state.ready?close=><ArchivePanel entries={state.entries} activeId={state.entry?.id??null} disabled={state.busy} onSelect={id=>{close();void controller.switchTo(id);}} />:undefined}
-    status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>} statusTone={statusTone(state.status)}
+    status={<span id="storage-status" role="status" aria-live="polite">{state.status}</span>} statusTone={tone}
     formattingControls={<FormattingToolbar editor={editor} disabled={!state.ready||state.busy} />}
     historyControls={<><IconButton icon="undo" label="Undo" title={`Undo (${shortcutLabel('Mod+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Z',mac)} disabled={state.busy||!history?.canUndo} onClick={()=>editor?.chain().focus().undo().run()} /><IconButton icon="redo" label="Redo" title={`Redo (${shortcutLabel('Mod+Shift+Z',mac)})`} aria-keyshortcuts={ariaShortcut('Mod+Shift+Z',mac)} disabled={state.busy||!history?.canRedo} onClick={()=>editor?.chain().focus().redo().run()} /></>}>
-    <div className="writing-column">
+    <div className="writing-column" onKeyDownCapture={typing.onKeyDownCapture} onCompositionEnd={typing.onCompositionEnd}>
       {error&&<div className="storage-error" role="alert"><p>{error}</p><button type="button" onClick={()=>void retry()} disabled={state.busy}>Retry {state.ready?'save':'opening storage'}</button>{closeBlocked&&<button type="button" className="destructive" onClick={()=>void invoke('journal_finish_exit')}>Close without saving</button>}</div>}
       {notice&&<div className="journal-notice" role="status"><p>{notice}</p><button type="button" onClick={dismissNotice}>Dismiss</button></div>}
       <div className="entry-meta">
@@ -143,7 +150,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
         </div>
       </div>
       {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
-      <input className="entry-title" aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>controller.edit({title:e.target.value})} />
+      <input className="entry-title" aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>{typing.changed();controller.edit({title:e.target.value});}} />
       <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<EditorContent editor={editor}/></div>
     </div>
     {restoreDialog}

@@ -23,12 +23,12 @@ test('Mint renders with the released v1.0.0 colours', async ({ page }) => {
   expect(await style('.archive-popover h2', 'color')).toBe('rgb(82, 240, 190)');
 });
 
-test('the Themes panel sits between Archives and New entry and applies a theme without touching the entry', async ({ page }) => {
+test('the Themes panel sits after Archives and applies a theme without touching the entry', async ({ page }) => {
   await installNativeMock(page, { entries: [{ title: 'Theme switch', body: 'Draft that must survive' }], openEntry: 1 });
   await page.goto('/');
   await expect(page.locator('#storage-status')).toHaveText('Saved');
   const rail = page.getByRole('navigation', { name: 'Journal navigation' }).locator('.rail-actions button');
-  expect(await rail.evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-label')))).toEqual(['Search titles', 'Archives', 'Themes', 'New entry']);
+  expect(await rail.evaluateAll(buttons => buttons.map(b => b.getAttribute('aria-label')))).toEqual(['Search titles', 'Archives', 'Themes', 'Sounds', 'New entry']);
   expect(await page.evaluate(() => document.documentElement.dataset.theme)).toBe('mint');
 
   const editor = page.getByRole('textbox', { name: 'Journal body' });

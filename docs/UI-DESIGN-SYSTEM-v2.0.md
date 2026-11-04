@@ -4,7 +4,7 @@ Status: accepted target for future implementation, November 4, 2026. This extend
 
 ## Preserve the released foundation
 
-Keep the rail order (Search, Archives, Themes, New entry, Settings below; Themes added by the product owner on November 4, 2026), dominant right writing field, Orbitron display lettering, IBM Plex Mono interface labels, and chosen writing fonts. Writing stays free of scanlines, glow, grids, and decorative overlays. All themes share the same layout, typography, controls, and motion behaviour.
+Keep the rail order (Search, Archives, Themes, Sounds, New entry, Settings below; Themes and Sounds added by the product owner on November 4, 2026), dominant right writing field, Orbitron display lettering, IBM Plex Mono interface labels, and chosen writing fonts. Writing stays free of scanlines, glow, grids, and decorative overlays. All themes share the same layout, typography, controls, and motion behaviour.
 
 ## Theme contract
 
@@ -78,7 +78,28 @@ Alpha tints use `rgba(var(--dominant-rgb), a)`. The comma (legacy) form is delib
 
 ## Sounds
 
-Optional, local, centrally managed, and immediately muteable. Existing 1.0 users upgrade silently until enabling sound. Keep master, keyboard, UI, and startup preferences explicit. Playback follows actual text input or actual action outcomes; do not sound every raw key event. Respect IME and accessibility input. Asset provenance and redistribution rights are release gates; see [the asset checklist](AUDIO-ASSETS-v2.0.md).
+Optional, local, centrally managed, and immediately muteable. Existing 1.0 users upgrade silently until enabling sound. Playback follows actual text input or actual action outcomes; do not sound every raw key event. Respect IME and accessibility input. Asset provenance and redistribution rights are release gates; see [the asset record](AUDIO-ASSETS-v2.0.md).
+
+### Sounds panel (T-25–T-27)
+
+At the product owner's request (November 4, 2026), sound has its own rail button, **Sounds** (a speaker with two waves), between Themes and New entry. It opens a centred panel like Archives:
+
+- **Sound** switch (off by default for everyone, including people upgrading from 1.0) and **Master volume**.
+- **Keyboard**: Silent, Thock (soft Cherry KC 1000) or Clicky (bright vintage keys), each with ▶ preview, and **Typing volume**. Choosing a pack previews it.
+- **Interface**: switches with ▶ preview for Icon menus, Typesetting, Text edit, Error, Close and Startup, and **Interface volume**.
+- Previews play even while sound is off, so a sound can be heard before switching it on.
+
+| Sound | Plays when | Source |
+| --- | --- | --- |
+| Icon menus | a rail button, panel row (archive, search result, theme) or panel close button is clicked | Kenney `switch_002` |
+| Typesetting | a toolbar control (font, size, style, formatting, alignment, table, undo/redo) or a Settings writing control is used | Kenney `tick_002` |
+| Text edit | Export, Delete, dialog buttons, notices, Retry, backup and restore are clicked | Kenney `click1` |
+| Keyboard | a keystroke changes the title or body: separate samples for letters (random variants), space, return and delete | Thock or Clicky pack |
+| Error | a save, export, backup or restore fails, once as the failure appears | Arlecchino |
+| Close | Terminal closes after the journal is saved; the window hides at once and the app exits when the sound ends (at most 6.5 s) | Arlecchino |
+| Startup | not yet; the startup screen (T-31) will play it | Arlecchino |
+
+Clicks are classified by the region of the interface (`data-sound` on the rail, panels, toolbar and writing area), not per component. Keyboard shortcuts, modifiers, navigation keys, paste, undo and toolbar formatting are silent; IME input sounds once when committed. Only the kind of key is known to the sound code; no text is recorded.
 
 ## Motion
 

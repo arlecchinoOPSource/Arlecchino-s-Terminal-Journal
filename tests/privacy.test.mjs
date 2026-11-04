@@ -30,9 +30,16 @@ test('the frontend makes no network requests and loads nothing remote', () => {
   for (const f of files('src', ['.ts', '.tsx', '.css'])) {
     // The SVG namespace inside inline data: images is an identifier, not a request.
     const s = readFileSync(join(root, f), 'utf8').replaceAll('http://www.w3.org/2000/svg', '');
-    if (/\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|https?:\/\/(?!localhost)/.test(s)) offenders.push(f);
+    // The sound manager alone may fetch: it decodes the app's own bundled sound files (checked below).
+    const network = f === 'src/audio/soundManager.ts' ? /XMLHttpRequest|WebSocket|EventSource|sendBeacon|https?:\/\/(?!localhost)/ : /\bfetch\s*\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|https?:\/\/(?!localhost)/;
+    if (network.test(s)) offenders.push(f);
   }
   assert.deepEqual(offenders, []);
+  // Every sound it can be given is a local file imported from src/assets/sounds.
+  const assets = readFileSync(join(root, 'src/audio/sounds.ts'), 'utf8');
+  const sources = [...assets.matchAll(/(?:from|glob<string>\()\s*'([^']+)'/g)].map(m => m[1]).filter(p => p.endsWith('.wav'));
+  assert.ok(sources.length >= 8);
+  for (const source of sources) assert.match(source, /^\.\.\/assets\/sounds\/[\w/*-]+\.wav$/);
   const html = readFileSync(join(root, 'index.html'), 'utf8');
   assert.ok(!/https?:\/\//.test(html), 'index.html references a remote resource');
 });

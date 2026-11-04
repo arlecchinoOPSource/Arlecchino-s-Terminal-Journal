@@ -169,6 +169,8 @@ A small number of sample variations may be used to reduce repetitive mechanical 
 
 ### Interface Sounds
 
+*(Amended by the product owner, November 4, 2026: sound has its own Sounds rail panel; clicks are three distinct sounds for icon menus, typesetting and text editing taken from licensed CC0 packs; Arlecchino supplied the startup, close and error sounds. See UI-DESIGN-SYSTEM-v2.0.md.)*
+
 Arlecchino will create original sounds in Ableton Live for:
 
 - Button activation.

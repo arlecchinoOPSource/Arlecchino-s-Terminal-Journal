@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
+import type { ClickRegion } from '../domain/sound';
 import { IconButton } from './IconButton';
 
-type Props = { id: string; title: string; onClose: () => void; triggerRef: RefObject<HTMLButtonElement | null>; children: ReactNode; className?: string; closeLabel?: string; scrim?: boolean };
+type Props = { id: string; title: string; onClose: () => void; triggerRef: RefObject<HTMLButtonElement | null>; children: ReactNode; className?: string; closeLabel?: string; scrim?: boolean; sound?: ClickRegion };
 /**
  * Non-modal panel. Escape or the close button returns focus to where it was before
  * opening (or the trigger); clicking outside or tabbing out closes it.
  */
-export function Popover({ id, title, onClose, triggerRef, children, className = '', closeLabel = 'Close', scrim = false }: Props) {
+export function Popover({ id, title, onClose, triggerRef, children, className = '', closeLabel = 'Close', scrim = false, sound = 'icon-menu' }: Props) {
   const panelRef = useRef<HTMLElement>(null);
   // Captured during the first render, before panel content moves focus.
   const [returnTo] = useState(() => document.activeElement);
@@ -36,8 +37,9 @@ export function Popover({ id, title, onClose, triggerRef, children, className = 
     const usable = returnTo instanceof HTMLElement && returnTo !== document.body && returnTo.isConnected && !panelRef.current?.contains(returnTo);
     (usable ? returnTo : triggerRef.current)?.focus();
   }
-  return <>{scrim && <div className="popover-scrim" aria-hidden="true" />}<section id={id} ref={panelRef} className={`popover ${className}`} role="dialog" aria-labelledby={`${id}-title`} tabIndex={-1}>
-    <header><h2 id={`${id}-title`}>{title}</h2><IconButton icon="close" label={closeLabel} onClick={closeAndReturn} /></header>
+  return <>{/* The scrim closes on its own, so a quick second click is never lost before the listeners above attach. */}
+  {scrim && <div className="popover-scrim" aria-hidden="true" onPointerDown={onClose} />}<section id={id} ref={panelRef} className={`popover ${className}`} role="dialog" aria-labelledby={`${id}-title`} tabIndex={-1} data-sound={sound}>
+    <header data-sound="icon-menu"><h2 id={`${id}-title`}>{title}</h2><IconButton icon="close" label={closeLabel} onClick={closeAndReturn} /></header>
     {children}
   </section></>;
 }

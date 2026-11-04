@@ -274,10 +274,25 @@ fn backup_cancel(pending: tauri::State<'_, PendingRestore>) {
 }
 
 #[tauri::command]
-fn journal_finish_exit(app: tauri::AppHandle) {
+fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
     app.state::<ExitAllowed>().0.store(true, Ordering::SeqCst);
-    app.exit(0);
+    // The journal is already saved. When a close sound is playing, hide the window at
+    // once and exit when it ends, so closing never waits on the sound.
+    let linger = linger_ms.unwrap_or(0).min(MAX_CLOSE_SOUND_MS);
+    if linger == 0 {
+        app.exit(0);
+        return;
+    }
+    for window in app.webview_windows().values() {
+        let _ = window.hide();
+    }
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(linger));
+        app.exit(0);
+    });
 }
+/// Upper bound on keeping a hidden app alive for its close sound; matches MAX_CLOSE_MS in the sound manager.
+const MAX_CLOSE_SOUND_MS: u64 = 6500;
 pub fn run() {
     #[cfg(feature = "startup-metrics")]
     metrics::start();
