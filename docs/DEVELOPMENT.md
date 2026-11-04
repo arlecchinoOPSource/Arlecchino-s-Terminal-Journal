@@ -30,7 +30,7 @@ npm run build
 
 What each suite covers, and what it cannot prove, is described in [TESTING.md](TESTING.md). CI runs the same suite on every pull request.
 
-`build` creates a native release executable without distributing an installer. Signing, notarization, Windows installation, and release automation remain T-19. `npm run tauri -- build --bundles app` creates a local macOS app bundle for testing only.
+`build` creates a native release executable without an installer. Installers for macOS and Windows are built by GitHub Actions from version tags into a draft release; see [RELEASE.md](RELEASE.md) for the procedure, signing and the clean-machine checklist. `npm run tauri -- build --bundles app` creates a local macOS app bundle for testing only.
 
 Oxlint is an MIT-licensed development-only linter. The existing TypeScript 7.0.2 is beyond typescript-eslint 8.72.1's supported peer range, so no forced peer resolution is used. Tests use Node's built-in test runner for these initial boundary checks; the comprehensive suite remains T-17. Native crates use the generated Cargo.lock. No logging, SQL, shell, filesystem, HTTP, or updater plugin is enabled in the initial native shell.
 
