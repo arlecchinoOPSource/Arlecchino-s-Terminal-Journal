@@ -11,7 +11,7 @@ Terminal is planned as an offline-first desktop journal for macOS and Windows. O
 ## Project documents
 
 - [Product Requirements Document v0.1](docs/PRD-v0.1.md)
-- [UI Design System v0.2](docs/UI-DESIGN-SYSTEM-v0.2.md)
+- [UI Design System v0.3](docs/UI-DESIGN-SYSTEM-v0.3.md)
 - [Accepted development backlog](docs/BACKLOG.md)
 - [Architecture and decisions](docs/ARCHITECTURE.md)
 - [Development environment](docs/DEVELOPMENT.md)
@@ -27,7 +27,7 @@ Tauri 2, React, TypeScript, Vite, Tiptap, and local SQLite. Distribution is plan
 
 ![Original workspace mockup](docs/reference/terminal-workspace-mockup.png)
 
-Forest black `#16231D`, near black `#090B0C`, and terminal mint `#B0E2CC`. The image above is the original layout reference. The current [v0.2 design direction](docs/UI-DESIGN-SYSTEM-v0.2.md) preserves the left menu, right writing area, and palette while specifying monospaced labels, compact technical frames, segmented controls, and restrained CRT atmosphere. This revision is documentation only; it does not change the application.
+The image above is the original layout reference. The current [v0.3 "Terminal 84" design](docs/UI-DESIGN-SYSTEM-v0.3.md) keeps the left menu and right writing area and gives them a retro-futuristic console treatment: blue-black framed panels, a phosphor-cyan accent, a striped Orbitron wordmark, and a calm writing page.
 
 ## Privacy and data ownership
 

@@ -75,3 +75,13 @@ test('a very long entry opens and stays responsive while typing', async ({ page 
   expect(open).toBeLessThan(8000);
   expect(typing).toBeLessThan(5000);
 });
+
+test('reduced-motion preference stops every animation', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await installNativeMock(page, { entries: [{ title: 'Calm' }], openEntry: 1 });
+  await page.goto('/');
+  await page.evaluate(() => { document.querySelector('.save-status')!.setAttribute('data-tone', 'busy'); });
+  const running = await page.evaluate(() => document.getAnimations().filter(a => a.playState === 'running').length);
+  expect(running).toBe(0);
+  expect(await page.locator('.wordmark-glow').evaluate(el => getComputedStyle(el).animationName)).toBe('none');
+});

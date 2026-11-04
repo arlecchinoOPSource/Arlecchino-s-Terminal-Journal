@@ -12,7 +12,7 @@ Status: accepted stack and product boundaries; implementation details below are 
 
 ## Visual specification
 
-[UI design system v0.2](UI-DESIGN-SYSTEM-v0.2.md) is the current presentation specification. Its terminal-console treatment does not change the stack, offline/privacy boundaries, storage contract, or feature scope. The November 3 aesthetic revision is documentation only; implementing it requires separate authorization.
+[UI design system v0.3](UI-DESIGN-SYSTEM-v0.3.md) is the current presentation specification. Its terminal-console treatment does not change the stack, offline/privacy boundaries, storage contract, or feature scope. The November 3 aesthetic revision is documentation only; implementing it requires separate authorization.
 
 ## Planned boundaries
 
