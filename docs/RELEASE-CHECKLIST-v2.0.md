@@ -22,13 +22,13 @@ Target: **2.0.0 — The Sensory Update**. Status, November 4, 2026: **release ca
 
 ## Validation and distribution
 
-- [ ] Existing and new unit, browser, native, and schema checks pass in CI at the exact release commit. *They pass on every PR branch; #49–#55 and this release PR must be merged, and CI must pass on the merged commit.*
+- [ ] Existing and new unit, browser, native, and schema checks pass in CI at the exact release commit. *Passing at the candidate `591ff67` on `development/v2.0.0` (run 41817026766, including native tests on Windows and macOS). The release commit on `main` still needs its own green run.*
 - [ ] Native macOS and Windows upgrade, startup audio, repeated launch, offline, and clean-install checks are recorded. *macOS: repeated launches, offline and the bundle are recorded; audio and clean install pending. Windows: none.*
 - [ ] Accessibility and text scaling results identify actual assistive technologies/platforms tested.
 - [x] Startup, memory, idle CPU, and input/audio responsiveness are measured against the v1 baseline. *Native audio latency is not measured.*
 - [x] Critical data-loss or startup bugs are resolved; remaining limits are explicit. *None known; limits are listed in each validation file and in CHANGELOG.md.*
 - [x] Application manifests and lockfiles agree on the candidate version; changelog, privacy, install and signing notes are updated. *2.0.0 in `package.json`, `package-lock.json`, `tauri.conf.json`, `Cargo.toml` and `Cargo.lock`; `check_version.mjs v2.0.0` passes.*
-- [ ] macOS universal and Windows installers match the tested tag/commit; signing/notarization status is stated accurately. *Build them from the merged commit with the release workflow; without signing secrets they are ad-hoc signed (macOS) and unsigned (Windows).*
+- [ ] macOS universal and Windows installers match the tested tag/commit; signing/notarization status is stated accurately. *Built from `591ff67`, with checksums recorded in [VALIDATION-T33.md](VALIDATION-T33.md). macOS is ad-hoc signed and Windows is unsigned. Rebuild from the final tag after merging to `main`.*
 - [ ] The owner explicitly authorizes tagging/publication after reviewing the evidence.
 - [ ] Official release downloads are published and verified.
 

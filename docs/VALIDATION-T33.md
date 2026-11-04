@@ -45,3 +45,15 @@ Apple M5, macOS 26.5.1.
   - quitting during the close sound, then relaunching
 - **Assistive technology:** VoiceOver, dictation and Voice Control, a real IME, and text scaling were not tested.
 - **The merged branch:** every check here ran on a stacked branch. Rerun `npm run check` and CI on the merged release commit.
+
+## Release candidate artifacts — `591ff67`
+
+Built by the release workflow from `development/v2.0.0` at `591ff67` (run [41817026766](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/actions/runs/41817026766), manual: workflow artifacts only, no tag or release). The run's CI passed: web checks plus native tests on Ubuntu 24.04, macOS 15 and Windows Server 2025.
+
+| Platform | Artifact | SHA-256 | Size | Tested | Result |
+| --- | --- | --- | --- | --- | --- |
+| macOS universal | `Terminal_2.0.0_universal.dmg` | `d8fee43d51c602b91876159db375c14091bcd2f9cdb3a5e8719c887b3e0a9a5d` | 13,419,992 B | Apple M5, macOS 26.5.1, Claude Code, Nov 4 | Mounts without prompts with Terminal.app and an Applications link. Binary is `x86_64 arm64`; version 2.0.0; minimum macOS 11.0. Ad-hoc signature valid; Gatekeeper rejects it (not notarized). Launched from the image with a throwaway home folder: no sockets, database integrity ok, no stderr. **Intel hardware not tested.** |
+| Windows x64 | `Terminal_2.0.0_x64-setup.exe` (NSIS) | `d5a97c838020e300f1d1fda6dda5ff7e295d85a77b76ccf91776352455022839` | 6,521,274 B | — | **Not tested.** Identified as an NSIS installer only. Unsigned. |
+| Windows x64 | `Terminal_2.0.0_x64_en-US.msi` | `d7eba66155b3a9d838ed9ee9c527ee82018b261acb6773cab2ba37127d964515` | 7,909,376 B | — | **Not tested.** Identified as an MSI (author Arlecchino) only. Unsigned. |
+
+The owner's hands-on approval was of the Mac development candidate before these artifacts existed; it is not copied into the rows above. Remaining gates are in [RELEASE-CHECKLIST-v2.0.md](RELEASE-CHECKLIST-v2.0.md) and issue #56.
