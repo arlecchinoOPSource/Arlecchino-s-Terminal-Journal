@@ -2,10 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const root = new URL('..', import.meta.url).pathname;
+// fileURLToPath, not URL#pathname: on Windows the latter yields "/C:/..." and breaks join().
+const root = fileURLToPath(new URL('..', import.meta.url));
 const files = (dir, ext) => readdirSync(join(root, dir)).flatMap(name => {
-  const path = join(dir, name);
+  // Forward slashes on every OS, so the path comparisons below hold on Windows too.
+  const path = `${dir}/${name}`;
   return statSync(join(root, path)).isDirectory() ? files(path, ext) : ext.some(e => name.endsWith(e)) ? [path] : [];
 });
 /** Rust source without its `#[cfg(test)]` module, i.e. the code that ships. */
