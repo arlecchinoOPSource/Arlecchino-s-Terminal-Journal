@@ -1,37 +1,63 @@
-import { useCallback, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { ariaShortcut, isMacPlatform, matchShortcut, shortcutLabel } from '../domain/shortcuts';
 import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
-type Props = { children: ReactNode; historyControls?: ReactNode };
-export function Shell({ children, historyControls }: Props) {
-  const [showInfo, setShowInfo] = useState(false);
+type Panel = 'search' | 'archives' | 'info' | null;
+// The wordmark's power-on flicker plays only at launch, not each time an entry opens.
+const launchedAt = Date.now();
+type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; statusTone?: string; onNew?: () => void; navigationDisabled?: boolean; archive?: (close: () => void) => ReactNode; search?: (close: () => void) => ReactNode; settings?: ReactNode };
+export function Shell({ children, formattingControls, historyControls, status, statusTone = 'idle', onNew, navigationDisabled, archive, search, settings }: Props) {
+  const [panel, setPanel] = useState<Panel>(null);
   const infoRef = useRef<HTMLButtonElement>(null);
-  const closeInfo = useCallback(() => setShowInfo(false), []);
+  const archiveRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLButtonElement>(null);
+  const closePanel = useCallback(() => setPanel(null), []);
+  const toggle = (next: Exclude<Panel, null>) => setPanel(panel === next ? null : next);
+  const mac = isMacPlatform();
+  const hint = (label: string, keys: string) => ({ label, title: `${label} (${shortcutLabel(keys, mac)})`, 'aria-keyshortcuts': ariaShortcut(keys, mac) });
+  // App shortcuts work from anywhere except while a modal dialog (e.g. delete confirmation) is open.
+  const actions = useRef({ onNew, navigationDisabled, search: !!search, archive: !!archive });
+  actions.current = { onNew, navigationDisabled, search: !!search, archive: !!archive };
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      const action = matchShortcut(event, mac);
+      if (!action || document.querySelector('dialog[open]')) return;
+      event.preventDefault();
+      const a = actions.current;
+      if (action === 'new-entry') { if (!a.navigationDisabled) { setPanel(null); a.onNew?.(); } return; }
+      const target = action === 'search' ? 'search' : action === 'archives' ? 'archives' : 'info';
+      if ((target === 'search' && !a.search) || (target === 'archives' && !a.archive)) return;
+      setPanel(current => current === target ? null : target);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mac]);
+  const showInfo = panel === 'info';
   return <div className="app-shell">
     <nav className="rail" aria-label="Journal navigation">
-      <span className="brand-mark" aria-label="Terminal">t<span>›</span></span>
+      <span className="brand-mark" role="img" aria-label="Terminal">t<span>&gt;</span></span>
       <div className="rail-actions">
-        <IconButton icon="search" label="Search — available in a later version" disabled />
-        <IconButton icon="archive" label="Archives — available in a later version" disabled />
-        <IconButton icon="plus" label="New entry — available in a later version" disabled />
+        <IconButton ref={searchRef} icon="search" {...hint('Search titles', 'Mod+K')} disabled={!search} aria-expanded={panel === 'search'} aria-controls="search-panel" onClick={() => toggle('search')} />
+        <IconButton ref={archiveRef} icon="archive" {...hint('Archives', 'Mod+O')} disabled={!archive} aria-expanded={panel === 'archives'} aria-controls="archive-panel" onClick={() => toggle('archives')} />
+        <IconButton icon="plus" {...hint('New entry', 'Mod+N')} disabled={navigationDisabled} onClick={onNew} />
       </div>
-      <IconButton ref={infoRef} icon="settings" label="About this preview" className="rail-bottom" aria-expanded={showInfo} aria-controls="preview-info" onClick={() => setShowInfo(!showInfo)} />
+      <IconButton ref={infoRef} icon="settings" {...hint('Settings', 'Mod+,')} className="rail-bottom" aria-expanded={showInfo} aria-controls="settings-panel" onClick={() => toggle('info')} />
     </nav>
-    {showInfo && <Popover id="preview-info" title="About Terminal" onClose={closeInfo} triggerRef={infoRef}>
-      <p>Terminal by Arlecchino</p><p>This preview introduces the workspace and basic writing. Your text stays in this window only and disappears when you close or reload it.</p>
-      <p>Saving, archives, search, formatting controls, and preferences will arrive in later versions.</p>
+    {panel === 'search' && search && <Popover id="search-panel" title="Search titles" className="search-popover" scrim closeLabel="Close search" onClose={closePanel} triggerRef={searchRef}>{search(closePanel)}</Popover>}
+    {panel === 'archives' && archive && <Popover id="archive-panel" title="Archives" className="archive-popover" scrim closeLabel="Close archives" onClose={closePanel} triggerRef={archiveRef}>{archive(closePanel)}</Popover>}
+    {showInfo && <Popover id="settings-panel" title="Settings" className="settings-popover" closeLabel="Close settings" onClose={closePanel} triggerRef={infoRef}>
+      {settings}
+      <section className="settings-about" aria-label="About Terminal"><p className="settings-section">ABOUT</p><p>Terminal by Arlecchino. Writing and settings are stored locally on this device. Check the save status before closing.</p></section>
     </Popover>}
     <div className="workspace">
-      <div className="identity-strip"><span className="wordmark">TERMINAL<span className="wordmark-cursor" aria-hidden="true"> ▪</span></span><span className="workspace-label">PERSONAL JOURNAL</span></div>
-      <header className="toolbar" aria-label="Writing tools">
-        <div className="font-preview" aria-label="Current writing font: IBM Plex Sans, 17 pixels"><span>IBM Plex Sans</span><span className="font-size">17</span></div>
-        <span className="toolbar-divider" aria-hidden="true" />
-        <div className="format-preview" aria-label="Formatting controls are not yet available"><button disabled title="Formatting arrives in a later version" aria-label="Bold — not yet available"><b>B</b></button><button disabled aria-label="Italic — not yet available"><i>I</i></button><button disabled aria-label="Underline — not yet available"><u>U</u></button></div>
+      <header className="identity-strip"><span className={Date.now() - launchedAt < 1500 ? 'wordmark-glow power-on' : 'wordmark-glow'}><span className="wordmark" data-text="TERMINAL">TERMINAL</span></span></header>
+      <section className="toolbar" aria-label="Writing tools">
+        {formattingControls}
         <div className="history-controls">{historyControls}</div>
-        <span className="tools-label">WRITING TOOLS</span>
-      </header>
+      </section>
       <main className="writing-surface" id="writing-workspace">{children}</main>
-      <footer className="workspace-footer"><span className="save-status">Preview · not saved</span><span id="preview-warning">Temporary writing · closes without saving</span></footer>
+      <footer className="workspace-footer"><span className="save-status" data-tone={statusTone}><span className="save-meter" aria-hidden="true"><span /></span>{status}</span></footer>
     </div>
   </div>;
 }

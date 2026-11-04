@@ -1,42 +1,28 @@
 # Terminal by Arlecchino
 
-A private, lightweight writing environment that makes journaling effortless.
+A private desktop journal for macOS and Windows. Write in rich text, find an older entry by title, and take your journal with you as a backup. Terminal saves to your device and works offline.
 
-![Terminal identity](docs/reference/arlecchino-brand-mockup.png)
+**[Download Terminal 1.0.0](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases/tag/v1.0.0)**
 
-**Status: T-03–T-05 desktop writing preview. No stable release yet. Writing is temporary and is not saved.**
+| Your computer | Choose this download | Install |
+| --- | --- | --- |
+| Mac with Apple silicon or Intel | Universal `.dmg` | Open the disk image and drag Terminal to Applications. |
+| Windows 10 or 11, x64 | `-setup.exe` | Run the installer for your Windows account. An `.msi` is also available for managed installations. |
 
-Terminal is planned as an offline-first desktop journal for macOS and Windows. Open it, write with a compact rich-text toolbar, and find previous entries through title search and a chronological archive. The planned release will store writing in a local SQLite database; this early preview uses memory only. No accounts, cloud dependency, analytics, advertising, or AI processing of journal content.
+Downloads are under **Assets** on the release page. The source archives are for development. The Windows installer may download WebView2 once if it is missing. See the [platform and signing notes](docs/RELEASE.md) for first-open prompts and the [release checklist](docs/RELEASE-CHECKLIST-v1.0.md) for verification limits.
 
-## Project documents
+## Your first entry
 
-- [Product Requirements Document v0.1](docs/PRD-v0.1.md)
-- [UI Design System v0.2](docs/UI-DESIGN-SYSTEM-v0.2.md)
-- [Accepted development backlog](docs/BACKLOG.md)
-- [Architecture and decisions](docs/ARCHITECTURE.md)
-- [Development environment](docs/DEVELOPMENT.md)
-- [Contribution workflow](CONTRIBUTING.md) and [AI agent instructions](AGENTS.md)
+1. Open Terminal, give the draft a title, and start writing. Use the toolbar for headings, lists, tables, and text formatting.
+2. Wait for **Saved** before quitting. The last entry reopens when you return. Use **New entry** for a fresh page.
+3. Use **Archives** to browse recent entries or **Search** to find a title. To take a copy elsewhere, export an entry as HTML or plain text, or export a JSON backup of the whole journal.
 
-Tracking: [20 ordered issues](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/issues?q=is%3Aissue+sort%3Acreated-asc) · [five milestones](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/milestones) · [Terminal v1.0 project board](https://github.com/users/arlecchinoOPSource/projects/1).
+## Where your writing lives
 
-## Technology
-
-Tauri 2, React, TypeScript, Vite, Tiptap, and local SQLite. Distribution is planned through GitHub Releases after cross-platform testing. Supported OS versions and installer trust requirements will be verified before release.
-
-## Design reference
-
-![Original workspace mockup](docs/reference/terminal-workspace-mockup.png)
-
-Forest black `#16231D`, near black `#090B0C`, and terminal mint `#B0E2CC`. The image above is the original layout reference. The current [v0.2 design direction](docs/UI-DESIGN-SYSTEM-v0.2.md) preserves the left menu, right writing area, and palette while specifying monospaced labels, compact technical frames, segmented controls, and restrained CRT atmosphere. This revision is documentation only; it does not change the application.
-
-## Privacy and data ownership
-
-The accepted design includes autosave, full versioned JSON backup/restore, and readable individual-entry export. Local storage is not automatically encrypted; v1 relies on operating-system account permissions and disk protection. No private journal data belongs in this repository or issue reports.
+Terminal stores entries in a local SQLite database. There are no accounts, analytics, ads, or cloud sync. The journal relies on your operating system’s account permissions and disk encryption. Exported backups contain readable writing. Keep them somewhere you control. Uninstalling Terminal leaves your journal on the device. [Storage locations and uninstall details](docs/RELEASE.md#clean-machine-checklist)
 
 ## Development
 
-Open this folder in VS Code and run `npm run dev` in its terminal, or select **Terminal → Run Task → Terminal: Run desktop preview**. Test the title, multiline writing, selection, copy/paste, and undo/redo. **Closing or reloading clears your writing.** Saving begins with later backlog tasks. See [the development guide](docs/DEVELOPMENT.md) for setup, checks, and platform limitations. Work through authorized backlog tasks in order.
+Install the [development prerequisites](docs/DEVELOPMENT.md), run `npm ci`, then `npm run dev` to open the desktop app. Run `npm run check` for the regression suite. Use synthetic entries for testing and bug reports.
 
-## License
-
-[MIT](LICENSE) — Copyright 2026 Arlecchino.
+[Architecture](docs/ARCHITECTURE.md) · [Design system](docs/UI-DESIGN-SYSTEM-v0.3.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE)

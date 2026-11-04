@@ -1,6 +1,6 @@
 {
   "name": "terminal-by-arlecchino",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Offline desktop journal — early writing preview",
   "license": "MIT",
@@ -13,8 +13,10 @@
     "@fontsource/ibm-plex-mono": "5.3.0",
     "@fontsource/ibm-plex-sans": "5.3.0",
     "@fontsource/ibm-plex-sans-condensed": "5.3.0",
+    "@fontsource/ibm-plex-serif": "5.3.0",
+    "@fontsource/literata": "5.3.0",
+    "@fontsource/orbitron": "5.3.0",
     "@tauri-apps/api": "2.12.4",
-    "@tauri-apps/plugin-sql": "2.6.0",
     "@tiptap/extension-table": "3.32.2",
     "@tiptap/extension-text-align": "3.32.2",
     "@tiptap/extension-text-style": "3.32.2",
@@ -25,6 +27,7 @@
     "react-dom": "19.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "@tauri-apps/cli": "2.12.4",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
@@ -39,8 +42,11 @@
     "build": "tauri build --no-bundle",
     "build:web": "tsc --noEmit && vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --deny-warnings src tests vite.config.ts",
+    "lint": "oxlint --deny-warnings src tests vite.config.ts playwright.config.ts",
     "test": "node --test tests/*.test.mjs",
+    "test:ui": "playwright test",
+    "test:native": "cargo fmt --manifest-path src-tauri/Cargo.toml --check && cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --locked -- -D warnings && cargo test --manifest-path src-tauri/Cargo.toml --locked && python3 tests/sqlite_schema.py",
+    "check": "npm run lint && npm run typecheck && npm test && npm run build:web && npm run test:ui && npm run test:native",
     "preview": "vite preview",
     "tauri": "tauri"
   }

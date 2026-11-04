@@ -1,9 +1,25 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Local main window; no filesystem, shell, SQL, or network permissions.",
+  "description": "Main local window: journal operations, editor preferences, backup and entry export through native file dialogs and close notification only. No direct filesystem or dialog access.",
   "windows": [
     "main"
   ],
-  "permissions": []
+  "permissions": [
+    "allow-journal-list",
+    "allow-journal-last",
+    "allow-journal-select",
+    "allow-journal-save",
+    "allow-journal-delete",
+    "allow-journal-finish-exit",
+    "allow-preferences-get",
+    "allow-preferences-set",
+    "allow-backup-export",
+    "allow-backup-choose",
+    "allow-backup-restore",
+    "allow-backup-cancel",
+    "allow-entry-export",
+    "core:event:allow-listen",
+    "core:event:allow-unlisten"
+  ]
 }

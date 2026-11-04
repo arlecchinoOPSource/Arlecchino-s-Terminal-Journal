@@ -1,0 +1,79 @@
+name: CI
+
+# Runs the full check suite on every push and pull request. No secrets are used
+# and nothing is published; release builds and installers belong to T-19.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  # Reused by the release workflow so a release is only built from a passing commit.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Lint, types, unit and UI tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build:web
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:ui
+        env:
+          CI: true
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  native:
+    name: Native tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-15, windows-2025]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Linux webview libraries
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev libayatana-appindicator3-dev patchelf
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.2
+          cache: npm
+      - run: npm ci
+      # The Tauri context embeds the built frontend.
+      - run: npm run build:web
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --locked -- -D warnings
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - run: python3 tests/sqlite_schema.py
+        if: runner.os != 'Windows'
+      - run: python tests/sqlite_schema.py
+        if: runner.os == 'Windows'

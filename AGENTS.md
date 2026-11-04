@@ -2,16 +2,16 @@
 
 ## Product and current stage
 
-Terminal by Arlecchino is a minimal, offline-first journal for macOS and Windows. Read `docs/PRD-v0.1.md`, `docs/UI-DESIGN-SYSTEM-v0.2.md`, `docs/ARCHITECTURE.md`, and the selected backlog issue before work.
+Terminal by Arlecchino is a minimal, offline-first journal for macOS and Windows. Read `docs/PRD-v0.1.md`, `docs/UI-DESIGN-SYSTEM-v0.3.md`, `docs/ARCHITECTURE.md`, and the selected backlog issue before work.
 
 Implementation of T-03 through T-05 was authorized on November 3, 2026. Work on one authorized issue at a time; do not silently implement adjacent issues. Later backlog tasks still require authorization.
 
 ## Mandatory boundaries
 
 - Use Tauri 2 + React + TypeScript + Vite + Tiptap + local SQLite. Explain and document any proposed architecture change before adopting it.
-- Follow the current v0.2 personal archive terminal design: monospaced interface labels, compact segmented strips, square technical frames, and restrained mint-filled selections. Preserve forest black `#16231D`, near black `#090B0C`, and terminal mint `#B0E2CC` exactly.
-- Preserve the left menu order (Search, Archives, New entry; Settings below) and dominant right-hand writing field. Keep writing clear of scanlines, grids, glow, and decorative overlays. No fake telemetry, network state, security claims, or reference-derived features.
-- The November 3, 2026 aesthetic revision authorizes documentation and GitHub updates only. Do not implement the v0.2 redesign or change app code/assets/dependencies without a separate implementation request.
+- Follow the current v0.3 "Terminal 84" design (`docs/UI-DESIGN-SYSTEM-v0.3.md`): green-black framed panels, one phosphor-green accent (amber and rose only for attention and failure), Orbitron display lettering for the wordmark and panel titles, IBM Plex Mono interface labels. Use the colour tokens in `src/styles/tokens.css`; the v0.2 forest/mint palette was retired by the product owner on November 4, 2026.
+- Preserve the left menu order (Search, Archives, New entry; Settings below) and dominant right-hand writing field. Keep the writing page clear of scanlines, grids, glow, and decorative overlays (these may appear only in the surrounding chrome). No fake telemetry, network state, security claims, or reference-derived content.
+- Visual changes beyond v0.3 require an explicit request from the product owner and an updated design document.
 - No accounts, servers, cloud sync, telemetry, ads, third-party AI processing, streaks, reminders, or unrelated productivity features.
 - No network dependency at app runtime. Bundle approved fonts/assets locally. Development dependency downloads do not justify runtime network features.
 - Never read, upload, log, or commit real journal content, credentials, signing keys, or backups. Use synthetic fixtures.

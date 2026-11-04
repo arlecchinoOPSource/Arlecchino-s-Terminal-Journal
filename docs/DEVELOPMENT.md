@@ -18,14 +18,19 @@ On this Mac, the workspace terminal supplies `DEVELOPER_DIR=/Applications/Xcode.
 ## Checks and builds
 
 ```sh
+npm run check        # everything below except the release build
 npm run lint
 npm run typecheck
-npm test
+npm test             # domain unit tests
+npm run test:ui      # Playwright UI tests (first run: npx playwright install chromium)
+npm run test:native  # cargo fmt/clippy/test and the SQLite schema check
 npm run build:web
 npm run build
 ```
 
-`build` creates a native release executable without distributing an installer. Signing, notarization, Windows installation, and release automation remain T-19. `npm run tauri -- build --bundles app` creates a local macOS app bundle for testing only.
+What each suite covers, and what it cannot prove, is described in [TESTING.md](TESTING.md). CI runs the same suite on every pull request.
+
+`build` creates a native release executable without an installer. Installers for macOS and Windows are built by GitHub Actions from version tags into a draft release; see [RELEASE.md](RELEASE.md) for the procedure, signing and the clean-machine checklist. `npm run tauri -- build --bundles app` creates a local macOS app bundle for testing only.
 
 Oxlint is an MIT-licensed development-only linter. The existing TypeScript 7.0.2 is beyond typescript-eslint 8.72.1's supported peer range, so no forced peer resolution is used. Tests use Node's built-in test runner for these initial boundary checks; the comprehensive suite remains T-17. Native crates use the generated Cargo.lock. No logging, SQL, shell, filesystem, HTTP, or updater plugin is enabled in the initial native shell.
 
@@ -37,12 +42,12 @@ SQLite remains the approved storage architecture, but native database initializa
 - [Vite guide](https://vite.dev/guide/)
 - [Tiptap React](https://tiptap.dev/docs/editor/getting-started/install/react)
 
-Windows builds, installation, Intel macOS, performance, persistence and crash recovery are unverified at this stage.
+Release status and remaining unverified areas are tracked in [RELEASE-CHECKLIST-v1.0.md](RELEASE-CHECKLIST-v1.0.md).
 
-## T-05 writing preview
+## Local data while developing
 
-The editor stores versioned Tiptap JSON in React memory. It does not create a database or use localStorage. Test only disposable writing. Closing/reloading intentionally resets the draft. Search, archives, new entries, preferences, tables, and full formatting controls remain deferred. Inline bold/italic/underline/strike survive rich clipboard paste; unsupported nodes are not registered. Spellcheck/autocorrect are disabled in this preview to avoid sending writing through optional OS/browser writing services.
+`npm run dev` and an installed Terminal use the same app-data folder (`journal.sqlite3` under the OS application-data directory for `com.arlecchino.terminal`). Use only synthetic writing while developing, or start the dev app with a throwaway `HOME` as described in [PERFORMANCE.md](PERFORMANCE.md). Spellcheck and autocorrect are disabled so writing is not sent through optional OS or browser writing services.
 
-VS Code also provides **Terminal → Run Task → Terminal: Run desktop preview** and **Terminal: Check**. The generated app for direct local testing is `src-tauri/target/release/bundle/macos/Terminal.app`. It is a locally built preview, not a signed/notarized distribution.
+`npm run tauri -- build --bundles app,dmg` builds a local, ad-hoc signed macOS app and disk image under `src-tauri/target/release/bundle/` for testing; it is not a signed or notarized distribution.
 
-See [validation evidence](VALIDATION-T03-T05.md). Vite reports a 500 kB chunk-size advisory for the combined editor/React bundle; this is not a failed build or a performance measurement. Splitting an always-needed editor solely to silence this warning is deferred until measurement.
+See validation evidence for [T-03–T-05](VALIDATION-T03-T05.md) and [T-06–T-08](VALIDATION-T06-T08.md). **Terminal: Native storage tests** runs the Rust SQLite and lifecycle tests. Vite reports a 500 kB chunk-size advisory for the combined editor/React bundle; this is not a failed build or a performance measurement. Splitting an always-needed editor solely to silence this warning is deferred until measurement.

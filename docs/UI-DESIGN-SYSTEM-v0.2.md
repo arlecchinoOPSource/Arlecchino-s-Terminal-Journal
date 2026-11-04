@@ -1,6 +1,6 @@
 # TERMINAL — Visual Design System
 
-**Design version:** 0.2  
+**Design version:** 0.2 — superseded by [v0.3](UI-DESIGN-SYSTEM-v0.3.md) on November 4, 2026  
 **Direction:** Personal archive terminal  
 **Approved scope:** Documentation and future UI guidance only, November 3, 2026  
 **References:** Nine visual references supplied by the product owner in the design revision request.

@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Terminal",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "identifier": "com.arlecchino.terminal",
   "build": {
     "frontendDist": "../dist",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Terminal \u2014 Arlecchino",
+        "title": "Terminal — Arlecchino",
         "width": 1100,
         "height": 780,
         "resizable": true,
@@ -29,13 +29,35 @@
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": [
+      "app",
+      "dmg",
+      "nsis",
+      "msi"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "publisher": "Arlecchino",
+    "copyright": "© 2026 Arlecchino",
+    "category": "Productivity",
+    "shortDescription": "A minimal, offline journal",
+    "longDescription": "Terminal is a minimal, offline-first desktop journal. Entries are stored only on this device; there are no accounts, cloud sync or tracking.",
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-"
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "installMode": "currentUser"
+      }
+    }
   }
 }
