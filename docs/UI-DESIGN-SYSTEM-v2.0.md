@@ -4,7 +4,7 @@ Status: accepted target for future implementation, November 4, 2026. This extend
 
 ## Preserve the released foundation
 
-Keep the rail order (Search, Archives, New entry, Settings below), dominant right writing field, Orbitron display lettering, IBM Plex Mono interface labels, and chosen writing fonts. Writing stays free of scanlines, glow, grids, and decorative overlays. All themes share the same layout, typography, controls, and motion behaviour.
+Keep the rail order (Search, Archives, Themes, New entry, Settings below; Themes added by the product owner on November 4, 2026), dominant right writing field, Orbitron display lettering, IBM Plex Mono interface labels, and chosen writing fonts. Writing stays free of scanlines, glow, grids, and decorative overlays. All themes share the same layout, typography, controls, and motion behaviour.
 
 ## Theme contract
 
@@ -29,6 +29,21 @@ Released Mint source: `src/styles/tokens.css` at `v1.0.0` (`7071143`). Examples 
 | Focus / `--focus` | `#C2FFE9` |
 
 The conceptual Text Drop role describes a recessed writing surface, but in the released Mint CSS the writing page is lighter than the canvas. Preserve that measured baseline rather than darkening Mint to force a new role name. The resolved aliases are recorded below. Other palettes are implementation proposals until contrast and theme/state coverage pass T-24.
+
+### Themes panel (T-23)
+
+At the product owner's request (November 4, 2026), themes are chosen from their own rail button, **Themes**, between Archives and New entry, not from Settings. Its icon is a monitor with a half-lit disc. The panel opens centred over a dimmed window like Search and Archives: a search field filters themes by name or description, Arrow/Home/End move the highlight, and Enter or a click applies the theme at once. The panel stays open so themes can be compared, and Escape returns focus. Each row shows a three-bar swatch (Background, Default Line, Dominant), drawn from the theme's own tokens through a scoped `data-theme`, and marks the theme in use with ▶ and "in use".
+
+The choice is applied with `data-theme` on `<html>` before React renders, so the interface never appears in the wrong theme. It is stored in the webview's local storage (`terminal.theme`), not in the journal database or backups; a missing, unknown, or unreadable value means Terminal Mint.
+
+| Theme | Dominant | Background | Text Drop | Attention | Failure |
+| --- | --- | --- | --- | --- | --- |
+| Terminal Mint | `#52F0BE` | `#0B0F0D` | `#050706` | `#FFB648` | `#FF6B78` |
+| Blue Monitor | `#4FC3FF` | `#0B0D0F` | `#050607` | `#FFB648` | `#FF6B78` |
+| Ember Orange | `#FF8A3D` | `#0F0D0B` | `#070605` | `#7FD8FF` | `#FF6B9A` |
+| Amber Display | `#FFC93C` | `#0F0E0B` | `#070605` | `#7FD8FF` | `#FF6B9A` |
+
+The other themes keep Mint's saturation and lightness for every surface, line, and ink token at their own hue. Two control-border tokens were raised to reach 3:1. In the warm themes, attention uses cyan and failure uses rose, so that neither matches the accent.
 
 ### Semantic token mapping (T-22)
 

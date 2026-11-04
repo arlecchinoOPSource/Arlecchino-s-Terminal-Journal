@@ -191,6 +191,16 @@ option { background: var(--panel-2); color: var(--text); }
 .search-results .archive-row[aria-selected='true'] .archive-title { color: var(--phosphor-hi); text-shadow: 0 0 8px var(--glow); }
 .search-results .archive-row[aria-selected='true'] { box-shadow: inset 2px 0 0 var(--phosphor), 0 0 12px rgba(var(--dominant-rgb), .14); }
 
+/* Themes reuse the search panel; each row previews its theme through a scoped data-theme. */
+.theme-list .archive-row { min-height: 52px; }
+.theme-name { display: grid; min-width: 0; }
+.theme-name .archive-meta { overflow: hidden; text-overflow: ellipsis; }
+.theme-swatch { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--default-line); border-radius: var(--radius); background: var(--text-drop); }
+.theme-swatch i { width: 10px; height: 20px; border-radius: 1px; }
+.theme-swatch i:nth-child(1) { background: var(--background); box-shadow: inset 0 0 0 1px var(--default-line); }
+.theme-swatch i:nth-child(2) { background: var(--default-line); }
+.theme-swatch i:nth-child(3) { background: var(--dominant); box-shadow: 0 0 6px rgba(var(--dominant-rgb), .5); }
+
 /* Settings stays beside its rail button. */
 .settings-popover { width: min(400px,calc(100% - var(--rail-width) - 40px)); padding: 0; font-family: var(--font-ui); }
 .settings-popover header { margin: 0; }

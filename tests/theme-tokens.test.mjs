@@ -8,15 +8,18 @@ const stripComments = css => css.replace(/\/\*[\s\S]*?\*\//g, '');
 const tokensCss = stripComments(read('src/styles/tokens.css'));
 const appCss = stripComments(read('src/styles/app.css'));
 
-/** Custom properties declared in the :root block that holds the core roles. */
-function themeTokens() {
-  const block = tokensCss.match(/:root\s*\{([^}]*--dominant:[^}]*)\}/);
-  assert.ok(block, 'tokens.css declares a theme block with the core roles');
+/** Custom properties declared in the block whose selector list starts with `selector`. */
+function block(selector) {
+  const escaped = selector.replace(/[[\]'().*]/g, c => `\\${c}`);
+  const found = tokensCss.match(new RegExp(`(?:^|[};])\\s*${escaped}[^{]*\\{([^}]*)\\}`));
+  assert.ok(found, `tokens.css declares ${selector}`);
   const tokens = {};
-  for (const [, name, value] of block[1].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) tokens[name] = value.trim();
+  for (const [, name, value] of found[1].matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) tokens[name] = value.trim();
   return tokens;
 }
-const theme = themeTokens();
+const mintBlock = block(':root');
+const themeTokens = id => id === 'mint' ? mintBlock : { ...mintBlock, ...block(`[data-theme='${id}']`) };
+let theme = mintBlock;
 const resolve = (value, depth = 0) => {
   assert.ok(depth < 10, `var() chain too deep: ${value}`);
   const next = value.replace(/var\((--[\w-]+)\)/g, (_, name) => {
@@ -84,4 +87,52 @@ test('components carry no inline theme colours', () => {
   // export.ts styles the exported HTML file, which is deliberately theme-independent.
   walk('src');
   for (const path of files) assert.deepEqual(read(path).match(/#[0-9a-f]{6}\b|rgba?\(\s*\d/gi) ?? [], [], path);
+});
+
+// T-23/T-24: every theme in the catalogue has a complete, readable palette.
+const { THEMES, parseTheme, searchThemes } = await import('../src/domain/themes.ts');
+const aliases = new Set(['--void', '--panel', '--line-2', '--phosphor', '--glow']);
+const themed = Object.keys(mintBlock).filter(name => !aliases.has(name));
+
+test('every theme in the catalogue sets every themed token', () => {
+  assert.deepEqual(THEMES.map(t => t.id), ['mint', 'blue', 'ember', 'amber']);
+  const declared = [...tokensCss.matchAll(/\[data-theme='([\w-]+)'\]/g)].map(m => m[1]);
+  assert.deepEqual([...new Set(declared)].sort(), THEMES.map(t => t.id).sort());
+  for (const { id } of THEMES.filter(t => t.id !== 'mint')) {
+    assert.deepEqual(Object.keys(block(`[data-theme='${id}']`)).sort(), themed.sort(), id);
+  }
+});
+
+const luminance = hex => channels(hex).split(',').map(c => c / 255).map(c => c <= .03928 ? c / 12.92 : ((c + .055) / 1.055) ** 2.4).reduce((sum, c, i) => sum + c * [.2126, .7152, .0722][i], 0);
+const contrast = (a, b) => { const [x, y] = [luminance(a), luminance(b)].sort((p, q) => q - p); return (x + .05) / (y + .05); };
+
+for (const { id, label } of THEMES) {
+  test(`${label}: channels, chevron and WCAG AA contrast`, () => {
+    theme = themeTokens(id);
+    try {
+      assert.equal(theme['--dominant-rgb'].replace(/\s/g, ''), channels(resolve('var(--dominant)')));
+      assert.equal(theme['--danger-rgb'].replace(/\s/g, ''), channels(resolve('var(--danger)')));
+      assert.ok(theme['--select-arrow'].includes(`stroke='%23${resolve('var(--dominant)').slice(1)}'`));
+      const failures = [];
+      const need = (fg, bg, min) => { const r = contrast(resolve(`var(${fg})`), resolve(`var(${bg})`)); if (r < min) failures.push(`${fg} on ${bg} ${r.toFixed(2)} < ${min}`); };
+      const surfaces = ['--void', '--gutter', '--panel', '--page', '--panel-2', '--tint'];
+      for (const ink of ['--text-strong', '--text', '--text-2', '--muted', '--phosphor', '--phosphor-hi', '--amber', '--danger']) for (const bg of surfaces) need(ink, bg, 4.5);
+      for (const bg of surfaces) need('--focus', bg, 3);
+      for (const bg of ['--void', '--panel', '--panel-2']) need('--line-3', bg, 3);
+      need('--void', '--phosphor', 4.5); // text selection
+      // Attention, failure and the accent must not be the same colour.
+      assert.notEqual(resolve('var(--amber)'), resolve('var(--dominant)'));
+      assert.notEqual(resolve('var(--danger)'), resolve('var(--dominant)'));
+      assert.deepEqual(failures, []);
+    } finally { theme = mintBlock; }
+  });
+}
+
+test('theme ids and search', () => {
+  assert.equal(parseTheme('ember'), 'ember');
+  for (const bad of [null, undefined, '', 'MINT', 'neon', 42, {}]) assert.equal(parseTheme(bad), 'mint');
+  assert.equal(searchThemes('').length, 4);
+  assert.deepEqual(searchThemes('  CRT ').map(t => t.id), ['blue']);
+  assert.deepEqual(searchThemes('phosphor').map(t => t.id), ['mint', 'amber']);
+  assert.deepEqual(searchThemes('purple'), []);
 });

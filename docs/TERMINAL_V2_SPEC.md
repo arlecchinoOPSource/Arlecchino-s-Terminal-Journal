@@ -125,7 +125,7 @@ All themes must share:
 
 ## 5. Theme Behavior
 
-- Theme selection is available in Settings.
+- Theme selection is available in Settings. *(Amended by the product owner, November 4, 2026: themes have their own Themes rail panel between Archives and New entry instead; see UI-DESIGN-SYSTEM-v2.0.md.)*
 - Selecting a theme updates the interface immediately.
 - The chosen theme is saved to local preferences.
 - The theme is restored before the main interface becomes visible.
