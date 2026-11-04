@@ -1,6 +1,6 @@
 # Terminal 2.0 — release checklist
 
-Target: **2.0.0 — The Sensory Update**. Status, November 4, 2026: **release candidate; not ready to publish.** Items are ticked only with recorded evidence; unticked items block publication. Evidence: [T-22](VALIDATION-T22.md), [T-23/24](VALIDATION-T23-T24.md), [T-25–27](VALIDATION-T25-T27.md), [T-28–30](VALIDATION-T28-T30.md), [T-31/32](VALIDATION-T31-T32.md), [T-33](VALIDATION-T33.md), [performance](PERFORMANCE.md), [audio assets](AUDIO-ASSETS-v2.0.md).
+Target: **2.0.0 — The Sensory Update**. Status, November 4, 2026: **owner-approved for publication; final tagged build gates still apply.** Items are ticked only with recorded evidence; unticked items block publication. Evidence: [T-22](VALIDATION-T22.md), [T-23/24](VALIDATION-T23-T24.md), [T-25–27](VALIDATION-T25-T27.md), [T-28–30](VALIDATION-T28-T30.md), [T-31/32](VALIDATION-T31-T32.md), [T-33](VALIDATION-T33.md), [performance](PERFORMANCE.md), [audio assets](AUDIO-ASSETS-v2.0.md).
 
 ## Compatibility and reliability
 
@@ -33,3 +33,7 @@ Target: **2.0.0 — The Sensory Update**. Status, November 4, 2026: **release ca
 - [ ] Official release downloads are published and verified.
 
 Use [RELEASE.md](RELEASE.md) for the existing pipeline. A CI artifact or draft release is not a published stable release.
+
+## Final owner decision — November 4, 2026
+
+The owner confirms the Windows check and preceding issues are resolved and explicitly instructs final integration and publication. Earlier unchecked/manual-coverage entries above are retained as historical evidence, not invented test results. The owner accepts the supplied sound inventory (no success tone), documented signing/WebView2 limitations, and remaining detailed hardware/accessibility coverage limits. PRs #58 and #59 are integrated. Publication requires successful CI and installer builds from the final v2.0.0 tag; verify assets before publishing.

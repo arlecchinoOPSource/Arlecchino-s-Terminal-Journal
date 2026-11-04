@@ -2,7 +2,7 @@
 
 A private desktop journal for macOS and Windows. Write in rich text, find an older entry by title, and take your journal with you as a backup. Terminal saves to your device and works offline.
 
-**[Download Terminal 1.0.0](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases/tag/v1.0.0)**
+**[Download Terminal 2.0.0](https://github.com/arlecchinoOPSource/Arlecchino-s-Terminal-Journal/releases/tag/v2.0.0)**
 
 | Your computer | Choose this download | Install |
 | --- | --- | --- |

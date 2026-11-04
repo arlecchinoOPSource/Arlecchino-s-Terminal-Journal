@@ -2,7 +2,7 @@
 
 All notable changes to Terminal. Versions follow the app version in `package.json`, `src-tauri/tauri.conf.json` and `src-tauri/Cargo.toml`.
 
-## 2.0.0 — The Sensory Update (release candidate, not yet published)
+## 2.0.0 — The Sensory Update — November 4, 2026
 
 **Themes**
 - Four interface themes: Terminal Mint (the original, unchanged), Blue Monitor, Ember Orange and Amber Display, chosen from the new **Themes** button in the left rail. Your writing is never recoloured or rewritten.
@@ -29,7 +29,7 @@ All notable changes to Terminal. Versions follow the app version in `package.jso
 
 **Known limitations**
 - Installers are not signed or notarized unless signing secrets are configured (see docs/RELEASE.md).
-- Windows, Intel Macs, screen readers, IME input and dictation have not been verified by hand.
+- Windows NSIS/MSI installation and launch are verified. Intel Mac hardware and detailed assistive-technology coverage remain limited; see docs/VALIDATION-T33.md.
 - On Windows, the Microsoft Edge WebView2 component that runs Terminal's interface opens its own HTTPS connections to Microsoft. Terminal's code makes no network requests (see docs/RELEASE.md).
 - Whether the startup sound plays depends on the system allowing audio before the first click; if not, it is skipped.
 
