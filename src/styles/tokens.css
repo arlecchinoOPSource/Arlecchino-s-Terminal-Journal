@@ -16,8 +16,12 @@
    Theme contract (T-22, docs/UI-DESIGN-SYSTEM-v2.0.md): every interface colour
    is one of the four core roles or a token derived for this theme. Components
    use these tokens only; app.css holds no theme colour literals. Values below
-   are Terminal Mint exactly as released in v1.0.0 — do not adjust them. */
-:root {
+   are Terminal Mint exactly as released in v1.0.0 — do not adjust them.
+
+   Themes (T-23) are chosen with data-theme on <html>. A theme block sets every
+   token that is not an alias; the aliases and --glow below re-resolve from it.
+   The same attribute on any element scopes a theme to it (theme swatches). */
+:root, [data-theme='mint'] {
   color-scheme: dark;
   /* Core roles (TERMINAL_V2_SPEC §3) */
   --dominant: #52F0BE;           /* principal accent */
@@ -49,12 +53,96 @@
   --phosphor-hi: #B4FFE4;  /* highlight, gradient top */
   --phosphor-lo: #16906C;  /* gradient foot, dim accent */
   --glow: rgba(var(--dominant-rgb), .32);
-  --amber: #FFB648;        /* attention: unsaved, saving */
+  --amber: #FFB648;        /* attention: unsaved, saving (not amber in every theme) */
   --danger: #FF6B78;       /* failures and destructive actions */
   --danger-rgb: 255, 107, 120;
   --focus: #C2FFE9;
   /* Select chevron, stroked in --dominant (a data URI cannot read custom properties). */
   --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2352F0BE' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+/* Blue Monitor. Attention uses the shared amber. */
+[data-theme='blue'] {
+  --dominant: #4FC3FF;
+  --dominant-rgb: 79, 195, 255;
+  --default-line: #283642;
+  --background: #0B0D0F;
+  --text-drop: #050607;
+  --gutter: #070809;
+  --page: #0D1012;
+  --panel-2: #121518;
+  --tint: #101C26;
+  --shell-bloom: #0E161C;
+  --scrim-rgb: 3, 4, 5;
+  --line: #1A1F24;
+  --line-3: #4A6B87;
+  --text-strong: #F3F7FB;
+  --text: #E0E8EF;
+  --text-2: #A2B1BD;
+  --muted: #7E8D9A;
+  --phosphor-hi: #BDE8FF;
+  --phosphor-lo: #1A78B0;
+  --amber: #FFB648;
+  --danger: #FF6B78;
+  --danger-rgb: 255, 107, 120;
+  --focus: #CDEEFF;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%234FC3FF' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+/* Ember Orange. Attention uses cyan so it stays distinct from the warm accent. */
+[data-theme='ember'] {
+  --dominant: #FF8A3D;
+  --dominant-rgb: 255, 138, 61;
+  --default-line: #423228;
+  --background: #0F0D0B;
+  --text-drop: #070605;
+  --gutter: #090807;
+  --page: #120F0D;
+  --panel-2: #181412;
+  --tint: #261910;
+  --shell-bloom: #1C140E;
+  --scrim-rgb: 5, 4, 3;
+  --line: #241E1A;
+  --line-3: #82614B;
+  --text-strong: #FBF6F3;
+  --text: #EFE6E0;
+  --text-2: #BDADA2;
+  --muted: #9A897E;
+  --phosphor-hi: #FFD2B0;
+  --phosphor-lo: #B4521A;
+  --amber: #7FD8FF;
+  --danger: #FF6B9A;
+  --danger-rgb: 255, 107, 154;
+  --focus: #FFE2CC;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23FF8A3D' stroke-width='1.4'/%3E%3C/svg%3E");
+}
+
+/* Amber Display. Attention uses cyan so it stays distinct from the warm accent. */
+[data-theme='amber'] {
+  --dominant: #FFC93C;
+  --dominant-rgb: 255, 201, 60;
+  --default-line: #423B28;
+  --background: #0F0E0B;
+  --text-drop: #070605;
+  --gutter: #090807;
+  --page: #12110D;
+  --panel-2: #181612;
+  --tint: #262010;
+  --shell-bloom: #1C180E;
+  --scrim-rgb: 5, 4, 3;
+  --line: #24211A;
+  --line-3: #786A43;
+  --text-strong: #FBF9F3;
+  --text: #EFEBE0;
+  --text-2: #BDB6A2;
+  --muted: #9A937E;
+  --phosphor-hi: #FFEBB0;
+  --phosphor-lo: #A97A12;
+  --amber: #7FD8FF;
+  --danger: #FF6B9A;
+  --danger-rgb: 255, 107, 154;
+  --focus: #FFF1C7;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23FFC93C' stroke-width='1.4'/%3E%3C/svg%3E");
 }
 
 /* Theme-independent tokens. */
