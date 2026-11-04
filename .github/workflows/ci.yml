@@ -33,7 +33,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build:web
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm run test:ui
         env:
           CI: true

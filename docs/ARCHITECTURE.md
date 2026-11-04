@@ -43,7 +43,7 @@ These boundaries are established by T-03. Feature implementations are added only
 
 ## Quality and release plan
 
-Vitest for unit logic, native/integration tests for SQLite and migrations, and Playwright for browser-rendered UI behavior. Native lifecycle/installation and assistive technology need platform-specific checks; browser tests cannot establish those claims. T-17 introduces the suite; T-19 introduces macOS/Windows release builds. Publish versioned installers through GitHub Releases only after T-20 acceptance. Automatic updates are deferred.
+Node's built-in test runner for domain logic, Rust tests for SQLite, migrations, backup and recovery, and Playwright (Chromium and WebKit) for UI behaviour; see [TESTING.md](TESTING.md). Native lifecycle/installation and assistive technology need platform-specific checks; browser tests cannot establish those claims. T-17 introduces the suite; T-19 introduces macOS/Windows release builds. Publish versioned installers through GitHub Releases only after T-20 acceptance. Automatic updates are deferred.
 
 ## References
 

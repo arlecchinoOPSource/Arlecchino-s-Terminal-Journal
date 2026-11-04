@@ -42,12 +42,12 @@ SQLite remains the approved storage architecture, but native database initializa
 - [Vite guide](https://vite.dev/guide/)
 - [Tiptap React](https://tiptap.dev/docs/editor/getting-started/install/react)
 
-Windows builds, installation, Intel macOS, performance, persistence and crash recovery are unverified at this stage.
+Release status and remaining unverified areas are tracked in [RELEASE-CHECKLIST-v1.0.md](RELEASE-CHECKLIST-v1.0.md).
 
-## T-05 writing preview
+## Local data while developing
 
-T-05 introduced the editor; since T-06–T-08 entries are stored in native SQLite in the OS application-data folder (`journal.sqlite3`) and autosave after a short pause. Development and the installed app share that folder, so use only synthetic writing while developing. Search, archives, preferences, tables, and full formatting controls remain deferred. Inline bold/italic/underline/strike survive rich clipboard paste; unsupported nodes are not registered. Spellcheck/autocorrect are disabled to avoid sending writing through optional OS/browser writing services.
+`npm run dev` and an installed Terminal use the same app-data folder (`journal.sqlite3` under the OS application-data directory for `com.arlecchino.terminal`). Use only synthetic writing while developing, or start the dev app with a throwaway `HOME` as described in [PERFORMANCE.md](PERFORMANCE.md). Spellcheck and autocorrect are disabled so writing is not sent through optional OS or browser writing services.
 
-VS Code also provides **Terminal → Run Task → Terminal: Run desktop preview** and **Terminal: Check**. The generated app for direct local testing is `src-tauri/target/release/bundle/macos/Terminal.app`. It is a locally built preview, not a signed/notarized distribution.
+`npm run tauri -- build --bundles app,dmg` builds a local, ad-hoc signed macOS app and disk image under `src-tauri/target/release/bundle/` for testing; it is not a signed or notarized distribution.
 
 See validation evidence for [T-03–T-05](VALIDATION-T03-T05.md) and [T-06–T-08](VALIDATION-T06-T08.md). **Terminal: Native storage tests** runs the Rust SQLite and lifecycle tests. Vite reports a 500 kB chunk-size advisory for the combined editor/React bundle; this is not a failed build or a performance measurement. Splitting an always-needed editor solely to silence this warning is deferred until measurement.

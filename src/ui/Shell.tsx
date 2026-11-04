@@ -4,6 +4,8 @@ import { IconButton } from './IconButton';
 import { Popover } from './Popover';
 
 type Panel = 'search' | 'archives' | 'info' | null;
+// The wordmark's power-on flicker plays only at launch, not each time an entry opens.
+const launchedAt = Date.now();
 type Props = { children: ReactNode; formattingControls?: ReactNode; historyControls?: ReactNode; status?: ReactNode; statusTone?: string; onNew?: () => void; navigationDisabled?: boolean; archive?: (close: () => void) => ReactNode; search?: (close: () => void) => ReactNode; settings?: ReactNode };
 export function Shell({ children, formattingControls, historyControls, status, statusTone = 'idle', onNew, navigationDisabled, archive, search, settings }: Props) {
   const [panel, setPanel] = useState<Panel>(null);
@@ -49,7 +51,7 @@ export function Shell({ children, formattingControls, historyControls, status, s
       <section className="settings-about" aria-label="About Terminal"><p className="settings-section">ABOUT</p><p>Terminal by Arlecchino. Writing and settings are stored locally on this device. Check the save status before closing.</p></section>
     </Popover>}
     <div className="workspace">
-      <header className="identity-strip"><span className="wordmark-glow"><span className="wordmark" data-text="TERMINAL">TERMINAL</span></span></header>
+      <header className="identity-strip"><span className={Date.now() - launchedAt < 1500 ? 'wordmark-glow power-on' : 'wordmark-glow'}><span className="wordmark" data-text="TERMINAL">TERMINAL</span></span></header>
       <section className="toolbar" aria-label="Writing tools">
         {formattingControls}
         <div className="history-controls">{historyControls}</div>

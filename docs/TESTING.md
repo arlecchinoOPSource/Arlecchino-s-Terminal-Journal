@@ -14,10 +14,10 @@ npm run check
 | `npm run typecheck` | `tsc --noEmit`, strict | Type safety of the app source |
 | `npm test` | Node test runner, `tests/*.test.mjs` | Domain logic: entries, autosave, search, archive order, preferences, shortcuts, export, editor schema, capability policy |
 | `npm run build:web` | Type check and Vite production build | The frontend bundles |
-| `npm run test:ui` | Playwright in Chromium, `tests/ui/*.spec.ts` | Important interactions in the real React/Tiptap interface |
+| `npm run test:ui` | Playwright in Chromium and WebKit (the macOS app's engine), `tests/ui/*.spec.ts` | Important interactions in the real React/Tiptap interface |
 | `npm run test:native` | `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`, `tests/sqlite_schema.py` | Native SQLite storage, migrations, validation, backup/restore, preferences, crash safety |
 
-First-time setup for UI tests: `npx playwright install chromium` (a development-only browser download).
+First-time setup for UI tests: `npx playwright install chromium webkit` (development-only browser downloads).
 
 ## Coverage of critical workflows
 
@@ -39,7 +39,7 @@ First-time setup for UI tests: `npx playwright install chromium` (a development-
 
 ## What the UI tests do not prove
 
-UI tests run in Chromium against the Vite dev server with the native commands replaced by an in-memory stand-in (`tests/ui/native-mock.ts`) that mirrors the native rules. They do not exercise WebKit (macOS) or WebView2 (Windows), real SQLite, native file dialogs, window close handling, or installation. Those are covered by the native tests and by manual desktop checks recorded in the `docs/VALIDATION-*.md` files.
+UI tests run in Chromium and WebKit against the Vite dev server with the native commands replaced by an in-memory stand-in (`tests/ui/native-mock.ts`) that mirrors the native rules. They do not exercise the native macOS window or WebView2 (Windows), real SQLite, native file dialogs, window close handling, or installation. Those are covered by the native tests and by manual desktop checks recorded in the `docs/VALIDATION-*.md` files.
 
 ## Writing tests
 
