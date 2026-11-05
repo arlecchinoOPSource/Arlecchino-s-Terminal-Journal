@@ -22,7 +22,6 @@ const curve = (percent: number) => (percent / 100) ** 2;
 export class SoundManager {
   private settings: SoundSettings = { ...DEFAULT_SOUND };
   private context: AudioContext | null = null;
-  private unavailable = false;
   private master: GainNode | null = null;
   private keyboardBus: GainNode | null = null;
   private interfaceBus: GainNode | null = null;
@@ -143,11 +142,16 @@ export class SoundManager {
   }
 
   private ensure(): AudioContext | null {
-    if (this.unavailable) return null;
+    if (this.context?.state === 'closed') {
+      this.stopAll();
+      for (const node of [this.master,this.keyboardBus,this.interfaceBus]) { try { node?.disconnect(); } catch { /* Device already gone. */ } }
+      this.context=null;this.master=null;this.keyboardBus=null;this.interfaceBus=null;
+      this.buffers.clear();
+    }
     if (!this.context) {
       try {
         const context = this.createContext();
-        if (!context) { this.unavailable = true; return null; }
+        if (!context) return null;
         this.context = context;
         this.master = context.createGain();
         this.master.connect(context.destination);
@@ -157,10 +161,10 @@ export class SoundManager {
         this.interfaceBus.connect(this.master);
         this.applyGains();
         this.preload();
-      } catch { this.unavailable = true; this.context = null; return null; }
+      } catch { this.context = null; return null; }
     }
     // Contexts start suspended until a user gesture; keystrokes and clicks are gestures.
-    if (this.context.state === 'suspended') void this.context.resume().catch(() => {});
+    if (['suspended','interrupted'].includes(this.context.state)) void this.context.resume().catch(() => {});
     return this.context;
   }
 
@@ -187,7 +191,11 @@ export class SoundManager {
     if (!context) return Promise.resolve(null);
     let pending = this.buffers.get(url);
     if (!pending) {
-      pending = this.load(url).then(data => context.decodeAudioData(data)).catch(() => null);
+      pending = this.load(url).then(data => context.decodeAudioData(data)).catch(() => {
+        // A transient device/load failure must not mute this file for the session.
+        if(this.context===context)this.buffers.delete(url);
+        return null;
+      });
       this.buffers.set(url, pending);
     }
     return pending;
@@ -204,12 +212,17 @@ export class SoundManager {
   private start(url: string, bus: 'keyboard' | 'interface' | 'preview', { rate, gain }: { rate: number; gain: number }, track: (source: AudioBufferSourceNode) => void) {
     const context = this.ensure();
     if (!context) return;
-    void this.buffer(url).then(buffer => {
+    // WebKit may finish a cached decode before resume() resolves. Give the
+    // current gesture a bounded recovery window, never queue cues indefinitely.
+    const ready = context.state === 'running' ? Promise.resolve() : Promise.race([
+      context.resume().catch(()=>{}), new Promise<void>(resolve=>setTimeout(resolve,150)),
+    ]);
+    void Promise.all([this.buffer(url),ready]).then(([buffer]) => {
       // Settings may have changed while decoding: check again so muting is immediate.
       const s = this.settings;
       const allowed = bus === 'preview' || (s.enabled && (bus !== 'keyboard' || s.keyboard !== 'silent'));
       const output = bus === 'keyboard' ? this.keyboardBus : bus === 'interface' ? this.interfaceBus : context.destination;
-      if (!buffer || !allowed || !output) return;
+      if (!buffer || !allowed || !output || context !== this.context || context.state !== 'running') return;
       try {
         const source = context.createBufferSource();
         source.buffer = buffer;
@@ -219,6 +232,11 @@ export class SoundManager {
         source.connect(level);
         level.connect(output);
         track(source);
+        const ended=source.onended;
+        source.onended=(event)=>{
+          ended?.call(source,event);
+          source.disconnect();level.disconnect();
+        };
         source.start();
       } catch { /* An unplayable sound is skipped. */ }
     });

@@ -278,7 +278,13 @@ fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
     app.state::<ExitAllowed>().0.store(true, Ordering::SeqCst);
     // The journal is already saved. When a close sound is playing, hide the window at
     // once and exit when it ends, so closing never waits on the sound.
-    let linger = linger_ms.unwrap_or(0).min(MAX_CLOSE_SOUND_MS);
+    // Hiding a fullscreen macOS window can leave its empty Space onscreen until
+    // the process exits. Do not keep that Space alive for an optional sound tail.
+    let fullscreen = app
+        .webview_windows()
+        .values()
+        .any(|w| w.is_fullscreen().unwrap_or(true));
+    let linger = exit_linger(linger_ms, fullscreen);
     if linger == 0 {
         app.exit(0);
         return;
@@ -290,6 +296,13 @@ fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
         std::thread::sleep(std::time::Duration::from_millis(linger));
         app.exit(0);
     });
+}
+fn exit_linger(requested: Option<u64>, fullscreen: bool) -> u64 {
+    if fullscreen {
+        0
+    } else {
+        requested.unwrap_or(0).min(MAX_CLOSE_SOUND_MS)
+    }
 }
 /// Upper bound on keeping a hidden app alive for its close sound; matches MAX_CLOSE_MS in the sound manager.
 const MAX_CLOSE_SOUND_MS: u64 = 6500;
@@ -361,6 +374,14 @@ pub fn run() {
 #[cfg(test)]
 mod tests {
     use super::safe_file_name;
+    #[test]
+    fn fullscreen_close_never_keeps_an_empty_space_alive() {
+        assert_eq!(super::exit_linger(Some(6000), true), 0);
+        assert_eq!(super::exit_linger(Some(u64::MAX), true), 0);
+        assert_eq!(super::exit_linger(Some(6000), false), 6000);
+        assert_eq!(super::exit_linger(Some(u64::MAX), false), 6500);
+        assert_eq!(super::exit_linger(None, false), 0);
+    }
     #[test]
     fn suggested_file_names_stay_plain() {
         assert_eq!(
