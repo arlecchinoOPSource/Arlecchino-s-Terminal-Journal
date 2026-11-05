@@ -1,4 +1,4 @@
-import { type CSSProperties, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -100,7 +100,19 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
   const typing=useTypingSounds();
   const [titleFocused,setTitleFocused]=useState(false);
   const titleStyle=state.draft.content.attrs??{};
-  const changeTitleStyle=(patch:Record<string,unknown>)=>controller.edit({content:{...controller.snapshot().draft.content,attrs:{...controller.snapshot().draft.content.attrs,...patch}}});
+  const changeTitleStyle=(patch:Record<string,unknown>)=>{const content=controller.snapshot().draft.content;controller.edit({content:{...content,attrs:{...content.attrs,...patch}}});};
+  // TipTap handles these keys only in the body. Mirror them for the whole title while it has focus.
+  const titleShortcut=(event:KeyboardEvent<HTMLInputElement>)=>{
+    const mod=mac?event.metaKey&&!event.ctrlKey:event.ctrlKey&&!event.metaKey;
+    if(!mod||event.altKey)return;
+    const key=event.key.toLowerCase();
+    const toggle=(name:string)=>{event.preventDefault();changeTitleStyle({[name]:!titleStyle[name]});};
+    if(!event.shiftKey&&key==='b')toggle('titleBold');
+    else if(!event.shiftKey&&key==='i')toggle('titleItalic');
+    else if(!event.shiftKey&&key==='u')toggle('titleUnderline');
+    else if(event.shiftKey&&key==='s')toggle('titleStrike');
+    else if(event.shiftKey&&(key==='l'||key==='e'||key==='r')){event.preventDefault();changeTitleStyle({titleAlign:{l:'left',e:'center',r:'right'}[key]});}
+  };
   const editor=useEditor({
     extensions:basicExtensions(),content:state.draft.content,autofocus:false,
     editable:state.ready&&!state.busy,
@@ -158,7 +170,7 @@ function EditorSession({controller,lifecycleError,closeBlocked,clearLifecycleErr
         </div>
       </div>
       {exportStatus&&<p className={exportStatus.error?'export-status settings-error':'export-status'} role={exportStatus.error?'alert':'status'}>{exportStatus.text}</p>}
-      <input className="entry-title" onFocus={()=>setTitleFocused(true)} style={{fontFamily:titleStyle.titleFontFamily??undefined,fontSize:titleStyle.titleFontSize??undefined,fontWeight:titleStyle.titleBold?'bold':undefined,fontStyle:titleStyle.titleItalic?'italic':undefined,textDecoration:[titleStyle.titleUnderline?'underline':'',titleStyle.titleStrike?'line-through':''].join(' '),textAlign:titleStyle.titleAlign??'left'} as CSSProperties} aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>{typing.changed();controller.edit({title:e.target.value});}} />
+      <input className="entry-title" onFocus={()=>setTitleFocused(true)} onKeyDown={titleShortcut} style={{fontFamily:titleStyle.titleFontFamily??undefined,fontSize:titleStyle.titleFontSize??undefined,fontWeight:titleStyle.titleBold?'bold':undefined,fontStyle:titleStyle.titleItalic?'italic':undefined,textDecoration:[titleStyle.titleUnderline&&'underline',titleStyle.titleStrike&&'line-through'].filter(Boolean).join(' ')||undefined,textAlign:titleStyle.titleAlign??'left'} as CSSProperties} aria-label="Entry title" aria-describedby="storage-status" placeholder="Untitled" value={state.draft.title} disabled={!state.ready||state.busy} spellCheck={false} autoComplete="off" autoCorrect="off" onChange={e=>{typing.changed();controller.edit({title:e.target.value});}} />
       <div className="editor-wrap">{history?.isEmpty&&<span className="editor-placeholder" aria-hidden="true">Start writing…</span>}<div onFocusCapture={()=>setTitleFocused(false)}><EditorContent editor={editor}/></div></div>
     </div>
     {restoreDialog}
