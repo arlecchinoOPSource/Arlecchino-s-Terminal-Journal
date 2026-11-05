@@ -50,3 +50,11 @@ test('export file names never contain path separators or control characters', ()
   assert.equal(exportFileStem('\u0007\n'), 'Untitled entry');
   assert.equal(exportFileStem('Café 日本語'), 'Café 日本語');
 });
+
+test('HTML export preserves safe title styles and escapes the title text', () => {
+  const html=entryToHtml({title:'<Synthetic>',created_at:0,updated_at:0,content:{type:'doc',attrs:{titleFontFamily:"'Literata', serif",titleFontSize:'24px',titleBold:true,titleAlign:'center'},content:[{type:'paragraph'}]}});
+  assert.match(html, /font-size: 24px/);
+  assert.match(html, /font-weight: bold/);
+  assert.match(html, /text-align: center/);
+  assert.match(html, /&lt;Synthetic&gt;/);
+});

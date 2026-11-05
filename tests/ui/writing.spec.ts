@@ -110,3 +110,54 @@ test('deleting asks first, names the entry, and removes it from archives and sea
   await page.getByRole('combobox', { name: 'Search entry titles' }).fill('lisbon');
   await expect(page.getByRole('listbox', { name: 'Matching entries' }).getByRole('option')).toHaveText([/Lisbon keep/]);
 });
+
+test('title font, size, emphasis and alignment persist independently of body formatting', async ({ page }) => {
+  await installNativeMock(page);
+  await page.goto('/');
+  const title=page.getByRole('textbox',{name:'Entry title'});
+  await title.fill('Synthetic styled title');
+  await page.getByRole('combobox',{name:'Font family',exact:true}).selectOption("'Literata', serif");
+  await page.getByRole('combobox',{name:'Font size',exact:true}).selectOption('24px');
+  await page.getByRole('button',{name:'Bold',exact:true}).click();
+  await page.getByRole('button',{name:'Align center',exact:true}).click();
+  await expect(title).toHaveCSS('font-size','24px');
+  await expect(title).toHaveCSS('font-weight','700');
+  await expect(title).toHaveCSS('text-align','center');
+  await body(page).click();
+  await page.keyboard.type('Body remains separate');
+  await expect(status(page)).toHaveText('Saved');
+  await page.reload();
+  await expect(title).toHaveValue('Synthetic styled title');
+  await expect(title).toHaveCSS('font-size','24px');
+  await expect(title).toHaveCSS('font-family', /Literata/);
+  await expect(title).toHaveCSS('font-weight','700');
+  await expect(body(page)).toContainText('Body remains separate');
+  await expect(body(page).locator('strong')).toHaveCount(0);
+});
+
+test('title formatting shortcuts apply to the whole title and leave the body alone', async ({ page }) => {
+  await installNativeMock(page);
+  await page.goto('/');
+  const title=page.getByRole('textbox',{name:'Entry title'});
+  await title.fill('Synthetic shortcut title');
+  await page.keyboard.press('ControlOrMeta+b');
+  await page.keyboard.press('ControlOrMeta+i');
+  await page.keyboard.press('ControlOrMeta+Shift+S');
+  await page.keyboard.press('ControlOrMeta+Shift+E');
+  await expect(title).toHaveCSS('font-weight','700');
+  await expect(title).toHaveCSS('font-style','italic');
+  await expect(title).toHaveCSS('text-decoration-line','line-through');
+  await expect(title).toHaveCSS('text-align','center');
+  await expect(page.getByRole('button',{name:'Bold',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.keyboard.press('ControlOrMeta+b');
+  await expect(title).toHaveCSS('font-weight','400');
+  await expect(page.getByRole('button',{name:'Bold',exact:true})).toHaveAttribute('aria-pressed','false');
+  // The body keeps its own shortcuts and never inherits the title's emphasis.
+  await body(page).click();
+  await page.keyboard.type('Body shortcut');
+  await page.keyboard.press('ControlOrMeta+a');
+  await page.keyboard.press('ControlOrMeta+b');
+  await expect(body(page).locator('strong')).toHaveText('Body shortcut');
+  await expect(title).toHaveCSS('font-weight','400');
+  await expect(status(page)).toHaveText('Saved');
+});

@@ -8,11 +8,11 @@ const mod = isMac ? '⌘' : 'Ctrl+';
 const shift = isMac ? '⇧' : 'Shift+';
 const alt = isMac ? '⌥' : 'Alt+';
 
-type Props = { editor: Editor | null; disabled: boolean };
+type Props = { editor: Editor | null; disabled: boolean; titleStyle?: Record<string, unknown>; onTitleStyleChange: (patch:Record<string,unknown>)=>void };
 
 /** Toolbar state is read from the editor selection, so it follows clicks, keys and shortcuts. */
-export function FormattingToolbar({ editor, disabled }: Props) {
-  const active = useEditorState({ editor, selector: ({ editor: e }) => {
+export function FormattingToolbar({ editor, disabled, titleStyle, onTitleStyleChange }: Props) {
+  const bodyActive = useEditorState({ editor, selector: ({ editor: e }) => {
     if (!e) return null;
     const style = e.getAttributes('textStyle');
     const level = HEADING_LEVELS.find(l => e.isActive('heading', { level: l }));
@@ -28,27 +28,29 @@ export function FormattingToolbar({ editor, disabled }: Props) {
       canDeleteRow: e.can().deleteRow(), canDeleteColumn: e.can().deleteColumn(),
     };
   } });
+  const active = titleStyle ? {...bodyActive, bold:!!titleStyle.titleBold,italic:!!titleStyle.titleItalic,underline:!!titleStyle.titleUnderline,strike:!!titleStyle.titleStrike,fontFamily:String(titleStyle.titleFontFamily??''),fontSize:String(titleStyle.titleFontSize??''),align:String(titleStyle.titleAlign??'left') as Alignment,canHeading:false,block:'paragraph',bulletList:false,orderedList:false,blockquote:false,inTable:false,canDeleteRow:false,canDeleteColumn:false} : bodyActive;
+  const change=(key:string,value:unknown,body:()=>unknown)=>titleStyle?onTitleStyleChange({[key]:value}):body();
   const off = disabled || !editor || !active;
   const run = () => editor!.chain().focus();
   return <>
     <Group label="Font">
       <label className="tool-field"><span>FONT</span>
-        <select aria-label="Font family" disabled={off} value={active?.fontFamily ?? ''} onChange={e => run().setJournalFontFamily(e.target.value || null).run()}>
+        <select aria-label="Font family" disabled={off} value={active?.fontFamily ?? ''} onChange={e => change('titleFontFamily',e.target.value||null,()=>run().setJournalFontFamily(e.target.value || null).run())}>
           {FONT_FAMILIES.map(f => <option key={f.label} value={f.value ?? ''}>{f.label}</option>)}
         </select>
       </label>
       <label className="tool-field"><span>SIZE</span>
-        <select aria-label="Font size" disabled={off} value={active?.fontSize ?? ''} onChange={e => run().setJournalFontSize(e.target.value || null).run()}>
+        <select aria-label="Font size" disabled={off} value={active?.fontSize ?? ''} onChange={e => change('titleFontSize',e.target.value||null,()=>run().setJournalFontSize(e.target.value || null).run())}>
           <option value="">Default</option>
           {FONT_SIZES.map(size => <option key={size} value={size}>{size.replace('px', '')}</option>)}
         </select>
       </label>
     </Group>
     <Group label="Text formatting">
-      <Toggle label="Bold" shortcut={`${mod}B`} pressed={active?.bold} disabled={off} onClick={() => run().toggleBold().run()}><b>B</b></Toggle>
-      <Toggle label="Italic" shortcut={`${mod}I`} pressed={active?.italic} disabled={off} onClick={() => run().toggleItalic().run()}><i>I</i></Toggle>
-      <Toggle label="Underline" shortcut={`${mod}U`} pressed={active?.underline} disabled={off} onClick={() => run().toggleUnderline().run()}><u>U</u></Toggle>
-      <Toggle label="Strikethrough" shortcut={`${mod}${shift}S`} pressed={active?.strike} disabled={off} onClick={() => run().toggleStrike().run()}><s>S</s></Toggle>
+      <Toggle label="Bold" shortcut={`${mod}B`} pressed={active?.bold} disabled={off} onClick={() => change('titleBold',!active?.bold,()=>run().toggleBold().run())}><b>B</b></Toggle>
+      <Toggle label="Italic" shortcut={`${mod}I`} pressed={active?.italic} disabled={off} onClick={() => change('titleItalic',!active?.italic,()=>run().toggleItalic().run())}><i>I</i></Toggle>
+      <Toggle label="Underline" shortcut={`${mod}U`} pressed={active?.underline} disabled={off} onClick={() => change('titleUnderline',!active?.underline,()=>run().toggleUnderline().run())}><u>U</u></Toggle>
+      <Toggle label="Strikethrough" shortcut={`${mod}${shift}S`} pressed={active?.strike} disabled={off} onClick={() => change('titleStrike',!active?.strike,()=>run().toggleStrike().run())}><s>S</s></Toggle>
     </Group>
     <Group label="Paragraph formatting">
       <label className="tool-field"><span className="visually-hidden">Paragraph style</span>
@@ -58,16 +60,16 @@ export function FormattingToolbar({ editor, disabled }: Props) {
           {HEADING_LEVELS.map(l => <option key={l} value={l}>Heading {l}</option>)}
         </select>
       </label>
-      <IconToggle icon="bulletList" label="Bulleted list" shortcut={`${mod}${shift}8`} pressed={active?.bulletList} disabled={off} onClick={() => run().toggleBulletList().run()} />
-      <IconToggle icon="orderedList" label="Numbered list" shortcut={`${mod}${shift}7`} pressed={active?.orderedList} disabled={off} onClick={() => run().toggleOrderedList().run()} />
-      <IconToggle icon="quote" label="Blockquote" shortcut={`${mod}${shift}B`} pressed={active?.blockquote} disabled={off} onClick={() => run().toggleBlockquote().run()} />
+      <IconToggle icon="bulletList" label="Bulleted list" shortcut={`${mod}${shift}8`} pressed={active?.bulletList} disabled={off || !!titleStyle} onClick={() => run().toggleBulletList().run()} />
+      <IconToggle icon="orderedList" label="Numbered list" shortcut={`${mod}${shift}7`} pressed={active?.orderedList} disabled={off || !!titleStyle} onClick={() => run().toggleOrderedList().run()} />
+      <IconToggle icon="quote" label="Blockquote" shortcut={`${mod}${shift}B`} pressed={active?.blockquote} disabled={off || !!titleStyle} onClick={() => run().toggleBlockquote().run()} />
     </Group>
     <Group label="Alignment">
-      {ALIGNMENTS.map(a => <IconToggle key={a} icon={`align-${a}`} label={`Align ${a}`} shortcut={`${mod}${shift}${{ left: 'L', center: 'E', right: 'R' }[a]}`} pressed={active?.align === a} disabled={off} onClick={() => run().setTextAlign(a).run()} />)}
+      {ALIGNMENTS.map(a => <IconToggle key={a} icon={`align-${a}`} label={`Align ${a}`} shortcut={`${mod}${shift}${{ left: 'L', center: 'E', right: 'R' }[a]}`} pressed={active?.align === a} disabled={off} onClick={() => change('titleAlign',a,()=>run().setTextAlign(a).run())} />)}
     </Group>
     <Group label="Table">
       {!active?.inTable
-        ? <IconButton icon="table" label="Insert table (3 × 3 with header row)" disabled={off} onClick={() => run().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} />
+        ? <IconButton icon="table" label="Insert table (3 × 3 with header row)" disabled={off || !!titleStyle} onClick={() => run().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} />
         : <>
           <TextTool label="Add row below" disabled={off} onClick={() => run().addRowAfter().run()}>+ROW</TextTool>
           <TextTool label="Delete row" disabled={off || !active.canDeleteRow} onClick={() => run().deleteRow().run()}>−ROW</TextTool>

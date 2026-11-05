@@ -97,7 +97,7 @@ option { background: var(--panel-2); color: var(--text); }
 .ghost-button:not(:disabled):hover { border-color: var(--phosphor-lo); color: var(--phosphor); background: var(--panel-2); }
 .ghost-button.danger-hover:not(:disabled):hover { border-color: var(--danger); color: var(--danger); }
 .export-status { margin: -8px 0 14px; font-size: .75rem; color: var(--muted); overflow-wrap: anywhere; }
-.entry-title { display: block; width: 100%; margin: 0 0 18px; padding: 0 0 10px; border: none; border-bottom: 1px solid var(--line-2); border-radius: 0; background: none; font: 1.75rem/1.35 var(--entry-font); color: var(--text); text-align: left; }
+.entry-title { display: block; width: 100%; margin: 0 0 18px; padding: 0 0 10px; border: none; border-bottom: 1px solid var(--line-2); border-radius: 0; background: none; font: calc(var(--entry-size) * 1.65)/1.35 var(--entry-font); color: var(--text); text-align: left; }
 .entry-title::placeholder { color: var(--muted); opacity: 1; }
 .entry-title:focus-visible { outline: none; border-bottom-color: var(--phosphor); }
 .editor-wrap { position: relative; }

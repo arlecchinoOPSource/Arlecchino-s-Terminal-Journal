@@ -62,7 +62,7 @@ export function Shell({ children, formattingControls, historyControls, status, s
     return () => window.removeEventListener('keydown', onKey);
   }, [mac]);
   const showInfo = panel === 'info';
-  return <div className="app-shell" onClick={e => clickSound(e, 'click')} onChange={e => clickSound(e, 'change')}>
+  return <div className="app-shell" onClickCapture={e => {if(e.target instanceof Element && e.target.closest('.toolbar'))clickSound(e, 'click');}} onChangeCapture={e => {if(e.target instanceof Element && e.target.closest('.toolbar'))clickSound(e, 'change');}} onClick={e => {if(!(e.target instanceof Element && e.target.closest('.toolbar')))clickSound(e, 'click');}} onChange={e => {if(!(e.target instanceof Element && e.target.closest('.toolbar')))clickSound(e, 'change');}}>
     <nav className="rail" aria-label="Journal navigation" data-sound="icon-menu">
       <span className="brand-mark" role="img" aria-label="Terminal">t<span>&gt;</span></span>
       <div className="rail-actions">

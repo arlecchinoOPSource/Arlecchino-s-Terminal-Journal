@@ -154,3 +154,20 @@ test('a failed save plays the error sound once, and writing continues', async ({
   await page.keyboard.type('?');
   await expect(editor).toContainText('Synthetic!?');
 });
+
+test('typesetting sounds survive toolbar rerenders for buttons and dropdowns and respect mute', async ({page})=>{
+  await recordSounds(page,{enabled:true,typesetting:true});
+  await page.getByRole('textbox',{name:'Journal body'}).click();
+  await clear(page);
+  await page.getByRole('button',{name:'Bold',exact:true}).click();
+  await expect.poll(()=>played(page)).toContain('ui/typesetting.wav');
+  await clear(page);
+  await page.getByRole('combobox',{name:'Font size',exact:true}).selectOption('24px');
+  await expect.poll(()=>played(page)).toContain('ui/typesetting.wav');
+  await page.getByRole('button',{name:'Sounds',exact:true}).click();
+  await page.getByRole('switch',{name:'Sound',exact:true}).click();
+  await page.keyboard.press('Escape');
+  await clear(page);
+  await page.getByRole('button',{name:'Italic',exact:true}).click();
+  expect(await played(page)).toEqual([]);
+});
