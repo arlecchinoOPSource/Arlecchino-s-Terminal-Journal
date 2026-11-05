@@ -276,6 +276,13 @@ fn backup_cancel(pending: tauri::State<'_, PendingRestore>) {
 #[tauri::command]
 fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
     app.state::<ExitAllowed>().0.store(true, Ordering::SeqCst);
+    // Synchronous commands run on the macOS main thread, where blocking would
+    // stall the run loop that animates the fullscreen Space shut. Move the
+    // transition and the sound tail to a worker thread.
+    std::thread::spawn(move || finish_exit(app, linger_ms));
+}
+
+fn finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
     // The journal is already saved. When a close sound is playing, hide the window
     // and exit when it ends, so closing never waits on the sound.
     // Hiding a fullscreen macOS window leaves its empty Space onscreen for the
@@ -292,14 +299,14 @@ fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
         for window in &windows {
             let _ = window.set_fullscreen(false);
         }
-        let deadline = std::time::Instant::now() + std::time::Duration::from_millis(1200);
+        let deadline = std::time::Instant::now() + std::time::Duration::from_millis(2000);
         while std::time::Instant::now() < deadline
             && windows.iter().any(|w| w.is_fullscreen().unwrap_or(false))
         {
             std::thread::sleep(std::time::Duration::from_millis(25));
         }
         // The Space keeps animating after the window reports itself windowed.
-        std::thread::sleep(std::time::Duration::from_millis(500));
+        std::thread::sleep(std::time::Duration::from_millis(700));
     }
     for window in &windows {
         let _ = window.hide();
@@ -307,10 +314,8 @@ fn journal_finish_exit(app: tauri::AppHandle, linger_ms: Option<u64>) {
     // The sound started before this command; do not lengthen the tail by the transition.
     let elapsed = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
     let remaining = plan.linger_ms.saturating_sub(elapsed);
-    std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(remaining));
-        app.exit(0);
-    });
+    std::thread::sleep(std::time::Duration::from_millis(remaining));
+    app.exit(0);
 }
 #[derive(Debug, PartialEq)]
 struct ExitPlan {
