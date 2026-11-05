@@ -8,7 +8,7 @@ All notable changes to Terminal. Versions follow the app version in `package.jso
 - Toolbar sounds now play for buttons and dropdowns even when the toolbar re-renders; mute and disabled states still silence them.
 - While the entry title is focused, font, size, emphasis and alignment now apply to the whole title independently of the body and persist with the entry. The advertised title shortcuts (bold, italic, underline, strikethrough and alignment) work too.
 - Audio recovers after a system interruption, a closed audio context or a transient decode failure instead of staying silent for the rest of the session; finished cues release their audio nodes.
-- Closing a fullscreen macOS window no longer holds an empty Space open for the optional close sound. The journal still saves before exit, and windowed close keeps the existing capped sound tail.
+- Closing a fullscreen macOS window now leaves fullscreen first, so no empty Space is left onscreen, and then plays the full close sound before exit. The journal still saves before exit, and windowed close keeps the existing capped sound tail.
 
 ## 2.0.0 — The Sensory Update — November 4, 2026
 

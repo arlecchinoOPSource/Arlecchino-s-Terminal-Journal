@@ -13,11 +13,11 @@ Use a development build containing this fix and a disposable synthetic journal. 
 ## Red close button in macOS fullscreen
 
 1. With close sound enabled, create a synthetic entry, enter fullscreen via the green window button, type a final edit, then click the red close button.
-2. The journal must save first, then exit promptly. There should be no extra six-second black fullscreen Space held open for the sound tail. macOS's normal brief Space transition may remain. The close sound may be truncated in fullscreen by design.
+2. The journal must save first, then leave fullscreen and play the close sound. There should be no extra six-second black fullscreen Space held open for the sound tail; the window becomes windowed, hides, and the app exits after the bounded cue. macOS's normal brief Space transition may remain. The full close sound should be audible.
 3. Reopen and verify the final edit. Repeat with close sound disabled, and with rapid close/quit actions.
 4. Repeat outside fullscreen: the window should hide, with the existing bounded close-sound tail, and saved text must reopen.
 5. Exercise a simulated save failure in the automated tests: close must remain blocked with writing intact. This fix changes only the exit step after successful save.
 
 ## Evidence and limits
 
-Automated tests simulate interrupted/closed audio contexts, transient initialization/decoding failures, and the native fullscreen/non-fullscreen linger policy. They do not reproduce a real macOS fullscreen Space transition, native audio-device interruption, or the reported long-session failure on the owner's machine. Record device, macOS version, time until failure, sound settings and interruption steps if symptoms persist. No diagnostic output should contain writing.
+Automated tests simulate interrupted/closed audio contexts, transient initialization/decoding failures, and the native fullscreen exit plan (leave fullscreen, then keep the capped sound tail). They do not reproduce a real macOS fullscreen Space transition, native audio-device interruption, or the reported long-session failure on the owner's machine. Record device, macOS version, time until failure, sound settings and interruption steps if symptoms persist. No diagnostic output should contain writing.
