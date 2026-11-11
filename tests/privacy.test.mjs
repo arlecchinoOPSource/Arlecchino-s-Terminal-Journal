@@ -21,9 +21,12 @@ test('shipped code never writes logs, so journal content cannot reach them', () 
   // measurement feature (docs/PERFORMANCE.md); every use of it must be feature-gated.
   for (const f of files('src-tauri/src', ['.rs'])) if (!f.endsWith('metrics.rs') && /\b(println|eprintln|print|eprint|dbg)!\s*\(|\b(log|tracing)::/.test(shipped(f))) offenders.push(f);
   assert.deepEqual(offenders, []);
-  const lib = readFileSync(join(root, 'src-tauri/src/lib.rs'), 'utf8').split('\n');
-  // Each use sits directly under the feature attribute, or inside a gated block that starts at most four lines above.
-  lib.forEach((line, i) => { if (/\bmetrics(::|;)/.test(line)) assert.ok(lib.slice(Math.max(0, i - 4), i).some(l => l.includes('#[cfg(feature = "startup-metrics")]')), `ungated metrics use on lib.rs line ${i + 1}`); });
+  // The shared commands moved out of lib.rs, so every file that can mention the metrics module is checked.
+  for (const name of ['lib.rs', 'commands.rs', 'standalone.rs']) {
+    const lib = readFileSync(join(root, 'src-tauri/src', name), 'utf8').split('\n');
+    // Each use sits directly under the feature attribute, or inside a gated block that starts at most four lines above.
+    lib.forEach((line, i) => { if (/\bmetrics(::|;)/.test(line)) assert.ok(lib.slice(Math.max(0, i - 4), i).some(l => l.includes('#[cfg(feature = "startup-metrics")]')), `ungated metrics use on ${name} line ${i + 1}`); });
+  }
   const metrics = readFileSync(join(root, 'src-tauri/src/metrics.rs'), 'utf8');
   assert.deepEqual(metrics.match(/eprintln!\([^;]*\);/g)?.map(c => c.replace(/\s+/g, '')), ['eprintln!("startup-metrics{milestone}{}ms",start.elapsed().as_millis());']);
 });
