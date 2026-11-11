@@ -140,7 +140,7 @@ test('the close sound reports how long to wait, capped', async () => {
   const off = fakeAudio();
   off.manager.configure(on({ close: false }));
   assert.equal(await off.manager.playClose(), 0);
-  const rust = readFileSync(new URL('../src-tauri/src/lib.rs', import.meta.url), 'utf8');
+  const rust = readFileSync(new URL('../src-tauri/src/standalone.rs', import.meta.url), 'utf8');
   assert.match(rust, new RegExp(`MAX_CLOSE_SOUND_MS: u64 = ${MAX_CLOSE_MS};`));
 });
 
